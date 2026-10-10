@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "edition": "friends",
+  "release": 1,
+  "snapshots": {
+    "1": {
+      "store": "git",
+      "location": "refs/releases/1"
+    }
+  },
+  "seeds_installed": [],
+  "locals_installed": [
+    "CHANGELOG.md"
+  ],
+  "holds": [],
+  "in_progress": null,
+  "history": [
+    {
+      "release": 1,
+      "started": "2026-10-10T15:15:07+00:00",
+      "finished": "2026-10-10T15:15:13+00:00"
+    }
+  ]
+}
