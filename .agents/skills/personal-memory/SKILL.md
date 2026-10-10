@@ -12,7 +12,7 @@ Use this skill to operate the local `memory/` workspace memory system. This memo
 
 Memory lives in `memory/` at the workspace root.
 
-Populated memory `.md` files are tracked in the workspace's local git repo. The repo has no remote and a pre-push hook refuses pushes, so memory stays on this machine. Never store credentials (git history keeps them). Binaries and `memory/raw/` stay git-ignored.
+Populated memory `.md` files are tracked in the workspace's local git repo. Keep the repo without a remote and never push. Shipped hooks are optional and are disabled in this Codex workspace; run the audit directly before committing. Never store credentials (git history keeps them). Binaries and `memory/raw/` stay git-ignored.
 
 ## Safety Rules
 
@@ -54,7 +54,7 @@ memory/
 
 Use tiered reads:
 
-1. At session start or first workspace-specific task, read `memory/index.md` and `memory/glossary.md`, then `read` the `memory/preferences/` directory and read each `.md` file it lists (use `read` on the directory rather than glob). Skip any that do not exist. Read `CONTEXT.md` before ticket, project, research, scope, or memory work, and whenever the user's wording sounds like a defined term.
+1. At session start or first workspace-specific task, read `memory/index.md` and `memory/glossary.md`, enumerate the `memory/preferences/` directory (including hidden files), then read every `.md` file listed. Use available file tools or, in Codex PowerShell, `Get-ChildItem -LiteralPath memory/preferences -Force` and `Get-Content -LiteralPath`; no tool named `read` is required. Skip any that do not exist. Read `CONTEXT.md` before ticket, project, research, scope, or memory work, and whenever the user's wording sounds like a defined term.
 2. Treat index rows as pointers, not facts: open the linked file before relying on or acting on a row. Use `memory/glossary.md` to resolve shorthand entities (client short names, nicknames, acronyms, project/engagement codenames) to full identity.
 3. Read promoted memory files relevant to the task before choosing tools, applying workflow rules, drafting user-facing communication, or acting on workspace-specific behavior.
 4. Before writing email, voice scripts, Slack messages, reports, or user-facing communication, check relevant promoted memory under `memory/email/`, `memory/voice/`, or `memory/preferences/`.
@@ -96,7 +96,7 @@ Use when setting up this memory system in a workspace.
    - `memory/README.md`
    - `memory/TEMPLATES.md`
    - `.gitkeep` in each memory subdirectory.
-3. Add or update `.gitignore` so `memory/raw/` and binaries are ignored while memory `.md` files are tracked; make sure the repo has no remote and a pre-push hook refuses pushes.
+3. Add or update `.gitignore` so `memory/raw/` and binaries are ignored while memory `.md` files are tracked; make sure the repo has no remote. Configure hooks only when the owner separately requests it; otherwise audit directly and never push.
 4. Add or update `AGENTS.md` with the personal memory rules.
 5. Do not create populated `memory/index.md` or `memory/log.md` until the first capture or promotion.
 6. Verify paths exist and report changed files.

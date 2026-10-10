@@ -24,6 +24,7 @@ The commands, plan, state file and exit codes are described in `.agents/skills/a
 - Checking what is inside a Release: `MANIFEST.md`.
 - Found a stray `<!-- edition:... -->` line: `MARKERS.md`.
 - Making it work with the owner's own agent app and computer: `ADAPTING.md`.
+- Using Codex on Windows, with hooks skipped: `CODEX.md`.
 - Proving it all works on a test system: `CHECKLIST.md`.
 
 ## Ground rules for the agent

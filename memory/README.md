@@ -2,7 +2,7 @@
 
 This directory is a local, personal memory area for sessions in this workspace.
 
-Populated memory `.md` files are tracked in this workspace's local git repo. The repo has no remote and a pre-push hook refuses pushes, so memory never leaves the machine. Never store credentials. Binaries and `raw/` stay git-ignored.
+Populated memory `.md` files are tracked in this workspace's local git repo. Keep the repo without a remote and never push. Shipped hooks are disabled in this Codex workspace; run the memory audit directly before committing. Never store credentials. Binaries and `raw/` stay git-ignored.
 
 
 ## Purpose

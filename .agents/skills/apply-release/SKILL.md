@@ -7,6 +7,12 @@ description: Apply a new Release of this workspace (a plain folder the owner rec
 
 A Release is a plain folder the owner received from whoever maintains the edition: the whole edition tree plus `MANIFEST.json` and `CHANGELOG.md` at its root. This skill brings the owner's workspace up to that Release and keeps every change the owner made. Vocabulary (Release, Manifest, Seed, Pristine Snapshot, Schema) is in `CONTEXT.md`.
 
+Codex on Windows: run these commands through the available shell tool in
+PowerShell; use a verified Python executable. See `.agents/setup/CODEX.md`.
+Do not enable or edit hooks as part of applying a Release in this workspace.
+Run the audit and relevant tests directly before `finish`; any hooks already
+enabled elsewhere still run normally and must not be bypassed.
+
 Run every command from the workspace root:
 
 ```

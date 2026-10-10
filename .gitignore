@@ -1,0 +1,46 @@
+# Python and tool caches
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.DS_Store
+Thumbs.db
+
+# Credentials and local connector configuration
+.env
+.env.*
+!.env.example
+.mcp.json
+
+# Generated working documents
+artifacts/
+reports/
+notes/
+tmp/
+.handoff/
+.teaching/
+brainstorming/
+
+# Private raw material and binary outputs; Markdown memory/research stay tracked
+memory/raw/
+youtube/**/raw/
+*.vtt
+*.srt
+*.info.json
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.pdf
+*.docx
+*.xlsx
+*.pptx
+*.mp3
+*.mp4
+*.wav
+*.zip
+
+# Release operation data; state remains tracked
+.agents/release-backup/
+.agents/snapshots/

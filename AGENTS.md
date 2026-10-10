@@ -10,7 +10,7 @@ In all interactions and commit messages, be extremely concise and sacrifice gram
 
 On your FIRST response in a session, before you answer, plan, load any skill, or ask any question, you MUST make these tool calls now. This is not background context — execute it as your first actions:
 
-1. Call the `read` tool on `memory/index.md` and `memory/glossary.md`. Then call `read` on the `memory/preferences/` directory and read each `.md` file it lists (use `read` on the directory, not glob, so nothing is skipped). If a file does not exist, note it and move on. Do this even if the user's request seems unrelated — memory may change how you answer.
+1. Read `memory/index.md` and `memory/glossary.md` with the available file or shell tools. Enumerate the `memory/preferences/` directory, then read every `.md` file it lists, including hidden files. In Codex on Windows, use `Get-Content -LiteralPath` and `Get-ChildItem -LiteralPath memory/preferences -Force`; a tool named `read` is not required. If a file does not exist, note it and move on. Do this even if the user's request seems unrelated — memory may change how you answer.
 2. Read `CONTEXT.md` before
 research, scope, or memory work, and whenever the user's wording sounds like a defined term.
 3. Treat index rows as pointers, not facts. Before relying on or acting on a row, open the file it links to.
@@ -24,6 +24,15 @@ This directory is a workspace configuration area, not normal application source 
 Primary audience: AI agents. Secondary audience: teammates reading the same operating rules.
 
 Before committing a change to a skill script, have a `reviewer` agent review the diff against `CODING_STANDARDS.md`.
+
+## Codex runtime
+
+- Keep project instructions in `AGENTS.md` and reusable skills in `.agents/skills/<name>/SKILL.md`; Codex discovers these locations directly.
+- Use the tools exposed in this session. File reads and directory listings may use the shell; prefer `rg` for searches. On Windows, use PowerShell and a verified Python executable. Bash examples require an explicitly selected Bash shell.
+- For requested or skill-required delegation, use Codex collaboration tools, not a presumed `task` or `Agent/Task` tool. Respect available agent slots; run independent branches in isolated batches when needed. Do not create sidebar chats for internal subtasks.
+- Use built-in web search/open tools for background research. Use the available browser integration for interactive pages; do not assume native desktop control is available.
+- Hook files are shipped but not enabled in this Codex workspace. Do not edit or enable them without a separate request. Run relevant checks directly before commits.
+- Treat the incoming `MANIFEST.json` and `CHANGELOG.md` as Release records. Do not regenerate them for local customizations; the Pristine Snapshot preserves the incoming Release for future merges.
 
 
 ## Core behavior
@@ -111,7 +120,7 @@ Strong success criteria allow independent progress. Weak goals like “make it b
 
 ## Personal workspace memory
 
-This workspace uses `memory/` for local, personal, non-code memory. Git here is local only (no remote), and populated memory `.md` files are tracked so they have version history. Hooks live in `.githooks/` (`core.hooksPath`): pre-commit scans for secrets, runs `gate.py audit` and the skill tests; commit-msg caps the subject at 72 characters; pre-push refuses every push.
+This workspace uses `memory/` for local, personal, non-code memory. Keep Git local only (no remote), and track populated memory `.md` files for version history. Optional hooks live in `.githooks/`: pre-commit scans for secrets, runs `gate.py audit` and the skill tests; commit-msg caps the subject at 72 characters; pre-push refuses every push. They are not enabled in this Codex workspace; do not add remotes or push, and run checks directly.
 
 Use the `personal-memory` skill when capturing, checking, promoting, pruning, or using memory under `memory/`.
 
@@ -163,7 +172,7 @@ Keep suggestions lightweight. Do not turn every response into a workflow checkli
 
 ## Documents and folder scaffolding
 
-Never save a document to the workspace root. The root holds only `AGENTS.md`, `CONTEXT.md`, `CODING_STANDARDS.md`, `.gitignore`, and `.mcp.json`.
+Never save a generated document to the workspace root. Root operating files are `AGENTS.md`, `CONTEXT.md`, `CODING_STANDARDS.md`, `.gitignore`, and optional `.mcp.json`. Shipped Release records `MANIFEST.json` and `CHANGELOG.md` also belong there.
 
 The folder map, naming, precedence, git-ignore status and file formats are in `memory/preferences/document-scaffolding.md`, read at session start. Default folder when nothing fits: `artifacts/<topic>/`.
 

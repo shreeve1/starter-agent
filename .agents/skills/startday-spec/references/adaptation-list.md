@@ -8,6 +8,12 @@ The owner must verify the loop on a test system (or a test list of items that ca
 
 1. **Re-prompt loop or scheduler.** How does this harness run the skill again later in the day? A built-in loop or repeat command, a scheduled task, a cron-style job, or the owner typing "startday" again? Pick the simplest one that exists. If none exists, the owner nudges it by hand.
 
+   In Codex, use the available automation tools only when the owner asks
+   for recurring work. Prefer a thread heartbeat for follow-ups in the same
+   chat. Keep unchanged-state runs quiet; notify on meaningful changes or
+   required owner action. If automation tools are unavailable, use manual
+   invocation rather than inventing a background shell loop.
+
 2. **Watcher exit contract.** If the loop uses a small check script ("anything new?") between turns, decide exactly what it returns: which result means "wake the agent", which means "nothing yet, check later", and which means "day over, stop". Write this down in the skill so it does not drift.
 
 3. **Notification mechanism.** How a message reaches the owner on this machine: desktop notification, chat, email to self, or only the approvals page. Test that one arrives. Keep private details out of it.

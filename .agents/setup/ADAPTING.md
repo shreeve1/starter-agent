@@ -2,12 +2,16 @@
 
 This workspace was written for a terminal coding agent that reads `AGENTS.md` at the workspace root and loads skills from `.agents/skills/<name>/SKILL.md`. The owner may use a different desktop or terminal agent. The owner's agent works out the fit, and the owner verifies it on a test system.
 
+Codex supports both locations directly. For this Windows Codex workspace,
+read `CODEX.md`; no instruction alias or skill symlink is needed. Use
+PowerShell examples, available tools and capacity-aware collaboration.
+
 ## Steps
 
 1. Find out which agent app the owner uses and how it loads instructions. Many read `AGENTS.md`; some read another file name (for example `CLAUDE.md`) or need a setting. If needed, add a short file that points at `AGENTS.md`; do not copy and fork it.
 2. Find out where that app looks for skills. If it does not read `.agents/skills/`, configure it to, or link that folder to the expected place. Keep `.agents/skills/` as the real copy so updates keep working.
 3. Check the tools the skills call exist: `git`, Python (`python`, `py -3` or `python3`), and on Windows Git Bash for the hooks.
-4. Check the hooks run: `git config core.hooksPath` prints `.githooks`.
+4. Check the chosen hook policy. This Codex workspace skips hooks: leave `.githooks/` unchanged, do not set `core.hooksPath`, and run audits/tests directly. If the owner separately enables hooks elsewhere, check that `git config core.hooksPath` prints `.githooks`.
 5. Note anything that does not fit (a command the app lacks, a path that differs) and show the owner before changing shipped files. Changes to shipped files are kept across updates but may conflict later.
 6. Run `CHECKLIST.md` on a test system. Do not treat any of this as working until the owner has run it.
 

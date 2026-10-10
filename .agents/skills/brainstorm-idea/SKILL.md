@@ -31,10 +31,10 @@ Do not use it when the user already wants a concrete implementation plan, code c
 
 ## Tools You'll Use
 
-- Respond in normal chat, or use `question` when multiple-choice input helps.
-- Use `read`, `glob`, `grep`, and limited `bash` for repo inspection.
-- Use `task` subagents for parallel research or codebase exploration.
-- Use `webfetch` for known URLs, and background-only search through this workspace's browser extensions when available.
+- Respond in normal chat, or use Codex's available user-input tool when multiple-choice input helps.
+- Read files with available file or shell tools; use `rg` / `rg --files` for targeted discovery. On Windows use PowerShell.
+- Use available Codex collaboration tools for independent research or exploration, within the session's agent-slot limit. Keep subtasks in this chat rather than creating sidebar chats.
+- Use built-in web search and page-open tools for background research and known URLs; a browser extension is not required.
 
 ## Workflow
 
@@ -50,7 +50,7 @@ Identify:
 
 If the idea is missing or too vague, ask one concise clarification question and stop.
 
-If the user supplied a project path, verify it exists before relying on it. Use `read` for directories when possible. Use `bash` only for commands that are needed and safe.
+If the user supplied a project path, verify it exists before relying on it. Enumerate directories with available file or shell tools. Use only needed, safe commands in the active shell.
 
 If no project path exists, continue without project context.
 
@@ -69,9 +69,9 @@ Look for:
 Preferred inspection order:
 
 1. Read `AGENTS.md`, `README*`, `wiki/index.md`, or obvious docs when relevant.
-2. Use `glob` and `grep` for targeted discovery.
+2. Use `rg --files` and `rg` for targeted discovery.
 3. Optional: use a helper script for broad repo context only when one actually exists in the workspace; otherwise skip this step.
-4. Use `task` subagents for medium/broad codebase exploration, not for tiny lookups.
+4. Use Codex subagents for independent medium/broad codebase exploration, within available slots; handle tiny lookups directly.
 
 Keep context summary short. This is not design review.
 
@@ -88,7 +88,7 @@ Useful question patterns:
 - "What constraint matters most: speed, cost, user delight, reliability, security, or reuse?"
 - "Should this stay exploratory, or should promising ideas turn into next steps?"
 
-When a few clear modes fit, use `question` with options such as:
+When a few clear modes fit, offer options in chat or through the available user-input tool, such as:
 
 1. Broad creative exploration
 2. Practical product directions
@@ -128,13 +128,12 @@ Research safety:
 
 - Do not send client-identifying details, private tickets, user emails, internal hostnames, private logs, or secrets to public search/pages.
 - Search generic terms, product names, errors, and public concepts.
-- Use `webfetch` for known URLs.
-- Use background-only search through this workspace's browser extensions when available.
+- Use built-in web page-open tools for known URLs.
+- Use built-in web search for background research; a browser extension is not required.
 - Do not open visible browser UI during this skill's research phase.
-- If search is needed and no background search extension exists, ask user for URLs or continue without web research.
-- If needed search capability is unavailable, check for a background-search extension before saying unavailable.
+- If web tools are unavailable, check already-connected read-only search tools; ask for source URLs or continue with the limitation stated when no route works.
 
-For parallel research, use `task` subagents. Assign one angle per subagent:
+For parallel research, use Codex collaboration tools. Assign one angle per subagent, batch within available slots, and provide only the context needed:
 
 ```text
 Research this brainstorming angle for idea: <idea>

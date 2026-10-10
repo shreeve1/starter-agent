@@ -2,12 +2,16 @@
 
 Run this once with the owner, on a scratch folder or test machine, before real use. `python` means `py -3` or `python3` if needed. Tick each box only after seeing it work.
 
+For this Codex workspace, hook checks are not applicable: the owner chose
+to leave hooks disabled and unchanged. Run audit/tests directly. Record
+results only for commands actually run; see `CODEX.md` for the local checks.
+
 ## Install
 
 - [ ] First install into an empty scratch folder by following `INSTALL.md`.
-- [ ] `git config core.hooksPath` prints `.githooks`.
+- [ ] Chosen policy verified: no `core.hooksPath` for this Codex workspace; `.githooks` only where the owner chose hooks.
 - [ ] `python .agents/skills/personal-memory/gate.py --memory memory audit` exits 0.
-- [ ] Hooks run: make a throwaway commit touching a `memory/` note and see the audit run; then undo it (`git reset --soft HEAD~1` and discard the change).
+- [ ] If hooks are enabled elsewhere: test them in a disposable workspace. If skipped here: run the memory audit and relevant tests directly; do not activate hooks for this test.
 - [ ] `python .agents/skills/apply-release/scripts/apply_release.py status` shows the Release applied and one snapshot.
 
 ## Updates
@@ -29,7 +33,7 @@ Run this once with the owner, on a scratch folder or test machine, before real u
 
 ## Windows
 
-- [ ] Hooks run under Git Bash when committing from PowerShell and from Git Bash.
+- [ ] If hooks are enabled elsewhere: they run under Git Bash when committing from PowerShell and Git Bash. Skipped here.
 - [ ] (team) `python -m pip install tzdata` done; the profile timezone loads.
 - [ ] Line endings: after an update, files keep the owner's CRLF or LF style, and `plan` still reports unchanged files as unchanged.
 

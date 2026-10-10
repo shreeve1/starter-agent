@@ -2,6 +2,11 @@
 
 A first install is the normal update flow with no previous snapshot. Work in a fresh, empty folder (the "workspace"). Run every command from the workspace root. `python` below means `py -3` on Windows if `python` is not found, or `python3` on macOS/Linux. All commands work in PowerShell and Git Bash.
 
+For Codex, also read `CODEX.md`. This owner has chosen to skip hooks:
+omit hook activation in step 3 and run the audit and tests directly before
+committing. Leave hook files unchanged. Keep the incoming Release records
+and Pristine Snapshot separate from local customizations.
+
 ## Before you start (Windows)
 
 - Install Python 3.14 from python.org (tick "Add python.exe to PATH").
@@ -12,7 +17,7 @@ A first install is the normal update flow with no previous snapshot. Work in a f
 
 1. Ask the owner where the Release folder is. Put it somewhere outside the workspace, for example next to it. Do not copy it into the workspace.
 2. Make the workspace a git repo if it is not one: `git init`. (An owner who refuses git can still install; see the no-git note in `UPDATE.md`.) Do not create any other file yet: a file the Release does not ship counts as an uncommitted change and blocks `apply`.
-3. Point git at the shipped hooks: `git config core.hooksPath .githooks`. The folder arrives in step 7; until then git simply finds no hooks.
+3. Only if the owner chose hooks, point Git at them: `git config core.hooksPath .githooks`. The folder arrives in step 7; until then Git finds no shipped hooks. Skip this command in this Codex workspace.
 4. Read the Release's `CHANGELOG.md` and check the Release is intact (`MANIFEST.md`).
 5. The skill is not in the workspace yet, so run it from the Release folder: `python <release folder>/.agents/skills/apply-release/scripts/apply_release.py plan <release folder> --root .` It changes nothing.
 6. **Owner decision:** explain the plan in plain words (it is all new files on a first install) and ask for an OK. No OK, stop here.
@@ -49,7 +54,7 @@ Minimal `memory/index.md`:
 9. Build the generated indexes: `python .agents/skills/personal-memory/indexes.py`, then `python .agents/skills/personal-memory/hubs.py`. (team) Run these after the seeded notes have landed in step 7.
 10. Run `python .agents/skills/personal-memory/gate.py --memory memory audit`. It prints exactly which pages are missing from `memory/index.md`. Add one row for each: under `## Client Hubs` for each new hub, under `## Promoted Memory` for each seeded note it lists. Rerun until it exits 0.
 11. (team) Create `.agents/operator-profile.json` by asking the owner each value in `OPERATOR-PROFILE.md`. (friends) Skip this step.
-12. Run `python .agents/skills/apply-release/scripts/apply_release.py finish`. It stores the snapshot and commits `apply Release <N>`; the hooks run. If a hook fails, fix what it reports and commit with the same message. Never use `--no-verify`.
+12. Run `python .agents/skills/apply-release/scripts/apply_release.py finish`. It stores the snapshot and commits `apply Release <N>`; enabled hooks run normally. With hooks skipped, run the audit and relevant tests directly first. If an enabled hook fails, fix what it reports and commit with the same message. Never use `--no-verify`.
 13. `finish` commits only the Release files. Commit `memory/index.md` and the generated indexes and hubs yourself, with the owner's OK. (team) Ask the owner whether to commit the Operator Profile too.
 14. Go through `ADAPTING.md`, then `CHECKLIST.md` with the owner on a test system before real use.
 

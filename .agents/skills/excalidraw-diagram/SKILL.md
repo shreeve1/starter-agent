@@ -16,6 +16,11 @@ If the user names a folder (e.g. `clients/<client>/`), use it instead of `artifa
 
 Keep chat responses concise. Lead with artifact paths.
 
+On Codex for Windows, use the PowerShell examples below and a verified
+Python executable (`python` here). Use `py -3` only if that launcher exists.
+Run from the workspace root; optional package installation needs the
+owner's approval. Open previews through the available Codex browser or
+file-panel tool; a native desktop-control tool is not required.
 
 ## Fallback preview: local Excalidraw editor URL
 
@@ -34,7 +39,8 @@ python3 .agents/skills/excalidraw-diagram/scripts/export_to_excalidraw_url.py ar
 Windows PowerShell:
 
 ```powershell
-Start-Process py -ArgumentList '.agents\skills\excalidraw-diagram\scripts\export_to_excalidraw_url.py','artifacts\diagrams\my-diagram.excalidraw','--port','0','--url-file','artifacts\diagrams\my-diagram.url' -RedirectStandardOutput 'artifacts\diagrams\my-diagram.server.log' -RedirectStandardError 'artifacts\diagrams\my-diagram.server.err.log'
+$DiagramPython = (Get-Command python -ErrorAction Stop).Source
+Start-Process -FilePath $DiagramPython -WindowStyle Hidden -WorkingDirectory (Get-Location).Path -ArgumentList '.agents\skills\excalidraw-diagram\scripts\export_to_excalidraw_url.py','artifacts\diagrams\my-diagram.excalidraw','--port','0','--url-file','artifacts\diagrams\my-diagram.url' -RedirectStandardOutput 'artifacts\diagrams\my-diagram.server.log' -RedirectStandardError 'artifacts\diagrams\my-diagram.server.err.log' -PassThru
 ```
 
 Read `artifacts/diagrams/<name>.url`, then open that exact `http://127.0.0.1:<port>` URL in a browser.
@@ -68,7 +74,9 @@ cd .agents/skills/excalidraw-diagram/scripts && uv sync && uv run playwright ins
 Windows PowerShell:
 
 ```powershell
-cd .agents\skills\excalidraw-diagram\scripts; uv sync; uv run playwright install chromium
+uv sync --directory .agents/skills/excalidraw-diagram/scripts
+if ($LASTEXITCODE -ne 0) { throw 'uv sync failed' }
+uv run --directory .agents/skills/excalidraw-diagram/scripts playwright install chromium
 ```
 
 Render:
@@ -82,7 +90,8 @@ cd .agents/skills/excalidraw-diagram/scripts && uv run python render_excalidraw.
 Windows PowerShell:
 
 ```powershell
-cd .agents\skills\excalidraw-diagram\scripts; uv run python render_excalidraw.py ..\..\..\..\artifacts\diagrams\my-diagram.excalidraw
+$DiagramScene = (Resolve-Path -LiteralPath artifacts/diagrams/my-diagram.excalidraw).Path
+uv run --directory .agents/skills/excalidraw-diagram/scripts python render_excalidraw.py $DiagramScene
 ```
 
 ### Fallback: Python available, uv missing
@@ -101,12 +110,12 @@ python -m playwright install chromium
 Windows PowerShell:
 
 ```powershell
-cd .agents\skills\excalidraw-diagram\scripts
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -U pip
-python -m pip install playwright
-python -m playwright install chromium
+python -m venv .agents/skills/excalidraw-diagram/scripts/.venv
+if ($LASTEXITCODE -ne 0) { throw 'venv creation failed' }
+$DiagramPython = (Resolve-Path -LiteralPath .agents/skills/excalidraw-diagram/scripts/.venv/Scripts/python.exe).Path
+& $DiagramPython -m pip install playwright
+if ($LASTEXITCODE -ne 0) { throw 'Playwright installation failed' }
+& $DiagramPython -m playwright install chromium
 ```
 
 Render:
@@ -122,9 +131,7 @@ python render_excalidraw.py ../../../../artifacts/diagrams/my-diagram.excalidraw
 Windows PowerShell:
 
 ```powershell
-cd .agents\skills\excalidraw-diagram\scripts
-.\.venv\Scripts\Activate.ps1
-python render_excalidraw.py ..\..\..\..\artifacts\diagrams\my-diagram.excalidraw
+& .agents/skills/excalidraw-diagram/scripts/.venv/Scripts/python.exe .agents/skills/excalidraw-diagram/scripts/render_excalidraw.py artifacts/diagrams/my-diagram.excalidraw
 ```
 
 Output PNG is written next to source `.excalidraw` file.
@@ -148,7 +155,8 @@ cd .agents/skills/excalidraw-diagram/scripts && uv run python export_to_excalidr
 Windows PowerShell:
 
 ```powershell
-cd .agents\skills\excalidraw-diagram\scripts; uv run python export_to_excalidraw_url.py ..\..\..\..\artifacts\diagrams\my-diagram.excalidraw --port 0
+$DiagramScene = (Resolve-Path -LiteralPath artifacts/diagrams/my-diagram.excalidraw).Path
+uv run --directory .agents/skills/excalidraw-diagram/scripts python export_to_excalidraw_url.py $DiagramScene --port 0
 ```
 
 With venv:
@@ -164,9 +172,7 @@ python export_to_excalidraw_url.py ../../../../artifacts/diagrams/my-diagram.exc
 Windows PowerShell:
 
 ```powershell
-cd .agents\skills\excalidraw-diagram\scripts
-.\.venv\Scripts\Activate.ps1
-python export_to_excalidraw_url.py ..\..\..\..\artifacts\diagrams\my-diagram.excalidraw --port 0
+& .agents/skills/excalidraw-diagram/scripts/.venv/Scripts/python.exe .agents/skills/excalidraw-diagram/scripts/export_to_excalidraw_url.py artifacts/diagrams/my-diagram.excalidraw --port 0
 ```
 
 Script prints `http://127.0.0.1:<port>`. Open that URL in a browser for visual editing.

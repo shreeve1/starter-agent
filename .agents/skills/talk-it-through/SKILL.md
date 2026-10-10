@@ -19,7 +19,7 @@ Resolve dependencies in order — settle a foundational decision before the ones
 
 Ask the questions one at a time, waiting for feedback on each question before continuing.
 
-Always output questions as plain text in the chat. Never use the `question` tool — this is a back-and-forth conversation, not a multiple-choice form.
+Ask one question at a time in plain chat text; keep this a back-and-forth conversation rather than a multiple-choice form.
 
 Stop when the remaining open questions are all low-stakes detail. At that point, say so and summarize the defaults you're assuming for the rest rather than continuing to probe.
 

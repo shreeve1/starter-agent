@@ -14,9 +14,9 @@ there.
 
 ## Pre-flight (run before Phase 1)
 
-This skill is expensive. About 10 Agent calls, 30 to 90 seconds wall clock,
-5 to 10x a single answer. Do not pay that cost when a direct answer is
-better. Run this gate before Phase 1.
+This skill uses several isolated agent calls. Duration and usage depend on
+the model and available agent slots; do not promise a fixed runtime or
+cost multiplier. Use a direct answer when it fits. Run this gate before Phase 1.
 
 **Step 1. Explicit invocation check.**
 
@@ -57,12 +57,17 @@ For the problem P:
    tags when the problem is code-shaped. Always include at least one wild
    frame to keep range.
 
-2. Spawn 5 **parallel** Agent/Task tool calls. One per frame. Each Agent
+2. Spawn one isolated Codex subagent per frame using the available
+   collaboration tools. Use `fork_turns="none"` so each branch sees only
+   the supplied brief. Keep the current model unless the user requests
+   another. Run as many branches concurrently as the session permits;
+   queue remaining frames in separate fresh agents. For a four-slot
+   session with the parent active, run three branches, then two. Each agent
    gets only:
    - the problem P
    - any context the user provided
    - the chosen frame's vantage prompt
-   - a system instruction that forbids evaluation
+   - a task instruction that forbids evaluation
 
    The exact instruction to give each Agent:
 
@@ -74,10 +79,12 @@ For the problem P:
    > Output a JSON array only. No prose before or after.
    > `[{"text": "...", "rationale": "..."}, ...]`
 
-3. **Critical invariant.** The Agent calls must be parallel and isolated.
-   Do NOT serialize them. Do NOT pass one branch's output as context to
-   another. Branches that see each other anchor each other and the whole
-   method collapses to a wider single thought.
+3. **Critical invariant.** Branches must be isolated. Parallelize within
+   the slot limit; batches are allowed. Do not pass one branch's output to
+   another, and do not reuse a generator's context for another frame.
+   Wait for all generator branches before scoring. If delegation is
+   unavailable, disclose the limitation and offer a direct brainstorm;
+   do not describe simulated branches as isolated agents.
 
 ### Phase 2 — Focus (critic on)
 
@@ -95,8 +102,8 @@ After all branches return:
    backends plays".
 
 3. **Deepen the top 3.** Rank by weighted score (novelty 0.35 + viability
-   0.40 + fit 0.25), exclude traps, take top 3. For each, spawn one Agent
-   call that produces:
+   0.40 + fit 0.25), exclude traps, take top 3. For each, spawn one isolated agent
+   within available slots that produces:
    - a 4 to 8 sentence sketch of how the idea works
    - the load-bearing risk
    - the first concrete step a builder would take
@@ -173,7 +180,7 @@ These are how this skill goes wrong. Watch for them.
   Generate wide, but converge with a real opinion.
 - **Skipping the isolation invariant.** If you simulate parallel branches
   by writing them sequentially in one context, you have not done ADHD. You
-  have done a wider single thought. The Agent/Task tool gives each branch a
+  have done a wider single thought. Codex collaboration gives each branch a
   fresh context. Use it.
 
 ## Calibration
@@ -189,27 +196,28 @@ These are how this skill goes wrong. Watch for them.
 
 ## Cost
 
-5 diverge + 1 score + 1 cluster + 3 deepen ≈ 10 Agent calls per run.
-About 5 to 10x a single-shot answer. Not for every keystroke. For decision
-points where the cost of the obvious answer is high.
+Default: five generator calls and three deepening calls. The parent scores
+and clusters. Usage varies; reserve this for decisions that benefit from
+independent exploration.
 
 ## Companion library and CLI
 
 There is a Node/TS implementation that does the same loop with structured
 JSON parsing, score weighting, and a CLI. Use it when running outside
-Claude Code or in batch.
+an interactive Codex session or in batch. Installation is optional and
+requires the owner's approval.
 
     npm install -g adhd-agent
     adhd "your problem here"
 
 Code, paper, evals, and contributing guide at
 https://github.com/UditAkhourii/adhd. The skill above gives you the same
-loop inside Claude with no install required.
+loop inside Codex with no companion CLI installation required.
 
 ## Source spec
 
 This skill operationalises a written spec on divergent ideation. The
-original prose is preserved in `SOURCE-SPEC.md` for reference. The
+upstream source is linked above; this Edition does not ship `SOURCE-SPEC.md`. The
 implementation choices made here (parallel isolated Agent calls,
 mechanical generator/critic split, frame-based branching) follow from
 that spec.
