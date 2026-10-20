@@ -6,6 +6,10 @@ On top of Release 5, in this workspace only:
 
 - Codex adaptation: `.agents/setup/CODEX.md`, a "Codex runtime" section in `AGENTS.md`, PowerShell examples and Codex collaboration tools in the skills. Hooks stay disabled; run the checks in `CODEX.md` directly.
 - GitHub remote: this workspace pushes to the owner's repository (`memory/decisions/projects/decision-github-repository.md`).
+- Replace before appending: `memory/preferences/memory-maintenance.md`, loaded by the memory row of `memory/rules.md`. Search memory first, fix out-of-date notes in place, add a note only for a new fact, then update notes that repeat the old wording.
+- Procedures: two rows in `memory/rules.md`, one for defining a procedure (saved only with the owner's approval) and one for following a saved procedure. New "Procedure File" template in `memory/TEMPLATES.md`: Trigger, Steps, Related and Notes are required; other sections are optional; an oversized procedure moves its troubleshooting into a sibling file.
+- New `browser` topic in `memory/schema.json` for browser procedures (`memory/workflows/browser/`).
+- Git: `notes/` and `reports/` are now tracked; `artifacts/` and `tmp/` stay ignored (`.gitignore`, `memory/preferences/document-scaffolding.md`). The folder map adds `clients/<short>/` for documents about one client.
 
 ## Release 5
 
