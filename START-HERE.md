@@ -21,4 +21,12 @@ Your agent copies this workspace into the new folder, reads your old setup, deci
 
 Open your agent with the new version, a new empty folder, and your current workspace, then say: "Follow the 'A newer version arrived' section of `.agents/setup/README.md` in the new version." Your current workspace is left untouched; it is the way back.
 
+## Upgrading from an earlier Release
+
+Use this when your workspace was set up from an earlier Release, whichever one, and you want this version with your own content brought across. Open your agent with three folders: this one, a new empty folder, and your current workspace. Paste this, with the paths filled in:
+
+> Upgrade my workspace at `<current workspace>` to the Release in `<this folder>`, building it in `<new folder>`. Follow `<this folder>/.agents/setup/README.md`, section "A newer version arrived", including "Older Releases". Read my current workspace's `CHANGELOG.md` (or `MANIFEST.json`) to see which Release I am on, and read this folder's `CHANGELOG.md` for everything that changed since. Bring all my notes, rules, procedures, decisions and my own skills across, in the places this Release uses. If I or my agent edited shipped files, show me those changes and ask before keeping or dropping each one. Change nothing in my current workspace. At the end, run the memory check and tell me what moved, what was left behind and why.
+
+Your current workspace stays as it is; if anything looks wrong afterwards, keep using it.
+
 Some apps and file browsers hide folders whose names start with a dot; the setup instructions are in `.agents/setup/`.

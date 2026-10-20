@@ -89,6 +89,17 @@ Only at the very end, after the owner has finished `ADAPTING.md` or declined it.
 6. Do not copy `MANIFEST.json`, `CHANGELOG.md`, `START-HERE.md` or anything under `.agents/setup/`: the new Release's copies win.
 7. Keep the old `.git` folder only if the owner wants the history; ask first. Tell the owner the old workspace can be deleted when they are happy.
 
+### Older Releases
+
+Skipping Releases is fine: the steps above work from any earlier Release. Read every `CHANGELOG.md` section newer than the owner's Release (the current workspace's `CHANGELOG.md` or `MANIFEST.json` names it). Then carry these across too:
+
+- **No `memory/rules.md`** (before Release 3): turn each rule the old `AGENTS.md` or preference notes held into a row in `memory/rules.md` (`personal-memory` "Rules"); every preference note needs a row that loads it.
+- **`memory/log.md`** (before Release 3): do not copy it; git keeps the history. Notes marked superseded, or a `Retired` index section: copy only what is still true, rewritten in place.
+- **Edited shipped files**, such as an `AGENTS.md` adapted for one app or edited skills: list each difference, then keep what the owner relies on as a preference note or a decision note, never as an edit to a shipped file. A whole adaptation the owner keeps (for example for Codex) becomes a decision note listing what to re-apply after each update.
+- **Gone tools** (`apply-release`, `doctor.py`, the `pre-push` hook, `release-state.json`, a migration ledger): leave them behind and say so. A remote the old workspace pushed to stays only with the owner's yes, recorded as a decision note.
+
+Then run `python .agents/skills/personal-memory/gate.py --memory memory audit` (with Python 3.11+). It also flags leftovers from older Releases: a `memory/log.md`, superseded notes and history lines.
+
 ## Going back
 
 Use the previous workspace folder again. Anything written in the new one after the update is not in the old one: list those files by date and copy across only what the owner asks for, using the table above.

@@ -12,6 +12,7 @@ On top of Release 5, in this workspace only:
 - Git: `notes/` and `reports/` are now tracked; `artifacts/` and `tmp/` stay ignored (`.gitignore`, `memory/preferences/document-scaffolding.md`). The folder map adds `clients/<short>/` for documents about one client.
 - Procedures are marked `type: procedure` (template and type list in `memory/TEMPLATES.md`), so no agent saves or changes one without the owner's yes.
 - Codex: hooks stay off, so `python .githooks/pre-commit` runs by hand before each commit (secret scan, memory audit, skill tests). The adaptation is recorded in `memory/decisions/workstation/decision-codex-workspace.md`, which an update keeps, with a `memory/rules.md` row that loads it when updating.
+- `START-HERE.md` has an "Upgrading from an earlier Release" prompt, and `.agents/setup/README.md` an "Older Releases" section, for owners several Releases behind.
 - `startday-spec` starts from the calendar. The interview opens with "walk me through how your day starts", then five calendar questions. A new Calendar module plans the day around fixed events, works flexible ones whenever they fit, writes a brief before each fixed event, never calls a past event upcoming, and lists tomorrow's early events in the wrap-up. Meetings uses the overlapping event as its first guess for who a transcript belongs to. Briefs are written after their meeting's items are researched; an after-meeting question goes on the item's research file; Calendar is included unless the owner declines it.
 
 ## Release 5
