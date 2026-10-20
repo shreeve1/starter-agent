@@ -61,6 +61,28 @@ class SchemaLoadTests(unittest.TestCase):
                 schema.load(mem)
             self.assertIn("schema.json", str(cm.exception))
 
+    def test_client_folder_defaults_to_clients(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            write_schema(mem)
+            self.assertEqual(schema.load(mem)["client_folder"], "clients")
+
+    def test_client_folder_is_read_from_schema(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            write_schema(mem, client_folder="students")
+            self.assertEqual(schema.load(mem)["client_folder"], "students")
+
+    def test_bad_client_folder_names_the_problem(self):
+        for bad in ("Students", "my students", "../x", "", 5, "memory", "research", "docs"):
+            with self.subTest(bad=bad), tempfile.TemporaryDirectory() as td:
+                mem = Path(td)
+                write_schema(mem, client_folder=bad)
+                with self.assertRaises(SystemExit) as cm:
+                    schema.load(mem)
+                self.assertIn("client_folder", str(cm.exception))
+
+
 
 if __name__ == "__main__":
     unittest.main()

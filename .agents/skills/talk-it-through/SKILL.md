@@ -11,19 +11,24 @@ description: |
 
 ## Workflow
 
-Interview me to reach a shared understanding of this plan, process, or document — but apply the 80/20 rule. Spend your questions on the vital few decisions that determine most of the outcome: the ones that are hard to reverse, that other decisions hang off of, or where getting it wrong is expensive or embarrassing. Skip the trivial many.
+Reach a shared understanding of this plan, process, or document by settling the vital few decisions and defaulting the rest. The vital few are hard to reverse, have other decisions hanging off them, or are expensive or embarrassing to get wrong. Everything else gets a stated default.
 
-Before each question, ask yourself: "Does this decision meaningfully change the plan, or am I just walking a branch for completeness?" If the branch is low-stakes, easily reversible, or has an obvious default, state your recommended default in one line and move on — do not turn it into a question. Prune branches that don't change what we do.
+Each turn:
 
-Resolve dependencies in order — settle a foundational decision before the ones that depend on it — but only descend into a sub-branch when the answer would actually shift the plan. For each real question, provide your recommended answer.
+1. **Explore first.** Re-read the files, memory and documents this turn depends on; form claims from them, never from earlier turns. A fact the workspace or a web search can answer is yours to find, never a question. Send a subagent for slow lookups and ask only what does not wait on it.
+2. **Diagram.** Show the plan as you understand it in a Mermaid flowchart. Redraw it whenever an answer changes its shape.
+3. **Defaults.** A numbered table (D1, D2, …) of every low-stakes call you made for the user, one line each.
+4. **Questions.** At most 3 vital questions, in dependency order; a question whose answer depends on another waits for the next turn. Format each as plain chat text:
 
-Ask the questions one at a time, waiting for feedback on each question before continuing.
+   ```
+   ❓ **Q1 - <title>**: <question, with the options>
 
-Ask one question at a time in plain chat text; keep this a back-and-forth conversation rather than a multiple-choice form.
+   ➡️ <recommended answer>
+   ```
 
-Stop when the remaining open questions are all low-stakes detail. At that point, say so and summarize the defaults you're assuming for the rest rather than continuing to probe.
+5. **Reply handling.** "ok" accepts every recommendation and default. "Q2: no, D4: weekly" overrides only those.
 
-If a question can be answered by checking existing material (the memory folder, prior decisions, a referenced document, or the workspace), check it instead of asking. If it can be answered by a web search (a vendor's published policy, a product's documented behavior, current guidance), search the web instead.
+Never use the `question` tool. Stop when no vital question remains: say so, show the final diagram and defaults table, then wrap up.
 
 ## Supporting Information
 
@@ -76,10 +81,11 @@ A talk-it-through session is itself the approval: the user was actively in the l
 For each settled item, pick the type by what it is. When ambiguous, default to **decision**.
 
 - **decision** — a choice about what gets done, who does it, or a process or boundary. → write to `memory/decisions/<topic>/decision-<slug>.md` per [DECISIONS-FORMAT.md](./DECISIONS-FORMAT.md).
-- **preference** — how the user wants the assistant to behave or communicate. → merge into `memory/preferences/` (e.g. `assistant-style.md`).
+- **preference** — how the user wants the assistant to behave or communicate. → merge into the closest existing file in `memory/preferences/`; a new file also gets a row in `memory/rules.md`.
+- **rule** — "when X, use Y": a trigger that should load a skill or memory file. → a row in `memory/rules.md` per "Rules" in `.agents/skills/personal-memory/SKILL.md`.
 - **voice** — a preference specific to voice-mode interaction. → merge into `memory/voice/voice-mode.md`.
 - **workflow** — a repeated habit or sequence of steps. → merge into `memory/workflows/<topic>/`. Verified steps for one workflow are a Procedure, not a workflow note: a shared Procedure is written only through an owner-approved change, never auto-captured.
-- **doc** — an important reference, link, or path to remember. → merge into `memory/docs/important-docs.md`.
+- **doc** — an important reference, link, or path to remember. → merge into the matching `memory/docs/<slug>.md` (one file per subject; create one only if none fits).
 - **guide** — a reusable, redacted ticket-resolution note. Do NOT auto-write; Ticket Guides are saved only through an owner-approved change (one `ticket-guide` approval). Leave it for that flow.
 - **glossary entity** — a shorthand -> identity mapping (client short name, nickname, acronym, codename). → merge into `memory/glossary.md`. Contested/overloaded terms instead go to `CONTEXT.md` inline, per above.
 
@@ -89,11 +95,11 @@ For decisions, follow [DECISIONS-FORMAT.md](./DECISIONS-FORMAT.md). For preferen
 
 #### 2. Before writing, check for existing entries
 
-Scan `memory/index.md` and the relevant topic folder for a matching or superseded entry. If one exists, update it (bump `updated`, note what changed) rather than creating a duplicate.
+Scan `memory/index.md` and the relevant topic folder for a matching entry. If one exists, overwrite it in place (bump `updated`) rather than creating a duplicate.
 
-#### 3. Update the index and log
+#### 3. Update the index and commit
 
-Update `memory/index.md` (Promoted Memory table; workflows/decisions only need their sub-index, linked from `memory/index.md`) and append a `memory/log.md` entry, matching the formats in `memory/TEMPLATES.md`. If updating an existing entry, update its existing index row date/summary instead of adding a duplicate. Run `python3 .agents/skills/personal-memory/indexes.py` and `gate.py audit` after writing.
+Update `memory/index.md` (Promoted Memory table; workflows/decisions only need their sub-index, linked from `memory/index.md`). If updating an existing entry, update its existing index row date/summary instead of adding a duplicate. Run `python3 .agents/skills/personal-memory/indexes.py` and `gate.py audit` after writing, trim any file you touched this session that it warns about, then commit per "Commit at the end of every task" in `AGENTS.md`.
 
 #### 4. Tell the user
 

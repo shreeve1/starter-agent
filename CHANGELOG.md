@@ -1,5 +1,48 @@
 # Changelog
 
+## Local changes
+
+On top of Release 5, in this workspace only:
+
+- Codex adaptation: `.agents/setup/CODEX.md`, a "Codex runtime" section in `AGENTS.md`, PowerShell examples and Codex collaboration tools in the skills. Hooks stay disabled; run the checks in `CODEX.md` directly.
+- GitHub remote: this workspace pushes to the owner's repository (`memory/decisions/projects/decision-github-repository.md`).
+
+## Release 5
+
+- Setup is now your agent's judgment, not a checklist. `.agents/setup/README.md` is the one setup guide: your agent copies this version, reads what you already use, decides where your files, notes and rules belong, shows you the plan once per group and tells you what it did. Nothing has to pass a check, and nothing is written into a ledger.
+- Gone: `doctor.py`, `doctor.ps1`, `INSTALL.md`, `UPDATE.md`, `MIGRATING.md`, `ROLLBACK.md`, `CHECKLIST.md` and the migration ledger. Older notes below that mention them describe versions that had them; follow `README.md` now.
+- Git and Python are optional and never a first step. If you have Git, your agent offers version history and the commit hooks; without Python it uses `.githooks/nopython`, which keeps the commit message check.
+- Gone: the `pre-push` hook. Pushing is up to you; the secret scan still runs on every commit.
+- New: 27 video skills from HyperFrames (Apache 2.0, licence in `.agents/third-party/hyperframes/`): start with `hyperframes` for any video, animation or motion graphic; others cover captions, music videos, changelog and product-launch videos, Figma imports and talking-head recuts.
+- Setup now ends with three steps in `.agents/setup/README.md`: saving a skill loader per skill in Claude Cowork (only on your yes), suggesting up to 7 rules from what your workspace shows, and removing `.agents/setup/` from your workspace.
+- The commit check reads tool output as UTF-8 on Windows and accepts a test folder with no unittest tests.
+- Updates work the same way: a fresh copy of the new version in a new folder, with your content brought across. Your current workspace is left alone and is the way back.
+
+## Release 4
+
+- New antislop skills: `antislop` plus `antislop-code`, `antislop-copywriting`, `antislop-human`, `antislop-layoutmobile` and `antislop-ui`. They catch the tell-tale signs of AI-written text and AI-designed pages. `memory/rules.md` loads them when you draft an email, write a document someone else will read, or design a page, PDF or slide.
+- Four starter preferences in `memory/preferences/`: `writing.md` (answer first, plain words, one fact per line), `diagrams.md` (use diagrams to get on the same page), `research-documents.md` (short, sourced findings) and `browser-shared-view.md` (ask once to open a browser you can sign into). The rules file loads them. They are yours to edit or delete.
+- To bring it in, give your agent this version and follow `.agents/setup/UPDATE.md`.
+
+## Release 3
+
+- Setup works differently. Your agent copies this version into a new folder, moves your own notes, rules and skills in, and runs a check. It is done only when the check passes. `START-HERE.md` at the top has the one message to give your agent.
+- Updates work the same way: a fresh copy of the new version, with your content moved across from your current workspace. Your current workspace is left untouched until the new one passes, so going back is just using the old folder.
+- The `apply-release` skill is gone; you no longer run anything to install or update.
+- New `.agents/setup/MIGRATING.md`: your agent lists everything in your old setup in a migration ledger, asks you once per group where it goes, and never drops anything without your OK. Personal rules go into memory, not into shipped files, so updates never overwrite them.
+- New check: `.agents/setup/doctor.py --migration`, or `doctor.ps1 -Migration` on a Windows computer without Python. Python and Git are no longer required. Without Python the secret scan and memory check cannot run, but the push protection stays on (`.githooks/nopython`), so your notes never reach a remote.
+- The Release brings a ready `memory/index.md`, the memory indexes and a `.gitignore`, so your agent no longer writes them by hand.
+- `ADAPTING.md` now starts with a "Tracking model" step, run before `MIGRATING.md`: your agent asks what people or things you keep coming back to and what you need remembered, then sets up short names, note subjects, a rule that loads them and a folder named in your own word (for example `students`, set with `client_folder` in `memory/schema.json`). Setup and migration use it, so existing notes land in the right place. A starter rule "Work on one client" now ships in `memory/rules.md`; setup renames or removes it.
+- `ADAPTING.md` also walks through making the workspace fit how you work: skills you won't use, answer style, folders, names and rules. Rules that differ from `AGENTS.md` become preference notes.
+- `startday-spec` now builds a loop from modules you pick: work items, meeting transcripts from a folder, and files or pages to watch (new `scripts/watch.py`). The loop is optional: type `startday` yourself, or pick a runner (a local scheduled task in Claude Desktop or Codex, Claude Code `/loop`, omp `/loop`). Cowork scheduled tasks run remotely by default and cannot see your workspace; the spec says when a local run works.
+- The team-only Operator Profile page is no longer in your copy.
+- Your agent reads less when it saves a memory. The `personal-memory` skill is shorter: setup, recovering missing files and a full health check moved to `.agents/skills/personal-memory/reference.md` (opened only for those), and text that repeated `memory/README.md` is gone. Saving a note, including a client note, needs nothing in the reference file. Nothing it remembers changed. The memory index is read at the start of every session, so `gate.py compact` now strips the extra spaces an editor adds to its table, and the audit warns when they appear.
+- To bring it in, give your agent this version and follow `.agents/setup/UPDATE.md`.
+
+## Release 2
+
+- No change to your files. The Release folder is rebuilt so its version moves with the team edition.
+
 ## Release 1
 
 - friends edition export.

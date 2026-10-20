@@ -1,23 +1,14 @@
 # MANIFEST.json
 
-Every Release has `MANIFEST.json` at its root. It holds:
+Every Release has `MANIFEST.json` at its root, and it stays in the workspace after setup. It lists every shipped file:
 
-- `edition`: `friends` or `team`.
-- `release`: the Release number (whole number, higher is newer).
-- For each file path: its `class` (`merge`, `seed` or `local`), its `sha256` (computed over the file with line endings turned into LF, so Windows CRLF copies still match), and its `mode`.
+- `edition`: `friends` or `team`. `release`: the version number (higher is newer).
+- For each file: its `class`, its `sha256` (taken with line endings turned into LF, so Windows CRLF copies still match) and its `mode`.
 
-## What each class means for updates
+## What each class means
 
-- `merge`: shared files (skills, `AGENTS.md`, hooks, these docs). Updated by a 3-way merge, so the owner's changes are kept and the Release's changes come in. If both changed the same lines, it is a conflict for the owner to decide.
-- `seed`: starter notes. Installed once if missing, then the owner's. Never changed again, never restored after the owner deletes them.
-- `local`: the owner's own files (for example `memory/index.md`, the Operator Profile). Installed once if missing, never touched.
+- `merge`: a shared file (`AGENTS.md`, skills, hooks, these setup docs). Keep it as shipped. Personal content never goes into it. An update replaces it with the new version's copy.
+- `seed`: a starter file the owner adapts (`CONTEXT.md`, `memory/glossary.md`, `memory/schema.json`, the folder map, `memory/rules.md`). Its content is the owner's. An update copies the owner's version across.
+- `local`: a starting copy of a file that is the owner's from day one (`memory/index.md`, the generated indexes, `.gitignore`, `START-HERE.md`). Same rules as `seed`.
 
-Details: `.agents/skills/apply-release/SKILL.md`.
-
-## Checking a Release folder is intact
-
-1. The folder has `MANIFEST.json` and `CHANGELOG.md` at its root.
-2. `edition` matches the workspace (`status` shows the applied edition) and `release` is higher than the one applied.
-3. Run `python .agents/skills/apply-release/scripts/apply_release.py plan <release folder>`. Before planning it checks every file listed in the manifest exists and matches its `sha256`. A missing or damaged file is refused with a message naming the file; nothing is written. Ask the owner for a fresh copy of the Release.
-
-Never edit `MANIFEST.json` to make a check pass.
+MANIFEST.json is a record of what shipped. Nothing checks it; an agent may use it to see which files the owner has changed.

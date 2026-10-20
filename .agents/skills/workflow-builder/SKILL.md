@@ -16,7 +16,7 @@ The walkthrough has four phases, run in order.
 
 ### Phase 1 — Goal, name, description, and seed
 
-1. Read `CONTEXT.md` and scan `memory/decisions/` at the workspace root so you build on agreed language and prior conventions. Create both lazily — only when you have something to write (a resolved term or a settled decision).
+1. Read `CONTEXT.md` and `memory/decisions/index.md` (decisions sit in `memory/decisions/<topic>/`) so you build on agreed language and prior conventions. Create both lazily — only when you have something to write (a resolved term or a settled decision).
 2. Ask the user to state the workflow goal in plain language: what business process should this skill run, and what are they automating or scaffolding?
 3. Propose a short name for the skill, derived from the goal, in all lowercase with hyphens between words (e.g. `launch-newsletter`, `onboard-client`). Recommend one; user confirms or overrides.
 4. Draft the produced skill's `description` frontmatter to the writing-great-skills bar (see "Authoring bar for the produced skill" below; if you have a skill-writing guide, apply it): front-load the skill's leading word, give one trigger per branch (collapse synonyms that rename a single branch), and cut identity the body already carries. Recommend it; user confirms or edits. Completion criterion: the description front-loads a leading word and carries one distinct trigger per branch, with no duplicated triggers.
@@ -111,7 +111,7 @@ Record **workflow-building conventions only** — choices that change how future
 
 The content of the produced skill (which agents, which steps) lives in the produced SKILL.md and its materialized agents, not in memory. Write a new decision file only when a convention actually changes or a genuinely new one is settled.
 
-After writing decisions: update `memory/index.md` and append `memory/log.md` per `memory/TEMPLATES.md`.
+After writing decisions: run `python3 .agents/skills/personal-memory/indexes.py` (decisions are listed in the generated `memory/decisions/index.md`, not in `memory/index.md`), run `python3 .agents/skills/personal-memory/gate.py --memory memory audit`, then commit per "Commit at the end of every task" in `AGENTS.md`.
 
 ### Agents library reference
 

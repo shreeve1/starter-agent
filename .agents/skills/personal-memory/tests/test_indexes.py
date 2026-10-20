@@ -131,22 +131,6 @@ class TopicFolderReorgTests(unittest.TestCase):
             proc2 = run_script(GATE, mem, "audit")
             self.assertEqual(proc2.returncode, 0, proc2.stdout + proc2.stderr)
 
-    def test_superseded_file_in_retired_not_topic(self):
-        with tempfile.TemporaryDirectory() as td:
-            mem = Path(td)
-            make_schema(mem)
-            halo = mem / "workflows" / "halo"
-            halo.mkdir(parents=True)
-            write_fm(halo / "active.md", "Active", "Still in use.")
-            write_fm(halo / "done.md", "Done", "Was retired.", status="superseded")
-            proc = run_script(INDEXES, mem)
-            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
-            text = (mem / "workflows" / "index.md").read_text(encoding="utf-8")
-            head, retired = text.split("## Retired", 1)
-            self.assertIn("done.md", retired)
-            self.assertNotIn("done.md", head)
-            self.assertIn("active.md", head)
-
     def test_crowded_16_guides(self):
         with tempfile.TemporaryDirectory() as td:
             mem = Path(td)
@@ -230,6 +214,45 @@ class TopicFolderReorgTests(unittest.TestCase):
             self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
             self.assertNotIn("not in", proc.stdout)
             self.assertIn("Success", proc.stdout)
+
+    def test_audit_follows_configured_client_folder(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem, client_subjects=["contacts"])
+            data = json.loads((mem / "schema.json").read_text(encoding="utf-8"))
+            data["client_folder"] = "students"
+            (mem / "schema.json").write_text(json.dumps(data), encoding="utf-8")
+            for d in ("workflows", "decisions"):
+                (mem / d).mkdir()
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            make_client_note(mem / "students" / "contacts" / "ana" / "note.md")
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+            self.assertIn("memory/students/_hubs/ana.md", proc.stdout)
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            (mem / "index.md").write_text(
+                (mem / "index.md").read_text(encoding="utf-8")
+                + "| [ana hub](memory/students/_hubs/ana.md) | hub | Hub for ana. | 2026-10-07 |\n",
+                encoding="utf-8")
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertIn("Success", proc.stdout)
+            self.assertFalse((mem / "clients").exists())
+
+    def test_client_notes_outside_the_configured_folder_fail_audit(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem, client_subjects=["contacts"])
+            for d in ("workflows", "decisions"):
+                (mem / d).mkdir()
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            make_client_note(mem / "students" / "contacts" / "ana" / "note.md")
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+            self.assertIn("memory/students/", proc.stdout)
+            self.assertIn("client_folder", proc.stdout)
 
     def test_missing_schema_json_fails_audit(self):
         with tempfile.TemporaryDirectory() as td:

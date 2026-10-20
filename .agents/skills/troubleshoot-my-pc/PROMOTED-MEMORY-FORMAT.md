@@ -29,14 +29,14 @@ These are **merge targets**, not one-file-per-item like decisions. Add to the
 relevant section of the owning topic file rather than creating a new file per
 item:
 
-- **preference** → `memory/preferences/` (default `assistant-style.md`; or a
-  more specific existing file, e.g. email tone lives in `memory/email/`).
-- **workflow** → `memory/workflows/<topic>/` (e.g. `memory/workflows/memory/session-end.md`; create a new `memory/workflows/<topic>/<slug>.md` only if no existing file fits).
-- **doc** → `memory/docs/important-docs.md`.
+- **preference** → the closest existing file in `memory/preferences/` (email tone
+  lives in `memory/email/`). A new file also gets a row in `memory/rules.md`.
+- **workflow** → `memory/workflows/<topic>/` (e.g. `memory/workflows/memory/session-end.md`; create a new `memory/workflows/<topic>/<slug>.md` only if no existing file fits). Never write `type: procedure` files here: they are written only through an owner-approved change, never auto-captured.
+- **doc** → the matching `memory/docs/<slug>.md`, one file per subject (create one only if none fits).
 
 Before writing, scan `memory/index.md` and the target folder for an existing
-matching or superseded entry. If one exists, update it in place (bump
-`updated`, note what changed) rather than duplicating.
+matching entry. If one exists, overwrite it in place (bump `updated`) rather
+than duplicating.
 
 Workflows live in a topic folder picked from the `topics` list in
 `memory/schema.json` (a new topic only with the owner's OK). After writing, run
@@ -51,6 +51,7 @@ Follow the **Promoted Topic File** template in `memory/TEMPLATES.md`:
 ```md
 ---
 title: Topic Title
+summary: One line shown on the index
 type: preference | workflow | doc
 status: promoted
 created: YYYY-MM-DD
@@ -65,8 +66,7 @@ topics: []
 ## Notes
 
 - Last reviewed: YYYY-MM-DD
-- Decided during a talk-it-through session on YYYY-MM-DD.
-- Superseded rules, if any.
+- Changed YYYY-MM-DD: why, only when the reason still matters.
 ```
 
 When merging into an existing topic file, add a bullet under `## Active memory`,
@@ -95,5 +95,5 @@ session should rely on it without re-asking. Typically:
 
 1. Add or update the entry in its topic file.
 2. Add or update the row in the Promoted Memory table in `memory/index.md` (workflows appear via the generated sub-index `memory/workflows/index.md` — run `python3 .agents/skills/personal-memory/indexes.py` after writing).
-3. Append an entry to `memory/log.md` (Log template in `memory/TEMPLATES.md`).
+3. Run `python3 .agents/skills/personal-memory/gate.py --memory memory audit`, trim any file you touched this session that it warns about, then commit per "Commit at the end of every task" in `AGENTS.md`. The commit message is the memory log.
 4. Tell the user, in one line, which items were recorded, their type, and where.

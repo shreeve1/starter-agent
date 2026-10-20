@@ -1,0 +1,24 @@
+# Start here
+
+This is a ready-made agent workspace: instructions (`AGENTS.md`), skills, memory and git hooks. Your AI agent (Claude Cowork or Codex) sets it up with you and moves your own notes and rules into it. You don't copy files by hand.
+
+## What you need
+
+- Claude Cowork or Codex.
+- Nothing else is required. Git and Python 3.11+ add version history and the commit checks; the setup works without them and your agent tells you what is off.
+
+## First setup
+
+1. Make a new, empty folder for your workspace.
+2. Open your agent with access to three folders: this one, the new empty one, and (if you have one) your current agent setup.
+3. Paste this, with the paths filled in:
+
+   > Read `<this folder>/.agents/setup/README.md` and set me up in `<new folder>`. Bring over what is useful from `<my current setup>` (or "nothing to migrate"). Decide where my files and notes go, and ask me before anything is dropped.
+
+Your agent copies this workspace into the new folder, reads your old setup, decides where things belong and tells you what it did.
+
+## A newer version arrived
+
+Open your agent with the new version, a new empty folder, and your current workspace, then say: "Follow the 'A newer version arrived' section of `.agents/setup/README.md` in the new version." Your current workspace is left untouched; it is the way back.
+
+Some apps and file browsers hide folders whose names start with a dot; the setup instructions are in `.agents/setup/`.

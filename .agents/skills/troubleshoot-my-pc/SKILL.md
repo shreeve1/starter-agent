@@ -81,11 +81,11 @@ Only record a **decision** ([DECISIONS-FORMAT.md](./DECISIONS-FORMAT.md)) in the
 
 ### 2. Before writing, check for an existing entry
 
-Scan `memory/index.md` and `memory/docs/` for a matching or superseded entry. If the same problem is already recorded, update that bullet (bump `updated`, note what changed) rather than adding a duplicate.
+Scan `memory/index.md` and `memory/docs/` for a matching entry. If the same problem is already recorded, overwrite that bullet in place (bump `updated`) rather than adding a duplicate.
 
-### 3. Update the index and log
+### 3. Update the index and commit
 
-Update `memory/index.md` (Promoted Memory table) and append a `memory/log.md` entry, matching the formats in `memory/TEMPLATES.md`. If updating an existing entry, update its existing index row date/summary instead of adding a duplicate.
+Update `memory/index.md` (Promoted Memory table). If updating an existing entry, update its existing index row date/summary instead of adding a duplicate. If you wrote a decision, run `python3 .agents/skills/personal-memory/indexes.py`. Then run `python3 .agents/skills/personal-memory/gate.py --memory memory audit`, trim any file you touched this session that it warns about, and commit per "Commit at the end of every task" in `AGENTS.md`.
 
 ### 4. Tell the person
 

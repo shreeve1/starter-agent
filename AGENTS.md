@@ -4,15 +4,14 @@ Instructions for AI agents working in this workspace.
 
 ## Hard rule: Keep responses concise
 
-In all interactions and commit messages, be extremely concise and sacrifice grammar for the sake of concision.
+In all interactions and commit messages, be extremely concise, in plain full sentences.
 
 ## DO THIS FIRST: run these tool calls before your first reply
 
 On your FIRST response in a session, before you answer, plan, load any skill, or ask any question, you MUST make these tool calls now. This is not background context — execute it as your first actions:
 
-1. Read `memory/index.md` and `memory/glossary.md` with the available file or shell tools. Enumerate the `memory/preferences/` directory, then read every `.md` file it lists, including hidden files. In Codex on Windows, use `Get-Content -LiteralPath` and `Get-ChildItem -LiteralPath memory/preferences -Force`; a tool named `read` is not required. If a file does not exist, note it and move on. Do this even if the user's request seems unrelated — memory may change how you answer.
-2. Read `CONTEXT.md` before
-research, scope, or memory work, and whenever the user's wording sounds like a defined term.
+1. Read `memory/index.md`, `memory/glossary.md` and `memory/rules.md` with the available file or shell tools (in Codex on Windows, `Get-Content -LiteralPath`; a tool named `read` is not required). Then read every file the `Always` row of `memory/rules.md` names. If a file does not exist, note it and move on. Do this even if the user's request seems unrelated — memory may change how you answer. Skip this step only when a "Session-start memory" message already holds these files.
+2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead skill runs the task, its Also load files add content.
 3. Treat index rows as pointers, not facts. Before relying on or acting on a row, open the file it links to.
 
 Do the above BEFORE acting on the user's request, even when the request tempts you to jump straight to another skill or answer. This applies EVEN when the request is itself a simple read or summary (e.g. "summarize AGENTS.md", "what does file X say") — do step 1 first, THEN read whatever the user asked about. Reading only the file the user named is NOT a substitute for step 1. Full policy: "Personal workspace memory" below.
@@ -23,7 +22,7 @@ This directory is a workspace configuration area, not normal application source 
 
 Primary audience: AI agents. Secondary audience: teammates reading the same operating rules.
 
-Before committing a change to a skill script, have a `reviewer` agent review the diff against `CODING_STANDARDS.md`.
+Before committing a change to a skill script, have a `reviewer` agent review the diff against `CODING_STANDARDS.md`. Same review for an agent-written memory change touching more than 10 notes: the reviewer reads both ends of every new link.
 
 ## Codex runtime
 
@@ -32,7 +31,7 @@ Before committing a change to a skill script, have a `reviewer` agent review the
 - For requested or skill-required delegation, use Codex collaboration tools, not a presumed `task` or `Agent/Task` tool. Respect available agent slots; run independent branches in isolated batches when needed. Do not create sidebar chats for internal subtasks.
 - Use built-in web search/open tools for background research. Use the available browser integration for interactive pages; do not assume native desktop control is available.
 - Hook files are shipped but not enabled in this Codex workspace. Do not edit or enable them without a separate request. Run relevant checks directly before commits.
-- Treat the incoming `MANIFEST.json` and `CHANGELOG.md` as Release records. Do not regenerate them for local customizations; the Pristine Snapshot preserves the incoming Release for future merges.
+- Treat `MANIFEST.json` as the incoming Release record; do not regenerate it for local customizations. Record local changes under a `Local changes` heading in `CHANGELOG.md`.
 
 
 ## Core behavior
@@ -49,13 +48,22 @@ This is not optional and does not require the user to say "remember." Before rep
 
 Write everything that qualifies once, at the end of the task, with the `personal-memory` skill — not mid-task after each trigger. Do NOT ask first. Then end the reply with ONE line per item saved: `Memory saved: <path> - <short summary>`.
 
-There are no candidates and no approval step. The guards are checks, not questions: the safety rules below, the conflict rule (supersede, never silently overwrite), and the `gate.py audit` check from the `personal-memory` skill. Never store passwords or other credentials; omit them automatically and never ask about them. Client information (names, environments, contacts, config facts) IS allowed in memory — it is what makes memory useful.
+There are no candidates and no approval step. The guards are checks, not questions: the safety rules below, the conflict rule (overwrite in place; git keeps the old text), and the `gate.py audit` check from the `personal-memory` skill. Never store passwords or other credentials; omit them automatically and never ask about them. Client information (names, environments, contacts, config facts) IS allowed in memory — it is what makes memory useful.
 
 Does not qualify: one-off task details (a single
 user, record, or device); the status of work still in motion (waiting on a vendor reply, a cancellation in progress, "built but not live") — save it once, when it settles; temporary instructions; anything memory already states correctly. When unsure, capture only if a future session would otherwise have to re-learn it the hard way. The full policy is under "Personal workspace memory" below.
 
 Use these rules for coding, non-coding office work, documents, spreadsheets, email drafts,
 research, scheduling, process updates, and workflow cleanup.
+
+### Commit at the end of every task
+
+Git here is local version history that protects work, not a review gate. Commit whatever this session changed at the end of every task that changed files, and before any long-running step. Do not ask. The commit message is the record of what changed and why; there is no separate log file.
+
+- Stage by exact path only the files this session wrote, moved or deleted. Parallel sessions share this tree: leave their files unstaged, and in a file both touched (often `memory/index.md`) stage only your own hunks (`git add -p`).
+- Git-ignored files stay uncommitted; never force-add them.
+- Subject `<area>: <what changed>`, at most 72 characters.
+- If a hook fails, fix what it reports and commit again. Use `--no-verify` only for a secret-scan hit you confirmed is a false positive.
 
 ### Hard rule: discussion is not approval
 
@@ -120,7 +128,7 @@ Strong success criteria allow independent progress. Weak goals like “make it b
 
 ## Personal workspace memory
 
-This workspace uses `memory/` for local, personal, non-code memory. Keep Git local only (no remote), and track populated memory `.md` files for version history. Optional hooks live in `.githooks/`: pre-commit scans for secrets, runs `gate.py audit` and the skill tests; commit-msg caps the subject at 72 characters; pre-push refuses every push. They are not enabled in this Codex workspace; do not add remotes or push, and run checks directly.
+This workspace uses `memory/` for local, personal, non-code memory. Populated memory `.md` files are tracked in git so they have version history. Hooks live in `.githooks/`: pre-commit scans for secrets, runs `gate.py audit` and the skill tests; commit-msg caps the subject at 72 characters. They are not enabled in this Codex workspace; run those checks directly before commits.
 
 Use the `personal-memory` skill when capturing, checking, promoting, pruning, or using memory under `memory/`.
 
@@ -135,21 +143,17 @@ Use the `personal-memory` skill when capturing, checking, promoting, pruning, or
 - Prefer short summaries over raw content. Do not store full emails, screenshots, client documents, or transcripts by default.
 - Store raw material only when the user explicitly asks to keep it, and strip credentials first.
 
-### Read policy
+### Rules
 
-- Treat `CONTEXT.md` as canonical vocabulary — contested/overloaded terms with a chosen form and aliases to avoid ("which meaning?"), plus relationships and resolved ambiguities. If user language conflicts with it, briefly surface the conflict and ask which meaning applies.
-- Treat `memory/glossary.md` as the entity directory — shorthand → full identity ("who/what is this?"). Consult it before acting on any request containing shorthand entities. Routing when capturing: naming dispute → `CONTEXT.md`; plain label expansion → `memory/glossary.md`.
-- Read promoted memory files relevant to the task before choosing tools, applying workflow rules, drafting user-facing communication, or acting on workspace-specific behavior.
-- Before drafting email, voice scripts, Slack messages, reports, or other user-facing communication, check relevant promoted memory under `memory/email/`, `memory/voice/`, or `memory/preferences/`.
-- Follow workspace-relative cross-links (`memory/topic.md`) between memory topics, and read tolerantly (`memory/README.md` "Tolerant Reads").
+`memory/rules.md` routes tasks to skills and memory files: one row per trigger, pointers only. Precedence between rows is stated at its top. Follow workspace-relative cross-links (`memory/topic.md`) between memory topics, and read tolerantly (`memory/README.md` "Tolerant Reads"). To add a rule, use the `personal-memory` skill.
 
 ### Global capture
 
 What happens after a trigger (see "Memory capture: check at the end of every task"). Capture is autonomous; there are no candidates.
 
-- **Write at end of task:** once per task, use the `personal-memory` skill to write directly to the correct topic file (workflows and decisions go in a topic folder from the fixed list), update `memory/index.md`, append `memory/log.md`, run `python3 .agents/skills/personal-memory/indexes.py` when a workflow/decision changed, and run `gate.py audit`.
-- **Commit at end of task:** commit the memory files you wrote so the tree is never left dirty for the next session. `memory/log.md` and `memory/index.md` are shared by parallel sessions, so stage only your own hunks (`git add -p`) and leave other sessions' lines unstaged.
-- **Conflicts:** when a new item contradicts an existing promoted rule, mark the old rule superseded (dated, in Notes) and make the new one active. Never delete the old rule. Procedures are the exception: corrected in place, git is the history.
+- **Write at end of task:** once per task, use the `personal-memory` skill to write directly to the correct topic file (workflows and decisions go in a topic folder from the fixed list), update `memory/index.md`, run `python3 .agents/skills/personal-memory/indexes.py` when a workflow/decision changed, and run `gate.py audit`. Trim any file you touched that it warns about.
+- **Commit at end of task:** per "Commit at the end of every task" above.
+- **Conflicts:** when a new item contradicts an existing rule, overwrite it in place. Files state only what is true now; git keeps the old wording.
 - **Report at wrap-up:** list everything saved this session (paths + one-line summaries) and fix any `gate.py audit` failure. If nothing qualified, say: `Memory check: nothing worth capturing.`
 
 ## Next-best action suggestions
@@ -172,7 +176,7 @@ Keep suggestions lightweight. Do not turn every response into a workflow checkli
 
 ## Documents and folder scaffolding
 
-Never save a generated document to the workspace root. Root operating files are `AGENTS.md`, `CONTEXT.md`, `CODING_STANDARDS.md`, `.gitignore`, and optional `.mcp.json`. Shipped Release records `MANIFEST.json` and `CHANGELOG.md` also belong there.
+Never save a document to the workspace root. The root holds only `AGENTS.md`, `CONTEXT.md`, `CODING_STANDARDS.md`, `.gitignore`, `.mcp.json`, and the Release records `MANIFEST.json`, `CHANGELOG.md` and `START-HERE.md`.
 
 The folder map, naming, precedence, git-ignore status and file formats are in `memory/preferences/document-scaffolding.md`, read at session start. Default folder when nothing fits: `artifacts/<topic>/`.
 

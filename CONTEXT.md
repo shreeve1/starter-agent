@@ -9,19 +9,15 @@ One of the two standalone builds of this workspace made for a different audience
 _Avoid_: version, fork, flavor
 
 **Release**:
-A numbered folder of one Edition's files that the person running that Edition has their own agent apply. It is built one-way from the source workspace and is never pulled from a remote.
+A numbered version of one Edition. The owner's agent copies it into a new folder and migrates the owner's content in. It is built one-way from the source workspace.
 _Avoid_: update, sync, pull
 
 **Manifest**:
-The file shipped in every Release that classifies each file by how an update may treat it: merged on every release, seeded once, or left to its owner.
+The file shipped in every Release that lists each shipped file: shared files that stay as shipped, and starter files that are the owner's to edit. Nothing checks it.
 _Avoid_: file list, lockfile
 
-**Pristine Snapshot**:
-The unedited copy of an applied Release, kept in the owner's own history and used as the common base when merging the next Release.
-_Avoid_: applied tag, backup, baseline
-
 **Schema**:
-The one list of valid Client Subjects, memory topics and per-client document folders for a workspace. Each Edition ships its own, and the owner may change it.
+The one list of valid Client Subjects, memory topics, per-client document folders and the name of the client folder (`client_folder`, default `clients`) for a workspace. Each Edition ships its own, and the owner may change it.
 _Avoid_: taxonomy, config
 
 **Client Short Name**:
@@ -50,10 +46,10 @@ _Avoid_: next steps, resolution plan
 
 ## Relationships
 
-- An **Edition** is built one-way from its source workspace: changes an owner makes never flow back, and each **Release** is applied by the owner's own agent after talking the plan through with the owner.
+- An **Edition** is built one-way from its source workspace: changes an owner makes never flow back, and each **Release** is set up by the owner's agent into a new folder, migrating the owner's content in.
 - An **Edition**'s skill list is chosen on its own, so a skill left out of one **Edition** is never restored because the other includes it.
-- A **Release** is merged against the **Pristine Snapshot** of the previous Release, never against the owner's edited files, so the owner's changes survive each update; a first install has no previous snapshot.
-- A **Release** never removes a **Schema** entry that the owner's notes still use: the change is held until those notes are migrated or validated, and the audit keeps failing any note whose subject is not in the **Schema**.
+- An update is a fresh copy of the new **Release** with the owner's content brought across by their agent; shared files arrive as shipped, and personal rules live in memory, never in shared files.
+- The audit keeps failing any note whose subject is not in the **Schema**; the owner's agent moves such notes to a valid subject first.
 - **Client Subject** and topic values come from the **Schema**; an agent adds one only with the owner's approval.
 - **Client Memory** is the single home for lasting client facts; other memory topics hold tool quirks, not client facts.
 - A **Client Memory** note belongs to exactly one client and one **Client Subject**; a fact spanning subjects is filed under the subject a future task would look in first and linked from the other.

@@ -1,5 +1,6 @@
 ---
 title: Documents Go in Folders, Never the Root
+summary: No loose files in the workspace root - folder map, naming, what git tracks vs ignores, formats; ask before new top-level folders.
 type: preference
 status: promoted
 created: 2026-10-05
@@ -29,4 +30,3 @@ topics: [preference, documents, workspace-layout]
 
 - Last reviewed: 2026-10-05
 - Captured 2026-10-05 from the user's request to add document scaffolding to AGENTS.md.
-- 2026-10-08: the folder map moved here from AGENTS.md (retro trim of always-loaded context); AGENTS.md keeps the root rule and a pointer. Superseded: "folder map lives in AGENTS.md".

@@ -3,8 +3,8 @@
 
 Builds `memory/workflows/index.md` and `memory/decisions/index.md` from the
 promoted files on disk, reading each file's frontmatter (title, summary,
-status, updated) as the single source for its index line. Superseded files are
-listed in a final `## Retired` section instead of under their topic.
+status, updated) as the single source for its index line. A `status: superseded`
+file is listed like any other; `gate.py audit` warns that it should be deleted.
 
 Deterministic and idempotent: output depends only on the files on disk.
 `--check` writes nothing and exits 1 if any index would be created or changed.
@@ -57,14 +57,10 @@ def render(memory_dir, topic_dir):
     ]
     topics = schema.load(memory_dir)["topics"]
     active = []
-    retired = []
     for p in promoted_files(memory_dir, topic_dir):
-        title, summary, status, updated, rel = parse_file(p, memory_dir)
+        title, summary, _status, updated, rel = parse_file(p, memory_dir)
         line = f"- [{title}]({rel}) {summary} ({updated})".rstrip()
-        if status == "superseded":
-            retired.append(line)
-        else:
-            active.append((p.parent.name, line))
+        active.append((p.parent.name, line))
     for topic in topics:
         entries = [line for t, line in active if t == topic]
         if entries:
@@ -72,11 +68,6 @@ def render(memory_dir, topic_dir):
             lines.append("")
             lines.extend(entries)
             lines.append("")
-    if retired:
-        lines.append("## Retired")
-        lines.append("")
-        lines.extend(retired)
-        lines.append("")
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
@@ -89,7 +80,7 @@ def plan(memory_dir):
 def drift(memory_dir):
     """([paths] that would be written or changed, stale=[])."""
     changed = [p for p, text in plan(memory_dir).items()
-               if not p.exists() or p.read_text(encoding="utf-8") != text]
+               if not p.exists() or hubs.read_note(p) != text]
     return changed, []
 
 

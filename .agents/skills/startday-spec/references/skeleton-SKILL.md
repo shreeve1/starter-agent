@@ -1,13 +1,13 @@
 # Skeleton SKILL.md
 
-Copy everything below the line into `.agents/skills/startday/SKILL.md`. Replace every `<fill in: ...>` with the owner's interview answer. Keep the six rules word for word.
+Copy everything below the line into `.agents/skills/startday/SKILL.md`. Replace every `<fill in: ...>` with the owner's interview answer. Keep the six rules word for word. Delete each `[module: ...]` section the owner did not pick, together with its heading; keep the heading text of picked ones without the `[module: ...]` tag.
 
 ---
 
 ```markdown
 ---
 name: startday
-description: Start-of-day loop over <fill in: what a work item is> from <fill in: where items come from>. Gathers the day's items, researches each one read-only into its own research file, drafts every change as an approval to tick, and executes only ticked approvals, until <fill in: when the day ends>. Use for "startday", "start my day", or when the loop re-prompts.
+description: Start-of-day loop over <fill in: what feeds the day, e.g. "my tasks, meeting transcripts and watched pages">. Each run gathers what changed, researches it read-only into research files, drafts every change as an approval to tick, and executes only ticked approvals, until <fill in: when the day ends>. Use for "startday", "start my day", or when a runner sends "Run the startday skill: poll turn."
 ---
 
 # startday
@@ -21,37 +21,65 @@ description: Start-of-day loop over <fill in: what a work item is> from <fill in
 5. The human's edits always survive. The loop never overwrites text the human typed.
 6. Empty or blank answers count as not answered.
 
-Owner settings:
-- Work item: <fill in: what a work item is and what separates two items>
-- Source: <fill in: tool or connector and how to read it>
-- Mine today: <fill in: which items count, which to skip>
+Owner settings (`.agents/startday.json` holds the paths and watch targets; this list is the rest):
 - Hours: <fill in: start time, stop-new-research time, end time, timezone>
 - May read: <fill in: allowed sources>; never read: <fill in: off limits>
 - Changes needing approval: <fill in: list>, plus anything else that writes or sends.
-- Research files: <fill in: folder>, one file per item. Approvals page: <fill in: path>.
+- Research folder: <fill in: folder>. Approvals page: <fill in: path>. Activity log: <fill in: path>.
 - Notify by: <fill in: method>. No private details in notifications.
+- Runner: <fill in: runner from references/runners.md, or "none: I type startday">.
 - Never: <fill in: hard limits>
 
-## Start
+## Each run
 
-1. Check the clock against Hours. Outside them, say so and stop.
-2. Open the approvals page and research folder; create them if missing (never overwrite).
-3. Handle any approvals ticked since the last run (see Check approvals).
+Every run does the same pass, whether the owner typed it or a runner sent it. It keeps nothing in memory between runs: everything it needs is in the files below.
 
-## Gather
+1. Check the clock against Hours. Before the start time, reply "Not started yet." and stop.
+2. Open the approvals page, research folder and activity log; create any that are missing (never overwrite).
+3. If the activity log has no heading for today, this is the first run: add today's heading, then run every picked module's "First run" step. After the end time, write the Wrap-up instead and stop.
+4. Check approvals (below).
+5. Run each picked module's "Every run" step.
+6. Research what steps 3 to 5 found, until the stop-new-research time (see Research).
+7. After the end time, if today's wrap-up line is missing: Wrap-up.
+8. Reply in one or two lines: what changed, what needs the owner.
 
-1. Read today's items from Source, keeping only "Mine today".
-2. Order them: due soonest first, then the rest.
-3. Note new, changed and gone items. A gone item: cancel its open approvals and mark its research file closed.
+## [module: work items] Work items
+
+- Work item: <fill in: what a work item is and what separates two items>
+- Source: <fill in: tool or connector and how to read it>
+- Mine today: <fill in: which items count, which to skip>
+
+First run: read today's items from Source, keeping only "Mine today". Order them due soonest first. Each one is something to research.
+
+Every run: read Source again. A new item: research it. An item with new activity since its research file's last findings: research it again. A gone item (closed, reassigned): cancel its open approvals and mark its research file closed.
+
+## [module: meetings] Meetings
+
+Source: the `"use": "meetings"` folder in `.agents/startday.json`, read through `python3 .agents/skills/startday-spec/scripts/watch.py`, or by hand when Python is missing (`.agents/skills/startday-spec/references/modules.md` "Watching without Python").
+
+First run and every run: run `watch.py` (or the by-hand method), once per pass, shared with Watch. For each `new` or `changed` transcript, follow `.agents/skills/startday-spec/references/modules.md` "Meetings": write the meeting record, save lasting facts, draft follow-ups as approvals, and ask when the item it belongs to is unclear. Name the record by the change's `id`; a `changed` transcript updates the record with that `id`.
+
+## [module: watch] Watch
+
+Targets: every other entry in `.agents/startday.json` "watch", each with its `why`.
+
+First run and every run: run `watch.py` (or the by-hand method), once per pass, shared with Meetings. For each change outside the meetings folder, follow `.agents/skills/startday-spec/references/modules.md` "Watch". An `error`: one activity log line. After Meetings and Watch have written down every change: `watch.py --ack`, or clear `manual.pending`.
+
+## [module: look-back] Look-back
+
+Every run, in Check approvals: when you find a `[-]` rejection or an edited body, also add the `Owner feedback` line that `.agents/skills/startday-spec/references/modules.md` "Look-back" describes, once per approval id.
+
+First run and every run: if the activity log has no `Look-back done` line dated in the last 7 days, follow that section (it re-reads the last 90 days of owner feedback), then add `Look-back done <date>: wrote <n>, candidates <n>`. Otherwise skip it.
 
 ## Research
 
-For each item, until the stop-new-research time:
+For each item found this run:
 1. Open or create its research file. Read the owner's notes and answers first; they are the newest facts.
 2. Read the item and related sources (read-only).
 3. Write dated findings and rewrite Path to Close: remaining steps, who owns each, next approval id.
 4. Something only the owner knows: add a question with an empty `Answer:` line. Park the item and move on.
 5. Stop at a wall: a change, a person, or a sign-in.
+6. One activity log line per item: what happened, in plain words.
 
 ## Draft approvals
 
@@ -59,10 +87,9 @@ For each change research wants, add one checkbox line to the approvals page with
 
 ## Check approvals
 
-Every <fill in: check interval>, and at Start:
 - `[x]` ticked: execute it (next step).
 - `[-]` rejected: record the reason in the research file; do not redraft.
-- Body edited by the owner: ask once "Send your edited version?".
+- Body edited by the owner: ask once "Send your edited version?". With a runner and no one watching, leave it and add a needs-you line instead.
 - Item changed since the draft: cancel and redraft.
 - Unticked: leave it; move on.
 
@@ -72,5 +99,5 @@ Do exactly what the ticked line says, nothing more. Check it took effect. Mark t
 
 ## Wrap-up
 
-At <fill in: what done for the day means>: stop starting research, write a short summary (items by status, approvals waiting, open questions, needs-you lines), notify by the owner's method, and stop the loop.
+At <fill in: what done for the day means>: stop starting research, add a short summary to the activity log (items by status, approvals waiting, open questions, needs-you lines) with the line `Wrap-up done <date>`, and notify by the owner's method.
 ```

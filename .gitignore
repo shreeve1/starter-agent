@@ -14,8 +14,6 @@ Thumbs.db
 
 # Generated working documents
 artifacts/
-reports/
-notes/
 tmp/
 .handoff/
 .teaching/
@@ -41,6 +39,5 @@ youtube/**/raw/
 *.wav
 *.zip
 
-# Release operation data; state remains tracked
-.agents/release-backup/
-.agents/snapshots/
+# Skill state
+.agents/startday.state.json

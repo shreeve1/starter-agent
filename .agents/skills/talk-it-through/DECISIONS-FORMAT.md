@@ -12,8 +12,8 @@ Everything still follows the conventions in
 
 - One file per decision: `memory/decisions/<topic>/decision-<slug>.md`
 - Create the `<topic>` folder lazily — only when the first decision in it is recorded. Pick the topic from the `topics` list in `memory/schema.json` (a new topic only with the owner's OK).
-- If a later session changes an earlier decision, update that decision's file (bump `updated`, note what changed) rather than creating a duplicate.
-- Before creating a new file, scan `memory/decisions/<topic>/` and `memory/index.md` for an existing matching or superseded decision.
+- If a later session changes an earlier decision, overwrite that decision's file in place (bump `updated`; one `Changed YYYY-MM-DD: <why>` line only if the reason still matters) rather than creating a duplicate.
+- Before creating a new file, scan `memory/decisions/<topic>/` and `memory/decisions/index.md` for an existing matching decision.
 - After writing, update the sub-index: run `python3 .agents/skills/personal-memory/indexes.py` (then `gate.py audit`). 15-file rule: a memory folder holding more than 15 `.md` files directly gets topic subfolders plus a generated index; `gate.py crowded` reports it.
 
 ## File template
@@ -21,6 +21,7 @@ Everything still follows the conventions in
 ```md
 ---
 title: Short decision title
+summary: One line shown on the decision index
 type: decision
 status: promoted
 created: YYYY-MM-DD
@@ -34,10 +35,8 @@ topics: [decision]
 
 ## Notes
 
-- Decided during a talk-it-through session on YYYY-MM-DD.
 - Alternatives considered, or constraints behind it — only if worth remembering.
 - Prefer role/process summaries over client names unless the client-specific constraint is essential.
-- Supersedes or updates: {earlier decision file, if any}
 ```
 
 Keep it short. The value is recording *that* a decision was made and *why* — not filling sections. Most decisions are a single paragraph.
@@ -65,5 +64,5 @@ should not have to re-litigate it. Typically:
 
 1. Add or update each decision file in `memory/decisions/<topic>/`.
 2. Run `python3 .agents/skills/personal-memory/indexes.py` to regenerate the sub-index `memory/decisions/index.md` (decisions are listed there, not per-file in `memory/index.md`).
-3. Append an entry to `memory/log.md` (use the Log template in `memory/TEMPLATES.md`).
+3. Run `python3 .agents/skills/personal-memory/gate.py --memory memory audit`, trim any file you touched this session that it warns about, then commit per "Commit at the end of every task" in `AGENTS.md`. The commit message is the memory log.
 4. Tell the user, in one line, which decisions were recorded and where.
