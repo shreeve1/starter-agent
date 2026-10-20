@@ -32,6 +32,7 @@ The owner must verify the loop on a test system (or a test list of items that ca
 
 - Run one full day on the test system: gather, research, draft, tick one approval, execute it, reject one, wrap up.
 - Check rule 5 directly: type a note and an answer in a research file, run a turn, and confirm both are untouched.
+- With Calendar picked: book a test event with another attendee inside the brief lead time, run a turn, and confirm the day plan lists it as fixed and its brief appears. Move it and confirm the next run updates the day plan once. Book one for tomorrow morning and confirm the wrap-up lists it.
 - With Meetings picked: drop a test transcript into the folder, wait two minutes and one run, and confirm a meeting record appears.
 - With Watch picked: change a watched file, confirm the next run reports it once and the run after reports nothing.
 - With Look-back picked: plant three rejections on three different items, each with the same reason in the owner's words. Run it and confirm one memory note is written, listing those three items as its source, with a `memory/rules.md` row that reaches it. Then plant five agent-written voids from one cause (for example `superseded: tone rule`) with no owner feedback, run it again, and confirm it writes only a candidate line in the activity log.

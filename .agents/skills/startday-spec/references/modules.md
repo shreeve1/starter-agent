@@ -2,11 +2,25 @@
 
 The core (the six rules, research files, approvals, questions, wrap-up) is always on. Modules are what feeds it. The owner picks any mix; each picked module adds its section from the skeleton. A module left out leaves no trace in the finished skill.
 
-Work items, Meetings and Watch write only research files, the approvals page and questions (Meetings also saves facts to memory with `personal-memory`). Look-back is not a feed: it reviews what the owner's feedback taught across many days, and writes memory only through `personal-memory`. The six rules cover all four unchanged.
+Calendar, Work items, Meetings and Watch write only research files, the approvals page and questions (Meetings also saves facts to memory with `personal-memory`). Look-back is not a feed: it reviews what the owner's feedback taught across many days, and writes memory only through `personal-memory`. The six rules cover all five unchanged.
+
+## Calendar
+
+The shape of the day. Most owners start from their calendar, so the interview asks about it first and the other modules plan around it. Interview questions 1 to 5 define it.
+
+- **Source:** the owner's calendar through a connector or CLI the agent can already read (Google Calendar, Microsoft 365, CalDAV, a published calendar link). Reading is never a change; accepting, declining, booking, moving or cancelling an event is, and is drafted as an approval.
+- **Kinds:** each event is **fixed** (a time the owner must be there: other attendees, a call, a site visit), **flexible** (the owner's own blocks and placeholders: work them whenever fits, never wait for the slot) or **ignored** (declined, all-day reminders, personal, anything the owner named). The interview sets the rule; an event it does not cover counts as fixed.
+- **Day plan:** on the first run, write today's events at the top of the activity log, fixed ones with their times, flexible ones as "any time", plus the free gaps between fixed events. Research runs in the gaps.
+- **Order:** items linked to today's fixed events are researched first, by start time; then items linked to flexible events; then everything else.
+- **Brief:** before each fixed event (lead time from the interview), write a brief in the research folder: time, attendees, purpose from the invite, linked work items with their Path to Close, notes from the last meeting with the same people, open questions and the owner's open promises. Link it from the day plan. A brief is research, never a change.
+- **Passed events:** a fixed event whose end time has passed is not "upcoming" any more; never write "at today's <time> meeting" for it. With Meetings picked, its transcript produces the follow-ups. Without Meetings, add one question to the brief: "Anything to follow up from <event>?"
+- **Changes during the day:** every run, read today's events again. A new, moved or cancelled fixed event updates the day plan and gets one activity log line; a new fixed event inside the lead time gets its brief at once.
+- **Linking:** an event belongs to a work item only when the invite names the item, its client or a person tied to it. A guess from the time alone is a question, never a link.
+- **Tomorrow:** in the wrap-up, list tomorrow's fixed events before midday, so the owner sees an early start the evening before.
 
 ## Work items
 
-Things the owner drives to completion: tickets, tasks, email threads, projects. Interview questions 1 to 3 define them. Each gets a research file with a Path to Close.
+Things the owner drives to completion: tickets, tasks, email threads, projects. Interview questions 6 to 8 define them. Each gets a research file with a Path to Close.
 
 
 ## Meetings
@@ -17,7 +31,7 @@ Turns finished meeting transcripts into facts, decisions and drafted follow-ups.
 - **Per transcript, write a meeting record** in the research folder: date, who attended, a short summary, decisions, the owner's own commitments, other people's action items, and open questions.
 - **Facts** worth keeping go to memory with the `personal-memory` skill, each with the meeting as its source.
 - **Follow-ups** (an email to send, a task to create, time to book) are drafted as approvals on the matching work item's research file, or on the meeting record when no item matches.
-- **Who it belongs to** is only a guess until the transcript itself names the person, company or item. When unsure, add a question ("Is the meeting on <date> about <item>?") and keep the facts in the record until it is answered.
+- **Who it belongs to:** with Calendar picked, the fixed event overlapping the transcript's start time is the first candidate. It is still only a guess until the transcript itself names the person, company or item. When unsure, add a question ("Is the meeting on <date> about <item>?") and keep the facts in the record until it is answered.
 - A transcript still being written is not read: `watch.py` waits until the file has not changed for two minutes.
 
 ## Watch

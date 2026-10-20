@@ -10,6 +10,7 @@ On top of Release 5, in this workspace only:
 - Procedures: two rows in `memory/rules.md`, one for defining a procedure (saved only with the owner's approval) and one for following a saved procedure. New "Procedure File" template in `memory/TEMPLATES.md`: Trigger, Steps, Related and Notes are required; other sections are optional; an oversized procedure moves its troubleshooting into a sibling file.
 - New `browser` topic in `memory/schema.json` for browser procedures (`memory/workflows/browser/`).
 - Git: `notes/` and `reports/` are now tracked; `artifacts/` and `tmp/` stay ignored (`.gitignore`, `memory/preferences/document-scaffolding.md`). The folder map adds `clients/<short>/` for documents about one client.
+- `startday-spec` starts from the calendar. The interview opens with "walk me through how your day starts", then five calendar questions. A new Calendar module plans the day around fixed events, works flexible ones whenever they fit, writes a brief before each fixed event, never calls a past event upcoming, and lists tomorrow's early events in the wrap-up. Meetings uses the overlapping event as its first guess for who a transcript belongs to.
 
 ## Release 5
 
