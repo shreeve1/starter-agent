@@ -30,7 +30,7 @@ Before committing a change to a skill script, have a `reviewer` agent review the
 - Use the tools exposed in this session. File reads and directory listings may use the shell; prefer `rg` for searches. On Windows, use PowerShell and a verified Python executable. Bash examples require an explicitly selected Bash shell.
 - For requested or skill-required delegation, use Codex collaboration tools, not a presumed `task` or `Agent/Task` tool. Respect available agent slots; run independent branches in isolated batches when needed. Do not create sidebar chats for internal subtasks.
 - Use built-in web search/open tools for background research. Use the available browser integration for interactive pages; do not assume native desktop control is available.
-- Hook files are shipped but not enabled in this Codex workspace. Do not edit or enable them without a separate request. Run relevant checks directly before commits.
+- Hook files are shipped but not enabled in this Codex workspace. Do not edit or enable them without a separate request. Before each commit, stage the files and run `python .githooks/pre-commit` (secret scan, memory audit, skill tests); fix what it reports first.
 - Treat `MANIFEST.json` as the incoming Release record; do not regenerate it for local customizations. Record local changes under a `Local changes` heading in `CHANGELOG.md`.
 
 

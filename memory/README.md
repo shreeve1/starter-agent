@@ -24,7 +24,7 @@ Use `memory/` to preserve durable non-code preferences and useful working contex
 - Client and third-party information (names, environments, contacts, config facts) is allowed in summaries. Exception: Ticket Guides in `guides/` stay redacted.
 - Prefer summaries over raw content.
 - Store raw snippets only when explicitly requested, with credentials stripped.
-- Keep memory local: commit to the local repo only; never add a remote or push it.
+- Keep memory local: commit to the local repo only. Add a remote or push only when a decision note allows it; this workspace's does: [GitHub repository](memory/decisions/projects/decision-github-repository.md).
 
 ## Data Classes
 

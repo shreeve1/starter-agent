@@ -22,6 +22,7 @@ Read at session start. Load every Always row now. Before each task, load every r
 | Using a tool, connector or workstation setup | | `memory/workflows/index.md` | Open the entries that fit. |
 | The owner starts defining a procedure ("let's define a procedure for …") | | `memory/README.md`, `memory/TEMPLATES.md`, `memory/workflows/index.md` | Saves only with owner approval; README "Capture" has the flow, TEMPLATES "Procedure File" the shape. |
 | A task a saved procedure covers | | `memory/workflows/index.md` | Open and follow the matching procedure file. |
+| Updating this workspace to a new Release | | `memory/decisions/workstation/decision-codex-workspace.md` | Re-apply the local Codex changes; the shipped update steps drop them. |
 | A choice that may already be decided | | `memory/decisions/index.md` | |
 | A hard-to-reverse choice only the owner can make | skill `talk-it-through` | | Routine choices get a stated default instead. |
 | Problem outside the owner's usual work, or the owner asks for an expert view | skill `professional-guidance` | | |

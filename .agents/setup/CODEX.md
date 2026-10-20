@@ -28,13 +28,26 @@ symlink or companion CLI is needed.
 
 This workspace follows friends Edition Release 5 (`MANIFEST.json`). Updates
 work as `README.md` "A newer version arrived" describes: a fresh copy of the
-new Release with this workspace's content brought across. Local Codex
-adaptations and owner changes are listed under "Local changes" in
-`CHANGELOG.md`; carry them across with the update.
+new Release with this workspace's content brought across. That update does
+not copy this file or `CHANGELOG.md`, so the Codex adaptation is recorded
+where it survives: `memory/decisions/workstation/decision-codex-workspace.md`,
+loaded by the "Updating this workspace" row in `memory/rules.md`. The
+"Local changes" list in `CHANGELOG.md` names every file to re-apply.
 
 ## Checks
 
-Run from the workspace root in PowerShell:
+Before every commit, stage the files and run the pre-commit check by hand.
+It scans the staged lines for secrets, then runs the memory audit and the
+skill tests, without enabling hooks:
+
+```powershell
+python .githooks/pre-commit
+```
+
+A non-zero exit means fix what it printed before committing; this workspace
+pushes to GitHub, so a missed secret leaves the machine.
+
+Full health check, from the workspace root in PowerShell:
 
 ```powershell
 git rev-parse --show-toplevel

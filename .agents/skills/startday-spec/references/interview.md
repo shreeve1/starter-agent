@@ -6,21 +6,23 @@ A blank or vague answer counts as not answered (core rule 6). Ask again once, th
 
 ## Start with the morning
 
-0. **Walk me through how your day starts today.** What do you open first, what do you check, what do you decide? Listen for the calendar, the lists and the inboxes they name; those answers pre-fill the questions below, so skip what they already covered.
+0. **Walk me through how your day starts today.** What do you open first, what do you check, what do you decide? Listen for the calendar, the lists and the inboxes they name; those answers pre-fill the questions below, so skip what they already covered. Naming a calendar never skips the read test in question 1.
 
 ## Calendar (asked first: most days start from it)
 
-1. **Where is your calendar, and can your agent read it here?** Google, Outlook or Microsoft 365, iCloud, a shared calendar link, more than one? Read today's events together now to prove it, and check the times show in the owner's timezone.
+Calendar is included unless the owner says no or no calendar can be read here; then skip questions 2 to 5.
+
+1. **Where is your calendar, and can your agent read it here?** Google, Outlook or Microsoft 365, iCloud, a shared calendar link, more than one? Always read today's events together now to prove it, even when question 0 named the calendar, and check the times show in the owner's timezone.
    Recommend: the one calendar your meetings are booked in. If none can be read here, leave Calendar out and say so; the other modules still work.
 
 2. **Which events fix your day, which can move, and which should be ignored?** Fixed: a time you must be there (with other people, a call, a site visit). Flexible: your own blocks and placeholders, worked whenever fits. Ignored: declined events, all-day reminders, personal events, anything else named.
    Recommend: events with other attendees are fixed; events only you attend are flexible; declined and all-day events are ignored.
 
-3. **What should be ready before a fixed event, and how early?** A meeting brief: who is coming, why (from the invite), the work items it touches, notes from the last meeting with these people, open questions, what you promised them.
-   Recommend: a one-screen brief 30 minutes before each fixed event with other people.
+3. **Which fixed events get a brief, and how early?** A meeting brief: who is coming, why (from the invite), the work items it touches, notes from the last meeting with these people, open questions, what you promised them.
+   Recommend: a one-screen brief 30 minutes before each fixed event with other attendees. Write the answer as the Brief rule; the module briefs exactly those events.
 
 4. **What should happen after a meeting?** Follow-ups drafted for your approval, a question asking what came out of it, nothing?
-   Recommend: draft follow-ups from the transcript when Meetings is picked; otherwise, an hour after the end, ask one question in the brief: "Anything to follow up from <event>?"
+   Recommend: draft follow-ups from the transcript when Meetings is picked; otherwise, at the event's end, ask one question on the linked work item's research file (on the activity log when no item is linked): "Anything to follow up from <event>?"
 
 5. **Should the day end with a look at tomorrow?**
    Recommend: yes, list tomorrow's fixed events before midday in the wrap-up.

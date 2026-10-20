@@ -38,8 +38,8 @@ Every run does the same pass, whether the owner typed it or a runner sent it. It
 2. Open the approvals page, research folder and activity log; create any that are missing (never overwrite).
 3. If the activity log has no heading for today, this is the first run: add today's heading, then run every picked module's "First run" step. After the end time, write the Wrap-up instead and stop.
 4. Check approvals (below).
-5. Run each picked module's "Every run" step, Calendar first.
-6. Research what steps 3 to 5 found, until the stop-new-research time (see Research). With Calendar picked, use its order: items linked to today's fixed events first, by start time.
+5. Run each picked module's "Every run" step, in the order the modules appear below.
+6. Research what steps 3 to 5 found, until the stop-new-research time (see Research), in the order the modules set.
 7. After the end time, if today's wrap-up line is missing: Wrap-up.
 8. Reply in one or two lines: what changed, what needs the owner.
 
@@ -49,12 +49,14 @@ Every run does the same pass, whether the owner typed it or a runner sent it. It
 - Fixed: <fill in: which events are fixed, e.g. "events with other attendees">
 - Flexible: <fill in: e.g. "events only I attend: work them any time, never wait for the slot">
 - Ignored: <fill in: e.g. "declined, all-day, personal">. Any other event counts as fixed.
-- Brief: <fill in: lead time and what goes in it, or "none">
-- After a meeting: <fill in: "follow-ups from the transcript (Meetings)" or "ask one follow-up question">
+- Brief: <fill in: which fixed events get one, the lead time and what goes in it, or "none">
+- After a meeting: <fill in: "follow-ups from the transcript (Meetings)" or "at its end, one follow-up question on the linked item's research file, or the activity log">
 
-First run: read today's events. Write the day plan at the top of today's activity log heading: fixed events with times, flexible events as "any time", the free gaps between fixed events. Write a brief for each fixed event that starts within the lead time, and link each event to a work item only when the invite names it (see `.agents/skills/startday-spec/references/modules.md` "Calendar").
+Calendar runs first among the modules. Research order: items linked to today's fixed events first, by start time; then items linked to flexible events; then the rest.
 
-Every run: read today's events again. New, moved or cancelled: update the day plan and add one activity log line. Write any brief now due. A fixed event that has ended is past: never call it upcoming; handle its follow-up as "After a meeting" says.
+First run: read today's events. Write the day plan at the top of today's activity log heading: fixed events with times, flexible events as "any time", the free gaps between fixed events. Link each event to a work item only when the invite names it. For each fixed event the Brief rule names that starts within the lead time, research its linked items first, then write the brief (see `.agents/skills/startday-spec/references/modules.md` "Calendar").
+
+Every run: read today's events again. New, moved or cancelled: update the day plan and add one activity log line. Write any brief now due, after researching its linked items; refresh a written brief when its items' research changed. A fixed event that has ended is past: never call it upcoming; handle its follow-up as "After a meeting" says. A flexible event that has passed stays open work until done or dropped at wrap-up.
 
 ## [module: work items] Work items
 
