@@ -25,14 +25,13 @@ Things the owner drives to completion: tickets, tasks, email threads, projects. 
 
 ## Meetings
 
-Turns finished meeting transcripts into facts, decisions and drafted follow-ups.
+Turns finished meeting transcripts into facts, decisions and drafted follow-ups. The `meeting` skill does the work; this module decides when it runs.
 
-- **Source:** a folder the owner's transcription tool saves to (Teams, Zoom, Otter, Granola and others can export or sync to a folder). Watched with `scripts/watch.py`, or by hand when Python is missing (see "Watching without Python"), as a `path` target with `"use": "meetings"`. A tool that only keeps transcripts online needs a connector the agent can read; otherwise this module is not available.
-- **Per transcript, write a meeting record** in the research folder: date, who attended, a short summary, decisions, the owner's own commitments, other people's action items, and open questions.
-- **Facts** worth keeping go to memory with the `personal-memory` skill, each with the meeting as its source.
-- **Follow-ups** (an email to send, a task to create, time to book) are drafted as approvals on the matching work item's research file, or on the meeting record when no item matches.
-- **Who it belongs to:** with Calendar picked, the fixed event overlapping the transcript's start time is the first candidate. It is still only a guess until the transcript itself names the person, company or item. When unsure, add a question ("Is the meeting on <date> about <item>?") and keep the facts in the record until it is answered.
-- A transcript still being written is not read: `watch.py` waits until the file has not changed for two minutes.
+- **Source:** the transcripts folder in `memory/preferences/meetings.md` (the `meeting` skill's settings), which the owner's transcription tool saves to (Teams, Zoom, Otter, Granola and others can export or sync to a folder). Watched with `scripts/watch.py`, or by hand when Python is missing (see "Watching without Python"), as a `path` target with `"use": "meetings"`. A tool that only keeps transcripts online needs a connector the agent can read; otherwise this module is not available.
+- **Per new or changed transcript, run the `meeting` skill** on that file. It writes the meeting record, saves lasting facts with `personal-memory`, adds progress to the matching work item's research file, drafts follow-ups as approvals there (or on the record when no item matches), asks when it is unsure who the meeting was with, and moves the transcript to the archive folder.
+- **Who it belongs to:** with Calendar picked, pass the fixed event overlapping the transcript's start time to the skill as its first guess. It is still only a guess until the transcript itself names the person, company or item.
+- **Archive:** a transcript the skill archived shows up in the next `watch.py` run as `gone` when the archive sits inside the watched folder. That is expected: ignore `gone` changes for the meetings target. Files under the archive folder are already processed: ignore their `new` changes too.
+- A transcript still being written is not read: `watch.py` and the skill both wait until it has not changed for two minutes.
 
 ## Watch
 

@@ -37,7 +37,7 @@ Calendar is included unless the owner says no or no calendar can be read here; t
 
 8. **Work items: which are yours today?** Assigned to you, flagged, due soon, in one list? Anything to always skip?
 
-9. **Meetings: where do transcripts land?** The folder your transcription tool saves or syncs to. Open one with the owner to confirm it is plain text the agent can read.
+9. **Meetings: where do transcripts land?** The folder your transcription tool saves or syncs to. Use the one already in `memory/preferences/meetings.md` when it is set; otherwise run the `meeting` skill's "First use" questions now, which save it there. Open one transcript with the owner to confirm it reads as text.
    Recommend: one folder for all transcripts, outside the research folder.
 
 10. **Watch: what should be watched, and why?** Each folder, file or page, with one line on what change matters. Pages must load without signing in.

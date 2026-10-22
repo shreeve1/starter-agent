@@ -43,7 +43,8 @@ Ask these in order. Skip any the owner already answered. Stop early when the res
 6. **Which words do you use in a specific way?** Add them to `CONTEXT.md` through `talk-it-through`.
 7. **Which rules in `AGENTS.md` do not fit?** Read the headings with the owner. Never edit `AGENTS.md`: write a preference note that overrides the rule, with a row in `memory/rules.md` (When: Always). The note wins because it is loaded for every task.
 8. **Do you want a start-of-day routine?** See "Start-of-day loop" below.
-9. **What must the agent never do?** Systems never to touch, people never to contact, actions that always need asking. Save as a preference note with a row in `memory/rules.md` (When: Always).
+9. **Do you have meeting transcripts?** If a transcription tool (Teams, Zoom, Otter, Granola, a recorder app) saves transcripts to a folder, personalize the `meeting` skill now: ask its "First use" questions (`.agents/skills/meeting/SKILL.md`) and save the answers in `memory/preferences/meetings.md`. Run it once on a real transcript with the owner. If there are no transcripts, leave the note as shipped and say the skill is there when they start recording.
+10. **What must the agent never do?** Systems never to touch, people never to contact, actions that always need asking. Save as a preference note with a row in `memory/rules.md` (When: Always).
 
 After the interview, restate the answers as a short list, ask "Is anything here wrong?", then make the changes and commit with the owner's OK.
 

@@ -72,7 +72,7 @@ Every run: read Source again. A new item: research it. An item with new activity
 
 Source: the `"use": "meetings"` folder in `.agents/startday.json`, read through `python3 .agents/skills/startday-spec/scripts/watch.py`, or by hand when Python is missing (`.agents/skills/startday-spec/references/modules.md` "Watching without Python").
 
-First run and every run: run `watch.py` (or the by-hand method), once per pass, shared with Watch. For each `new` or `changed` transcript, follow `.agents/skills/startday-spec/references/modules.md` "Meetings": write the meeting record, save lasting facts, draft follow-ups as approvals, and ask when the item it belongs to is unclear. Name the record by the change's `id`; a `changed` transcript updates the record with that `id`.
+First run and every run: run `watch.py` (or the by-hand method), once per pass, shared with Watch. For each `new` or `changed` transcript outside the archive folder, run the `meeting` skill on that file, with the overlapping fixed event (Calendar) as its first guess. It writes the meeting record, saves lasting facts, drafts follow-ups as approvals and archives the transcript; a `changed` transcript updates its existing record. Ignore `gone` changes for this target and `new` ones under the archive folder: the skill's archive move causes them. Once every change is handled (here and in Watch, when picked): `watch.py --ack`, or clear `manual.pending`.
 
 ## [module: watch] Watch
 

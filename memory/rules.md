@@ -21,6 +21,7 @@ Read at session start. Load every Always row now. Before each task, load every r
 | A word that sounds like a defined term | | `CONTEXT.md` | |
 | Using a tool, connector or workstation setup | | `memory/workflows/index.md` | Open the entries that fit. |
 | The owner starts defining a procedure ("let's define a procedure for …") | | `memory/README.md`, `memory/TEMPLATES.md`, `memory/workflows/index.md` | Saves only with owner approval; README "Capture" has the flow, TEMPLATES "Procedure File" the shape. |
+| Processing a meeting transcript, or the owner names who a meeting was with | skill `meeting` | `memory/preferences/meetings.md` | Settings first; ask the skill's First use questions when they are not set. |
 | A task a saved procedure covers | | `memory/workflows/index.md` | Open and follow the matching procedure file. |
 | Updating this workspace to a new Release | | `memory/decisions/workstation/decision-codex-workspace.md` | Re-apply the local Codex changes; the shipped update steps drop them. |
 | A choice that may already be decided | | `memory/decisions/index.md` | |
