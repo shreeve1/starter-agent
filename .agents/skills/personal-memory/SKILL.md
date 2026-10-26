@@ -28,7 +28,7 @@ Reads are routed by `memory/rules.md`; the session-start steps live in the folde
 
 1. Treat index rows as pointers, not facts: open the linked file before relying on or acting on a row.
 2. Client skills read Client Memory through the hub `memory/<client_folder>/_hubs/<short>.md`, never by guessing note paths.
-3. Before wrapping up, run the end-of-session aggregation (see Global Capture).
+3. Before wrapping up, run the end-of-session sweep (see Global Capture).
 4. If a note you rely on is older than 90 days (`updated` or `verified`; `gate.py stale` lists them), re-ground it against current tool output or files first. Update it in place, or delete it if no longer true. Do not ask the user.
 
 ## Rules
@@ -61,7 +61,7 @@ There are no memory candidates and no approval step for memory writes (a `memory
 
 ## Reference file
 
-For setup or migration, use the `memory-setup` skill. Recovering missing scaffold (`README.md`, `TEMPLATES.md`, `index.md`) and a full memory-health lint are in `<skills>/personal-memory/reference.md`; open it only for one of those. Saving a preference, doc, workflow, decision or client fact needs nothing in it. The directory layout, data classes and file naming are in `memory/README.md`.
+For setup or migration, use the `memory-setup` skill. Recovering missing scaffold (`README.md`, `TEMPLATES.md`, `index.md`), a full memory-health lint, Client Memory and the Weekly Sweep are in `<skills>/personal-memory/reference.md`; open it only for one of those. Saving a preference, doc, workflow or decision needs nothing in it. The directory layout, data classes and file naming are in `memory/README.md`.
 
 ## Global Capture
 
@@ -110,7 +110,7 @@ Direct promotion steps:
    - `memory/guides/` — never auto-written here.
    - `memory/workflows/<topic>/<slug>.md` — pick a topic from the `topics` list in `memory/schema.json` (a new topic only with the owner's OK). Shared Procedures (`type: procedure`) here are written only through an owner-approved change, never auto-captured. After writing, run `indexes.py` and `gate.py audit`.
    - `memory/decisions/<topic>/decision-<slug>.md` — same topic list; after writing, run `indexes.py` and `gate.py audit`.
-   - `memory/<client_folder>/<subject>/<short>/<slug>.md` — Client Memory, for lasting facts about one client. See Client Memory below. After writing, run `python3 <skills>/personal-memory/hubs.py`; add an `index.md` row under `## Client Hubs` for any new hub.
+   - `memory/<client_folder>/<subject>/<short>/<slug>.md` — Client Memory, for lasting facts about one client. See Client Memory in `reference.md`. After writing, run `python3 <skills>/personal-memory/hubs.py`; add an `index.md` row under `## Client Hubs` for any new hub.
    - `memory/glossary.md` — entity directory (shorthand -> identity). Route here for plain label expansions; contested/overloaded terms go to `CONTEXT.md` instead. When first created it gets its OWN `index.md` row for discoverability; `gate.py audit` audits promoted folders and Client Memory, not root files, so it will not flag a missing glossary row. Internal format: see the `glossary.md` template in `memory/TEMPLATES.md`.
    - `memory/rules.md` — a rule (trigger plus pointers), and a row for any new preference or email file. See Rules.
 4. Update frontmatter to `status: promoted` where relevant.
@@ -122,13 +122,7 @@ Direct promotion steps:
 
 ## Client Memory
 
-Lasting client facts live at `memory/<client_folder>/<subject>/<short>/<slug>.md`, one fact per note, template in `memory/TEMPLATES.md`. `<client_folder>` is `clients` unless `memory/schema.json` sets `client_folder` to the owner's own word (one lowercase word, for example `students`); every script and path below follows it. The word "client" in this skill means whatever the owner tracks. `<short>` is the Client Short Name from `memory/glossary.md` (add the client there first if missing). Required frontmatter: `type: client-memory`, `client`, `subject`, `title`, `verified` (YYYY-MM-DD last confirmed), `source` (ticket `"#70358"`, `"the owner said"`, or `"meeting <session8>"`).
-
-Subjects come from the `client_subjects` list in `memory/schema.json` — the source of truth. An agent adds a subject only with the owner's approval, and `gate.py audit` fails any note whose subject is not in the schema. A subject is a kind of lasting fact the owner needs about whatever they track: `contacts` — who to deal with and how; `history` — what happened and was agreed; `preferences` — what the thing likes or needs; `temperature` — dated, sourced observations of what pleases or frustrates it (never personality guesses). Add a subject that fits what the owner tracks, for example the system that holds their records, with the owner's OK.
-
-A fact spanning subjects is filed where a task would look first and linked (by `memory/...` path) from a short note in the other subject.
-
-Hubs: `python3 <skills>/personal-memory/hubs.py` regenerates `memory/<client_folder>/_hubs/<short>.md` for every client found under any subject (notes by subject with verified date, plus that client's `<client_folder>/<short>/tickets/`, `projects/` and `procedures/` files). Without Python, write the hub by hand with the same note paths, subjects and verified dates, and any existing client document paths. Otherwise never edit generated hubs by hand. `hubs.py --check` exits 1 if a hub is out of date. The session writes Client Memory and runs `hubs.py`; when subagents are used, they return facts. `hubs.py` lists every note on disk, including another live session's uncommitted notes, even for the same client. In a git repo, stage only the hub lines for notes this session wrote or deleted: start from `git show HEAD:<hub>`, apply just your lines, then `git hash-object -w` and `git update-index --cacheinfo` (as `startday` step 8 does, where used). Never `git add` a whole hub.
+Before writing or reading a client fact, read Client Memory in `<skills>/personal-memory/reference.md`: note paths, required frontmatter, subjects and hubs.
 
 ## Conflict Resolution
 
@@ -148,21 +142,7 @@ Hubs: `python3 <skills>/personal-memory/hubs.py` regenerates `memory/<client_fol
 
 ## Weekly Sweep
 
-Only where a scheduled sweep is set up (`WEEKLY-SWEEP.md` in a starter workspace) or the owner asks. The automated sweep needs git and Python; without either, use the Lint Workflow in `reference.md` and report proposed deletions instead. `sweep.py` deletes a file only when its bytes equal the committed copy, so every deletion can be undone from git.
-
-0. `git status --short`. Another session may be mid-edit: never edit, compact, trim, merge or delete a file listed there, staged or not; name it in the final report instead. Never run `git restore`, `checkout`, `reset`, `stash` or `clean`: they discard other sessions' work. To undo your own edit, write the old text back by hand. `sweep.py` checks this itself for the files it deletes.
-
-1. `python3 <skills>/personal-memory/sweep.py --apply`. It deletes `.sessions/` and `artifacts/` files older than 90 days, except `artifacts/startday/` (where used) and any file a note, skill or context file names. `reports/`, `memory/` and `clients/` are never aged out. Keep its output for the commit body.
-2. Run `gate.py audit`, `stale`, `crowded` and `links`.
-3. Act on what they show:
-   - `status: superseded`, or a note whose only content is history: delete it and its index row.
-   - Stale (over 90 days): re-ground it against current files or tool output. Still true: set `updated`. False: delete it. Needs a live system you cannot reach: leave it and name it in the report. Never delete a note for age alone.
-   - Two notes on the same subject: merge into one, delete the other, repoint links (`gate.py backlinks <path>` lists them).
-   - Over size, or a glossary row longer than one line: trim it and move the detail into a Client Memory source note (`memory/clients/<subject>/<short>/<slug>.md`), never into a hub, which `hubs.py` regenerates. Run `gate.py compact` only when `rules.md`, `glossary.md` and `index.md` are all clean in `git status`; it rewrites every padded one of them. Otherwise leave the padding and say so.
-   - Crowded folder: consolidate per the 15-file rule.
-4. Run `indexes.py --check` and `hubs.py --check`. If neither would change a file, skip to 5. Otherwise run `git status --short`: when every index or hub they would rewrite or remove is clean, run `indexes.py` and `hubs.py`; when one is dirty, leave it and name it in the report. Then `gate.py audit`; if it still fails only because of a file you were told to leave, report that and stop.
-5. Commit only the paths this run changed or deleted, never other sessions' files: `memory: weekly sweep <date>`, with the swept and deleted paths in the body.
-6. Reply with one line: files swept, notes deleted, merged, trimmed, left for the owner.
+Only where a scheduled sweep is set up (`WEEKLY-SWEEP.md` in a starter workspace) or the owner asks: follow Weekly Sweep in `<skills>/personal-memory/reference.md`.
 
 ## Output Rules
 
