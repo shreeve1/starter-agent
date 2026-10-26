@@ -42,7 +42,7 @@ Create folders only as content needs them.
 
 ## Capture
 
-No candidates and no approval step. At the end of each task, when a capture trigger fired (a correction, a stated rule or preference, a described workflow, a settled decision, or a reusable fact discovered while working), the agent writes it to the right file, updates `index.md`, runs `indexes.py` for workflow/decision changes (and `hubs.py` for Client Memory) and `gate.py audit`, commits if the project is a git repo, and reports what it saved. Without Python, use the `personal-memory` skill's manual checks instead.
+No candidates and no approval step, except for procedures (`type: procedure`): one is saved only after the owner says yes to the full file. At the end of each task, when a capture trigger fired (a correction, a stated rule or preference, a described workflow, a settled decision, or a reusable fact discovered while working), the agent writes it to the right file, updates `index.md`, runs `indexes.py` for workflow/decision changes (and `hubs.py` for Client Memory) and `gate.py audit`, commits if the project is a git repo, and reports what it saved. Without Python, use the `personal-memory` skill's manual checks instead.
 
 ## Client Memory
 

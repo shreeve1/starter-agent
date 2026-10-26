@@ -13,4 +13,6 @@ Read at session start. Load every Always row now. Before each task, load every r
 | Shorthand name of a host, service, person or system | | `memory/glossary.md` | |
 | A word that sounds like a defined term | | `CONTEXT.md` | Delete this row if the project has no `CONTEXT.md`. |
 | Work on one tracked thing | | `memory/clients/_hubs/<short>.md` | Template: rename to the project's word and folder when Client Memory is set up, otherwise delete. |
+| The owner starts defining a procedure ("let's define a procedure for …") | skill `personal-memory` | `memory/TEMPLATES.md`, `memory/workflows/index.md` | Steps: personal-memory reference.md "Procedures". |
+| A task a saved procedure or workflow covers | | `memory/workflows/index.md` | Open the matching file and follow it. |
 | Saving, pruning or checking memory | skill `personal-memory` | | |

@@ -1,6 +1,6 @@
 ---
 name: personal-memory
-description: Use when capturing, promoting, pruning, or using local personal memory under memory/. Triggers include remember this, capture this preference, run memory check, email preferences, voice preferences, glossary or entity shorthand, client facts (Client Memory, client hubs), and important docs to remember.
+description: Use when capturing, promoting, pruning, or using local personal memory under memory/. Triggers include remember this, capture this preference, run memory check, email preferences, voice preferences, glossary or entity shorthand, client facts (Client Memory, client hubs), defining or following a procedure ("let's define a procedure for X"), and important docs to remember.
 ---
 
 
@@ -61,7 +61,7 @@ There are no memory candidates and no approval step for memory writes (a `memory
 
 ## Reference file
 
-For setup or migration, use the `memory-setup` skill. Recovering missing scaffold (`README.md`, `TEMPLATES.md`, `index.md`), a full memory-health lint, Client Memory and the Weekly Sweep are in `<skills>/personal-memory/reference.md`; open it only for one of those. Saving a preference, doc, workflow or decision needs nothing in it. The directory layout, data classes and file naming are in `memory/README.md`.
+For setup or migration, use the `memory-setup` skill. Recovering missing scaffold (`README.md`, `TEMPLATES.md`, `index.md`), a full memory-health lint, Client Memory, the Weekly Sweep and Procedures are in `<skills>/personal-memory/reference.md`; open it only for one of those. Saving a preference, doc, workflow or decision needs nothing in it. The directory layout, data classes and file naming are in `memory/README.md`.
 
 ## Global Capture
 
@@ -108,7 +108,7 @@ Direct promotion steps:
    - `memory/voice/`
    - `memory/email/`
    - `memory/guides/` — never auto-written here.
-   - `memory/workflows/<topic>/<slug>.md` — pick a topic from the `topics` list in `memory/schema.json` (a new topic only with the owner's OK). Shared Procedures (`type: procedure`) here are written only through an owner-approved change, never auto-captured. After writing, run `indexes.py` and `gate.py audit`.
+   - `memory/workflows/<topic>/<slug>.md` — pick a topic from the `topics` list in `memory/schema.json` (a new topic only with the owner's OK). Shared Procedures (`type: procedure`) here are written only through an owner-approved change, never auto-captured. Defining or following one: Procedures in `reference.md`. After writing, run `indexes.py` and `gate.py audit`.
    - `memory/decisions/<topic>/decision-<slug>.md` — same topic list; after writing, run `indexes.py` and `gate.py audit`.
    - `memory/<client_folder>/<subject>/<short>/<slug>.md` — Client Memory, for lasting facts about one client. See Client Memory in `reference.md`. After writing, run `python3 <skills>/personal-memory/hubs.py`; add an `index.md` row under `## Client Hubs` for any new hub.
    - `memory/glossary.md` — entity directory (shorthand -> identity). Route here for plain label expansions; contested/overloaded terms go to `CONTEXT.md` instead. When first created it gets its OWN `index.md` row for discoverability; `gate.py audit` audits promoted folders and Client Memory, not root files, so it will not flag a missing glossary row. Internal format: see the `glossary.md` template in `memory/TEMPLATES.md`.
@@ -123,6 +123,10 @@ Direct promotion steps:
 ## Client Memory
 
 Before writing or reading a client fact, read Client Memory in `<skills>/personal-memory/reference.md`: note paths, required frontmatter, subjects and hubs.
+
+## Procedures
+
+When the owner says "let's define a procedure for X", or a task matches a saved procedure, follow Procedures in `<skills>/personal-memory/reference.md`.
 
 ## Conflict Resolution
 

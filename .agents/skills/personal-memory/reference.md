@@ -1,6 +1,6 @@
 # Personal Memory Reference
 
-Rare operations for the `personal-memory` skill: recovering missing scaffold, linting memory health, Client Memory and the weekly sweep. `SKILL.md` covers everyday capture and reads; open this file only for one of these. `<skills>` is defined in `SKILL.md`.
+Rare operations for the `personal-memory` skill: recovering missing scaffold, linting memory health, Client Memory, the weekly sweep and procedures. `SKILL.md` covers everyday capture and reads; open this file only for one of these. `<skills>` is defined in `SKILL.md`.
 
 ## Setup Workflow
 
@@ -75,3 +75,17 @@ Only where a scheduled sweep is set up (`WEEKLY-SWEEP.md` in a starter workspace
 4. Run `indexes.py --check` and `hubs.py --check`. If neither would change a file, skip to 5. Otherwise run `git status --short`: when every index or hub they would rewrite or remove is clean, run `indexes.py` and `hubs.py`; when one is dirty, leave it and name it in the report. Then `gate.py audit`; if it still fails only because of a file you were told to leave, report that and stop.
 5. Commit only the paths this run changed or deleted, never other sessions' files: `memory: weekly sweep <date>`, with the swept and deleted paths in the body.
 6. Reply with one line: files swept, notes deleted, merged, trimmed, left for the owner.
+
+## Procedures
+
+A procedure is a verified set of steps the agent follows whenever its trigger comes up: a `type: procedure` file in `memory/workflows/<topic>/<slug>.md`, shaped by "Procedure File" in `memory/TEMPLATES.md`. A runbook a person follows belongs in the project's `docs/` instead.
+
+**Defining one** ("let's define a procedure for X"):
+
+1. Read `memory/workflows/index.md`. If a procedure or workflow already covers X, propose changes to that file instead of a new one.
+2. Interview the owner one question at a time: the trigger, where things are, defaults, then each step with its exact command or click. Mark each point where the owner must say yes as a ready check.
+3. Run the steps for real with the owner. A procedure holds only steps that were run and verified; when the run has to wait, say so, and save after that run.
+4. Pick a topic from `memory/schema.json` (a new topic only with the owner's OK). Show the owner the full file and save only after a clear yes.
+5. Add a `memory/rules.md` row whose When is the trigger and whose Also load is the file. Run `indexes.py`, then `gate.py audit` until it exits 0, and commit in a git repo.
+
+**Following one:** open the matching file and run its steps in order, stopping at each ready check until the owner says yes. When a step fails or no longer matches the system, stop and propose the change; edit the file only after the owner's yes.

@@ -7,7 +7,9 @@ Use this table when sorting old material. The owner approves what moves and what
 | A rule about how the agent behaves (tone, format, "always", "never") | A preference note in `memory/preferences/` plus a row in `memory/rules.md` (`personal-memory` skill) |
 | A fact about the owner, their tools or machine | A doc note in `memory/docs/` |
 | Lasting facts about a person or thing they track | A Client Memory note under the subjects settled in the tracking model (`personal-memory` skill, then `hubs.py`) |
-| A repeatable process | `memory/workflows/<topic>/` (topics in `memory/schema.json`) |
+| A process the agent runs, learned from use | `memory/workflows/<topic>/` (topics in `memory/schema.json`) |
+| Verified steps the agent follows when a trigger comes up | A procedure in `memory/workflows/<topic>/` (`personal-memory` reference.md "Procedures"), saved only with the owner's yes |
+| A runbook a person follows | The project's `docs/`, or wherever its runbooks already live |
 | A settled decision | `memory/decisions/<topic>/` |
 | Email or message style | `memory/email/` or `memory/voice/` |
 | A shorthand name | A row in `memory/glossary.md` |
