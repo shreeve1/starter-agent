@@ -21,6 +21,11 @@ The bar is the rule, not a quota. A wiki usually keeps well under 15%; a person'
 
 For a mixed page, split it into identified items (for example `page.md#item-1`) and give each one a verdict. Account for every input page and every extracted item without introducing another verdict. Preserve source references so the owner can inspect what will be left behind.
 
+## Before presenting
+
+- **Contradictions:** when a kept item contradicts a current doc, search the whole folder (instructions, docs, skills, per-client files) for the same instruction. List every location; the proposed fix covers all of them, not only the first one found.
+- **Uncommitted sources:** in git, check each file a kept item cites with `git status --short <path>`. List every untracked or modified source; the owner decides whether to commit it, or the note cites a committed file instead.
+
 ## Presenting
 
 Speak to the owner in plain words, not verdict labels:
@@ -28,6 +33,7 @@ Speak to the owner in plain words, not verdict labels:
 - **What I would keep:** group proposed notes by destination; give each note's short summary and which source items it combines. Show shorthand names separately.
 - **What I would leave behind:** count each reason and show safe examples. Explain: "already written in your docs", "no longer true", "a past update, not a lasting rule", or "only about how the old notes system ran". Include source pointers so all dropped items remain inspectable.
 - **Work still to do:** show each proposed backlog item and where it would go; say it is not being saved as a fact about the current project.
+- **Conflicts and sources:** each contradiction with every location found, and each cited source not in git.
 - **What happens to the original:** say whether it stays untouched or propose a local archive and removal, including any reader that blocks removal.
 
 Ask once per group, for example: "Shall I save these notes about how you work?" Wait for an OK before writing that group's migrated content or dropping real content. Show both versions of any conflict with a shipped rule and ask about it individually; the answer becomes a preference note. Sorting output is a proposal, not permission to remove the source.
