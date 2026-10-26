@@ -42,11 +42,11 @@ Create folders only as content needs them.
 
 ## Capture
 
-No candidates and no approval step. At the end of each task, when a capture trigger fired (a correction, a stated rule or preference, a described workflow, a settled decision, or a reusable fact discovered while working), the agent writes it to the right file, updates `index.md`, runs `indexes.py` for workflow/decision changes (and `hubs.py` for Client Memory) and `gate.py audit`, commits if the project is a git repo, and reports what it saved.
+No candidates and no approval step. At the end of each task, when a capture trigger fired (a correction, a stated rule or preference, a described workflow, a settled decision, or a reusable fact discovered while working), the agent writes it to the right file, updates `index.md`, runs `indexes.py` for workflow/decision changes (and `hubs.py` for Client Memory) and `gate.py audit`, commits if the project is a git repo, and reports what it saved. Without Python, use the `personal-memory` skill's manual checks instead.
 
 ## Client Memory
 
-For things the project keeps coming back to (hosts, services, customers). Notes live at `memory/<client_folder>/<subject>/<short>/<slug>.md`, one fact per note; `client_folder` and `client_subjects` are set in `schema.json`. `<short>` is the short name from `glossary.md`. Run `hubs.py` after writing; hubs are never hand-edited and each gets an `index.md` row under `## Client Hubs`. Unused when `client_subjects` is empty.
+For things the project keeps coming back to (hosts, services, customers). Notes live at `memory/<client_folder>/<subject>/<short>/<slug>.md`, one fact per note; `client_folder` and `client_subjects` are set in `schema.json`. `<short>` is the short name from `glossary.md`. Run `hubs.py` after writing; edit hubs by hand only without Python, following the skill's manual hub instructions, and give each an `index.md` row under `## Client Hubs`. Unused when `client_subjects` is empty.
 
 ## Naming
 
