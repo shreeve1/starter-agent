@@ -7,6 +7,7 @@ A file under `artifacts/` is kept while a note, skill or context file names it o
 Only a file whose bytes equal the committed copy is deleted, so every deletion can be undone.
 Any doubt (not a git repo, a nested root, an unreadable folder) deletes nothing.
 """
+
 import argparse
 import os
 import re
@@ -45,7 +46,9 @@ def corpus(root):
                 dirnames[:] = [d for d in dirnames if d not in CORPUS_SKIP]
                 for f in filenames:
                     if Path(f).suffix in CORPUS_SUFFIXES:
-                        parts.append((Path(dirpath) / f).read_text(encoding="utf-8", errors="replace"))
+                        parts.append(
+                            (Path(dirpath) / f).read_text(encoding="utf-8", errors="replace")
+                        )
     text = "\n".join(parts)
     return text + "\n" + unquote(text)
 
@@ -89,7 +92,11 @@ def matches_head(root, rel, path=None):
         after = os.lstat(path)
     except OSError:
         return False
-    stable = (before.st_size, before.st_mtime_ns, before.st_ctime_ns) == (after.st_size, after.st_mtime_ns, after.st_ctime_ns)
+    stable = (before.st_size, before.st_mtime_ns, before.st_ctime_ns) == (
+        after.st_size,
+        after.st_mtime_ns,
+        after.st_ctime_ns,
+    )
     return stable and data == blob.stdout
 
 
@@ -108,7 +115,12 @@ def candidates(root, now):
             for name in filenames:
                 p = Path(dirpath) / name
                 rel = p.relative_to(root).as_posix()
-                if p.is_symlink() or not p.is_file() or rel not in keep or any(rel == s or rel.startswith(s + "/") for s in skip):
+                if (
+                    p.is_symlink()
+                    or not p.is_file()
+                    or rel not in keep
+                    or any(rel == s or rel.startswith(s + "/") for s in skip)
+                ):
                     continue
                 st = p.stat()
                 age = (now - st.st_mtime) / DAY
@@ -137,9 +149,15 @@ def delete_if_restorable(root, rel):
     try:
         os.link(aside, path)
     except FileExistsError:
-        return False, f"changed since it was listed; its text is kept as {aside.relative_to(root).as_posix()}"
+        return (
+            False,
+            f"changed since it was listed; its text is kept as {aside.relative_to(root).as_posix()}",
+        )
     except OSError as e:
-        return False, f"changed since it was listed; its text is kept as {aside.relative_to(root).as_posix()} ({e})"
+        return (
+            False,
+            f"changed since it was listed; its text is kept as {aside.relative_to(root).as_posix()} ({e})",
+        )
     aside.unlink()
     return False, "changed since it was listed; left in place"
 
@@ -180,7 +198,9 @@ def main():
         size += nbytes
     if args.apply:
         prune_empty(root, done)
-    print(f"sweep: {len(done)} files, {size} bytes{'' if args.apply else ' (dry run; --apply deletes)'}")
+    print(
+        f"sweep: {len(done)} files, {size} bytes{'' if args.apply else ' (dry run; --apply deletes)'}"
+    )
 
 
 if __name__ == "__main__":

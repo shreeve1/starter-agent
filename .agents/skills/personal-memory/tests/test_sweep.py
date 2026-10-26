@@ -1,4 +1,5 @@
 """sweep.py retention rules and gate.py budgets for indexes and root context files."""
+
 import os
 import subprocess
 import sys
@@ -24,8 +25,12 @@ def make(root, rel, age_days, text="x"):
 
 
 def git(root, *args):
-    return subprocess.run(["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t", *args],
-                          capture_output=True, text=True, check=True)
+    return subprocess.run(
+        ["git", "-C", str(root), "-c", "user.email=t@t", "-c", "user.name=t", *args],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
 
 
 def commit_all(root):
@@ -38,7 +43,9 @@ def commit_all(root):
 def sweep(root, *args, commit=True):
     if commit:
         commit_all(root)
-    return subprocess.run([sys.executable, str(SWEEP), "--root", str(root), *args], capture_output=True, text=True)
+    return subprocess.run(
+        [sys.executable, str(SWEEP), "--root", str(root), *args], capture_output=True, text=True
+    )
 
 
 class GitSafetyTests(unittest.TestCase):
@@ -51,7 +58,11 @@ class GitSafetyTests(unittest.TestCase):
             os.utime(modified, (time.time() - 200 * 86400,) * 2)
             untracked = make(td, ".sessions/untracked.md", 200)
             proc = sweep(td, "--apply", commit=False)
-            self.assertEqual([modified.exists(), untracked.exists(), clean.exists()], [True, True, False], proc.stdout)
+            self.assertEqual(
+                [modified.exists(), untracked.exists(), clean.exists()],
+                [True, True, False],
+                proc.stdout,
+            )
 
     def test_outside_a_git_repo_nothing_is_deleted(self):
         with tempfile.TemporaryDirectory() as td:
@@ -87,8 +98,12 @@ class SweepTests(unittest.TestCase):
             by_file = make(td, "artifacts/diagrams/flow.png", 200)
             by_topic = make(td, "artifacts/brand/palette/logo.svg", 200)
             unnamed = make(td, "artifacts/other/stale.csv", 200)
-            make(td, "memory/preferences/p.md", 1,
-                 "Palette: `artifacts/brand/palette/logo.svg`. Flow: artifacts/diagrams/flow.png\n")
+            make(
+                td,
+                "memory/preferences/p.md",
+                1,
+                "Palette: `artifacts/brand/palette/logo.svg`. Flow: artifacts/diagrams/flow.png\n",
+            )
             make(td, "memory/preferences/q.md", 1, "The `artifacts/brand` folder holds the look.\n")
             sweep(td, "--apply")
             self.assertTrue(by_file.exists())
@@ -100,14 +115,18 @@ class SweepTests(unittest.TestCase):
             old = make(td, "artifacts/brand-old/x.png", 200)
             make(td, "memory/preferences/p.md", 1, "See artifacts/brand/ only.\n")
             sweep(td, "--apply")
-            self.assertFalse(old.exists(), "a note naming artifacts/brand must not protect artifacts/brand-old")
+            self.assertFalse(
+                old.exists(), "a note naming artifacts/brand must not protect artifacts/brand-old"
+            )
 
     def test_startday_runtime_state_and_other_folders_are_never_touched(self):
         with tempfile.TemporaryDirectory() as td:
-            kept = [make(td, "artifacts/startday/ledger.jsonl", 400),
-                    make(td, "reports/old-report.md", 400),
-                    make(td, "memory/preferences/old.md", 400),
-                    make(td, "clients/acme/notes.md", 400)]
+            kept = [
+                make(td, "artifacts/startday/ledger.jsonl", 400),
+                make(td, "reports/old-report.md", 400),
+                make(td, "memory/preferences/old.md", 400),
+                make(td, "clients/acme/notes.md", 400),
+            ]
             sweep(td, "--apply")
             self.assertEqual([p.exists() for p in kept], [True] * 4)
 
@@ -145,7 +164,9 @@ class SweepTests(unittest.TestCase):
     def test_main_keeps_a_file_edited_between_listing_and_deleting(self):
         sys.path.insert(0, str(SWEEP.parent))
         import io
+
         import sweep as sw
+
         with tempfile.TemporaryDirectory() as td:
             old = make(td, ".sessions/old.md", 200, "committed text")
             commit_all(td)
@@ -164,7 +185,9 @@ class SweepTests(unittest.TestCase):
                 sw.main()
             finally:
                 sw.candidates, sys.argv, sys.stdout = real, argv, stdout
-            self.assertEqual(old.read_text(encoding="utf-8"), "edited by another session", out.getvalue())
+            self.assertEqual(
+                old.read_text(encoding="utf-8"), "edited by another session", out.getvalue()
+            )
             self.assertIn("skipped .sessions/old.md", out.getvalue())
             self.assertIn("sweep: 0 files", out.getvalue())
 
@@ -205,6 +228,7 @@ class SweepTests(unittest.TestCase):
     def test_a_file_edited_after_listing_survives_with_its_new_text(self):
         sys.path.insert(0, str(SWEEP.parent))
         import sweep as sw
+
         with tempfile.TemporaryDirectory() as td:
             old = make(td, ".sessions/old.md", 200, "committed text")
             commit_all(td)
@@ -232,6 +256,7 @@ class SweepTests(unittest.TestCase):
     def test_a_modified_file_whose_name_was_recreated_keeps_both_versions(self):
         sys.path.insert(0, str(SWEEP.parent))
         import sweep as sw
+
         with tempfile.TemporaryDirectory() as td:
             old = make(td, ".sessions/old.md", 200, "committed text")
             commit_all(td)
@@ -261,11 +286,14 @@ class SweepTests(unittest.TestCase):
             old.write_text("uncommitted edit git cannot see", encoding="utf-8")
             os.utime(old, (time.time() - 200 * 86400,) * 2)
             proc = sweep(td, "--apply", commit=False)
-            self.assertEqual(old.read_text(encoding="utf-8"), "uncommitted edit git cannot see", proc.stdout)
+            self.assertEqual(
+                old.read_text(encoding="utf-8"), "uncommitted edit git cannot see", proc.stdout
+            )
 
     def test_a_write_landing_after_the_move_aside_is_never_lost(self):
         sys.path.insert(0, str(SWEEP.parent))
         import sweep as sw
+
         with tempfile.TemporaryDirectory() as td:
             old = make(td, ".sessions/old.md", 200, "committed text")
             commit_all(td)
@@ -287,7 +315,12 @@ class SweepTests(unittest.TestCase):
     def test_a_url_encoded_reference_keeps_the_artifact(self):
         with tempfile.TemporaryDirectory() as td:
             old = make(td, "artifacts/client diagrams/flow.png", 200)
-            make(td, "memory/preferences/p.md", 1, "![flow](../artifacts/client%20diagrams/flow.png)\n")
+            make(
+                td,
+                "memory/preferences/p.md",
+                1,
+                "![flow](../artifacts/client%20diagrams/flow.png)\n",
+            )
             sweep(td, "--apply")
             self.assertTrue(old.exists())
 
@@ -321,8 +354,10 @@ class BudgetTests(unittest.TestCase):
     def test_oversize_index_warns(self):
         with tempfile.TemporaryDirectory() as td:
             mem = memory(td)
-            (mem / "index.md").write_text((mem / "index.md").read_text(encoding="utf-8") + "\n" + "x" * 10300,
-                                          encoding="utf-8")
+            (mem / "index.md").write_text(
+                (mem / "index.md").read_text(encoding="utf-8") + "\n" + "x" * 10300,
+                encoding="utf-8",
+            )
             self.assertRegex(audit(mem).stdout, r"Warning: memory/index\.md: \d+ bytes, over 10240")
 
     def test_index_under_budget_is_quiet(self):
@@ -345,10 +380,14 @@ class BudgetTests(unittest.TestCase):
             mem = memory(td)
             (mem / "glossary.md").write_text(
                 "## Clients\n| Short   | Halo client ID |\n| ------- | -------------- |\n| acme    | 1              |\n\n"
-                "Note   with   spaces.\n", encoding="utf-8")
+                "Note   with   spaces.\n",
+                encoding="utf-8",
+            )
             run_script(GATE, mem, "compact")
-            self.assertEqual((mem / "glossary.md").read_text(encoding="utf-8"),
-                             "## Clients\n| Short | Halo client ID |\n|---|---|\n| acme | 1 |\n\nNote   with   spaces.\n")
+            self.assertEqual(
+                (mem / "glossary.md").read_text(encoding="utf-8"),
+                "## Clients\n| Short | Halo client ID |\n|---|---|\n| acme | 1 |\n\nNote   with   spaces.\n",
+            )
 
 
 if __name__ == "__main__":
