@@ -15,9 +15,9 @@ This is a ready-made agent workspace: instructions (`AGENTS.md`), skills, memory
 
    > Read `<this folder>/.agents/setup/README.md` and set me up in `<new folder>`. Bring over what is useful from `<my current setup>` (or "nothing to migrate"). Decide where my files and notes go, and ask me before anything is dropped.
 
-Later, ask your agent "set up memory in `<folder>`" for any other project, or "bring my old notes from `<place>` into memory".
-
 Your agent copies this workspace into the new folder, reads your old setup, decides where things belong and tells you what it did.
+
+Later, ask your agent "set up memory in `<folder>`" for any other project, or "bring my old notes from `<place>` into memory".
 
 ## A newer version arrived
 

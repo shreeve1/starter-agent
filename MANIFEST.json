@@ -3069,7 +3069,7 @@
     },
     ".agents/skills/memory-setup/SKILL.md": {
       "class": "merge",
-      "sha256": "8b711f2d313fd32c3b5ed7118b7fb1447bd9f568f9c6380ad2ae5ab3176fb906",
+      "sha256": "b135d53fc02608d88324f2e48afd15b2c827dd9321a2e21c65e7942c57e09269",
       "mode": "644"
     },
     ".agents/skills/memory-setup/code-repos.md": {
@@ -3079,7 +3079,7 @@
     },
     ".agents/skills/memory-setup/sorting.md": {
       "class": "merge",
-      "sha256": "bc20deded16d0f6d5aa73897d2aca69074ea8b3a300fd9caaecf33e5cf97fd1f",
+      "sha256": "dd36874a7e71f251c612320c3de9ae953b53dfd4a09f4ce23c8deca92183cd16",
       "mode": "644"
     },
     ".agents/skills/memory-setup/subagent-brief.md": {
@@ -3089,12 +3089,12 @@
     },
     ".agents/skills/memory-setup/tests/test_layout.py": {
       "class": "merge",
-      "sha256": "d724750fcf5abbebf001e45d6c38843eb22c832a504593fc4acb638d5c204023",
+      "sha256": "be522e265f9a5a780690caba1f357e9e9a418fb6a23fc6bec56a9f273efb0c38",
       "mode": "644"
     },
     ".agents/skills/memory-setup/tracking-model.md": {
       "class": "merge",
-      "sha256": "c6781175d042c14ddd9d2ddf5f077e2fb675a89bed2e4614d9ddcbb987e68cd9",
+      "sha256": "4e5a59fcc3bdb9cbf3411e357ce3243d4452f09d7c2579aa69e2f8c048bb2387",
       "mode": "644"
     },
     ".agents/skills/memory-setup/where-things-go.md": {
@@ -4089,7 +4089,7 @@
     },
     ".agents/skills/personal-memory/SKILL.md": {
       "class": "merge",
-      "sha256": "f60b741fd2b27de96f558b6c1da77a493c4f38c95d369e0262ec94f82181fe2f",
+      "sha256": "a805ead4a8f744475924e70a2cd9a569eac91b5693cea3b717199840e0285cfd",
       "mode": "644"
     },
     ".agents/skills/personal-memory/gate.py": {
@@ -4119,7 +4119,7 @@
     },
     ".agents/skills/personal-memory/scaffold/AGENTS-memory.md": {
       "class": "merge",
-      "sha256": "358e5a807f76f2cd26ddb3ae03dc19b0f316795164fcf5135456b4b8dc0313f0",
+      "sha256": "171a0e030028553c6c19049155c9892ba45df540374a439ead96d9d9f3c4965a",
       "mode": "644"
     },
     ".agents/skills/personal-memory/scaffold/README.md": {
@@ -4129,7 +4129,7 @@
     },
     ".agents/skills/personal-memory/scaffold/TEMPLATES.md": {
       "class": "merge",
-      "sha256": "ad2f61a057a1949a142318209475a852bbd95366f5cc1f7d397d1acd9651a39b",
+      "sha256": "7b95c61e9b5427f3650f4f907cc7a6a6dd8e45fe92d5e3e1bdbb8901990530f4",
       "mode": "644"
     },
     ".agents/skills/personal-memory/scaffold/glossary.md": {
@@ -4184,7 +4184,7 @@
     },
     ".agents/skills/personal-memory/tests/test_rules.py": {
       "class": "merge",
-      "sha256": "47057b6f809475c2b9a5ca5a86763a0ec6e7f084293116e42c2646b74eee2d4c",
+      "sha256": "b739b7eaf3c1895674bc7edf5e300b01ba04d983e3753587f354ec97162f302e",
       "mode": "644"
     },
     ".agents/skills/personal-memory/tests/test_schema.py": {
@@ -6754,7 +6754,7 @@
     },
     "CHANGELOG.md": {
       "class": "local",
-      "sha256": "1ab6bbac89553d191f2c8ba11d364009cbdfe0ff55af5212d9056549b15186e5",
+      "sha256": "aab7c47483c9740b0c72e6477708662888164ed5f95ea117edee3c48f707f96b",
       "mode": "644"
     },
     "CONTEXT.md": {
@@ -6764,7 +6764,7 @@
     },
     "START-HERE.md": {
       "class": "local",
-      "sha256": "afe9ec44893aafa64301aebbeb78448cb3046e24daead9f0a1abd858502024a3",
+      "sha256": "017c78c6e3465673230fc4c8ea7c1bf1d04934a185c1480937acdb25216a06fa",
       "mode": "644"
     },
     "memory/README.md": {

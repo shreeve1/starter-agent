@@ -92,7 +92,7 @@ One row per entity, grouped under the sections that have content. Thin rows: sho
 ## Systems
 | Shorthand | Identity |
 | --- | --- |
-| ct127 | Monitoring LXC on pve3 (Prometheus, Grafana) |
+| mon1 | Monitoring server |
 ```
 
 ## rules.md

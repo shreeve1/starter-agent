@@ -10,7 +10,7 @@ Use this skill to operate the local `memory/` workspace memory system. In a proj
 
 ## Scope
 
-`<skills>` below is the folder that holds this skill's folder: `.agents/skills` in a workspace or a project copy, `~/.agents/skills` for a global install.
+`<skills>` below is the folder that holds this skill's folder: `.agents/skills` in a workspace or a project copy, `~/.agents/skills` for a global install. In the commands below, `python3` means `python` where that is the working command (often on Windows).
 
 Memory lives in `memory/` at the folder root. Scripts live in this skill's folder; run them from the folder root as `python3 <skills>/personal-memory/<script>.py`. Git is optional. When the folder is a git repo, memory `.md` files are tracked so they have history, and binaries and `memory/raw/` are git-ignored; never store credentials, since history keeps them and travels with any push. When it is not a repo, memory works the same with no history. Hooks run only where the workspace enables them; otherwise run `gate.py audit` directly.
 

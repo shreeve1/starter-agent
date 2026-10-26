@@ -2,7 +2,6 @@ import re
 import unittest
 from pathlib import Path
 
-
 SKILL = Path(__file__).resolve().parents[1]
 SKILLS = Path(__file__).resolve().parents[2]
 
@@ -14,9 +13,7 @@ class LayoutTests(unittest.TestCase):
         return path.read_text(encoding="utf-8")
 
     def source_files(self):
-        return sorted(
-            path for path in SKILL.rglob("*") if path.suffix in {".md", ".py"}
-        )
+        return sorted(path for path in SKILL.rglob("*") if path.suffix in {".md", ".py"})
 
     def test_frontmatter(self):
         text = self.read_required("SKILL.md")
@@ -38,9 +35,7 @@ class LayoutTests(unittest.TestCase):
             "subagent-brief.md",
             "code-repos.md",
         }
-        self.assertEqual(
-            {path.name for path in SKILL.glob("*.md")} - {"SKILL.md"}, expected
-        )
+        self.assertEqual({path.name for path in SKILL.glob("*.md")} - {"SKILL.md"}, expected)
         for path in SKILL.glob("*.md"):
             if path.name != "SKILL.md":
                 with self.subTest(reference=path.name):
@@ -60,7 +55,14 @@ class LayoutTests(unittest.TestCase):
     def test_sorting_verdicts(self):
         text = self.read_required("sorting.md")
         for verdict in (
-            "covered", "stale", "history", "meta", "backlog", "keep", "client", "glossary",
+            "covered",
+            "stale",
+            "history",
+            "meta",
+            "backlog",
+            "keep",
+            "client",
+            "glossary",
         ):
             with self.subTest(verdict=verdict):
                 self.assertRegex(text, rf"\b{verdict}\b")
@@ -68,7 +70,11 @@ class LayoutTests(unittest.TestCase):
     def test_no_personal_content(self):
         # Split fixtures so scanning this test does not flag the fixtures themselves.
         forbidden = (
-            "ja" + "mes", "ita" + "stack", "ita" + "n8n", "home" + "lab", "Na" + "than",
+            "ja" + "mes",
+            "ita" + "stack",
+            "ita" + "n8n",
+            "home" + "lab",
+            "Na" + "than",
         )
         for path in self.source_files():
             text = path.read_text(encoding="utf-8").lower()

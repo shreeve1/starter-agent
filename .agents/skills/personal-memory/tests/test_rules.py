@@ -92,12 +92,12 @@ def index_row(path):
 class RulesAuditTests(unittest.TestCase):
     def test_global_skill_passes(self):
         with tempfile.TemporaryDirectory() as td:
-            mem = workspace(td, ["| Email | | skill `antislop` | |"])
+            mem = workspace(td, ["| Email | | skill `only-in-home` | |"])
             home = Path(td) / "home"
-            global_skill(home, "antislop")
+            global_skill(home, "only-in-home")
             proc = audit(mem, home)
             self.assertEqual(proc.returncode, 0, proc.stdout)
-            self.assertNotIn("skill antislop not found", proc.stdout)
+            self.assertNotIn("skill only-in-home not found", proc.stdout)
 
     def test_skill_missing_locally_and_globally_fails(self):
         with tempfile.TemporaryDirectory() as td:
