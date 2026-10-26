@@ -3069,17 +3069,17 @@
     },
     ".agents/skills/memory-setup/SKILL.md": {
       "class": "merge",
-      "sha256": "5d0927a8bb85b3f84fcb6ebc08c2a135cdfa9644cc87122a6c6fc1deb5b6295d",
+      "sha256": "8b711f2d313fd32c3b5ed7118b7fb1447bd9f568f9c6380ad2ae5ab3176fb906",
       "mode": "644"
     },
     ".agents/skills/memory-setup/code-repos.md": {
       "class": "merge",
-      "sha256": "b28194d9917097764a309acd4dd176181aa2a9d093c4d74aa8d5a820774c7930",
+      "sha256": "524467c056d7a5b76bc3e3d8a33c9b6da51a98403c6a8e7bc6bf5d8214c47db5",
       "mode": "644"
     },
     ".agents/skills/memory-setup/sorting.md": {
       "class": "merge",
-      "sha256": "33a85d1f265f4151b2e56e4636a163fe5d84a19373a1cea7eaa7f7d900875902",
+      "sha256": "bc20deded16d0f6d5aa73897d2aca69074ea8b3a300fd9caaecf33e5cf97fd1f",
       "mode": "644"
     },
     ".agents/skills/memory-setup/subagent-brief.md": {
@@ -3099,7 +3099,7 @@
     },
     ".agents/skills/memory-setup/where-things-go.md": {
       "class": "merge",
-      "sha256": "517744b1a3a69af33d0cc4e3324f07120ed0e14c58de6141235857be3a17144b",
+      "sha256": "1c5bdd53024dfa0e15bc95896baea2c5c337ebbb280e7ac9cb0591e27da41648",
       "mode": "644"
     },
     ".agents/skills/motion-doctrine/SKILL.md": {

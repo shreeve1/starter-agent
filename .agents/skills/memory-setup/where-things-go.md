@@ -12,7 +12,7 @@ Use this table when sorting old material. The owner approves what moves and what
 | Email or message style | `memory/email/` or `memory/voice/` |
 | A shorthand name | A row in `memory/glossary.md` |
 | A word used in a specific way | `CONTEXT.md` |
-| Unsorted notes worth keeping | `memory/candidates/` |
+| Unsorted notes worth keeping | Sort now, or use `memory/raw/` (git-ignored) if the owner wants them kept as is, with credentials removed. |
 | Raw material to keep as is (git-ignored) | `memory/raw/` |
 | Their own skill (**workspace only**) | `.agents/skills/<name>/`, copied whole |
 | An old copy of a shipped skill (**workspace only**) | Not copied; the shipped one wins. A difference the owner relies on becomes a preference note naming the skill. |
