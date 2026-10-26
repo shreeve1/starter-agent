@@ -3094,7 +3094,7 @@
     },
     ".agents/skills/memory-setup/tracking-model.md": {
       "class": "merge",
-      "sha256": "b784f77698ef7e80ba7b9423f8448d7cb6118304f4e5c2d3226ba8db407f2278",
+      "sha256": "c6781175d042c14ddd9d2ddf5f077e2fb675a89bed2e4614d9ddcbb987e68cd9",
       "mode": "644"
     },
     ".agents/skills/memory-setup/where-things-go.md": {
