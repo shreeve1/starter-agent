@@ -1,0 +1,20 @@
+---
+name: memory-setup
+description: Use when asked to set up memory in a folder, project or repo, give a project memory, or migrate an old wiki, notes, saved memories or agent setup into memory. Saving a single fact belongs to personal-memory instead.
+---
+
+# Memory setup
+
+Give the folder memory that fits its owner. Git, Python and subagents are optional; use the available file tools when they are absent. Never install tools without the owner's OK.
+
+`<skills>` means the folder holding `personal-memory`: `.agents/skills` for a workspace or project copy, `~/.agents/skills` for a global install. Run commands from the target folder; substitute the chosen path and quote paths containing spaces for the owner's shell.
+
+1. **Look at what's there.** Read the target folder's instructions and any `memory/`; identify code and git if present. Read the named source, if any. Ask what the owner wants remembered and where the old material is; ask them to paste or export saved memories or instructions an app keeps out of reach. Check tool availability only when needed.
+2. **Settle skills and tracking.** If global skills already exist, point instructions there; copy nothing. In a starter workspace, use its existing `.agents/skills/`. Otherwise ask whether to copy `personal-memory` into the project's `.agents/skills/` or always open the project with their workspace. Recommend a self-contained copy; explain workspace updates will not update it. Codex and Claude Code find it there; Cowork needs a saved loader pointing to its `SKILL.md`, with this folder attached (ask before saving one). Settle what the owner tracks with [tracking-model.md](tracking-model.md) before sorting; complete its proof only after approval in step 6.
+3. **Set up memory if absent.** With the owner's OK, copy the six memory files from `<skills>/personal-memory/scaffold/` into `memory/`; the seventh file, `AGENTS-memory.md`, is an instructions snippet. Set topics, `client_folder` and `client_subjects` in `memory/schema.json`. Paste the snippet's sections into the folder's instructions file, creating `AGENTS.md` if absent and preserving existing content; replace `<skills>` with the chosen path. In git, add `memory/raw/` to `.gitignore`. Existing `memory/` skips this step.
+4. **Code or wiki source?** Read [code-repos.md](code-repos.md) before sorting; account for every reader of the old source before proposing removal.
+5. **Sort the source.** Use [sorting.md](sorting.md) and destinations in [where-things-go.md](where-things-go.md). Sort small sources here. Above roughly 100 items or pages, available subagents may sort read-only batches with [subagent-brief.md](subagent-brief.md); spot-check their evidence and all input coverage. Without subagents, sort the same batches here.
+6. **Show and wait.** Follow sorting.md's Presenting section: group kept items by destination, explain dropped items with counts and examples, and show backlog destinations. Ask once per group. Write no migrated content and delete nothing until the owner approves that group.
+7. **Write approved notes.** Use `personal-memory`, `memory/README.md` and `memory/TEMPLATES.md`. Add one `memory/rules.md` row per kept note a task should load, glossary rows and index rows. With Python, run `python3 <skills>/personal-memory/indexes.py`, then `python3 <skills>/personal-memory/hubs.py`, then `python3 <skills>/personal-memory/gate.py --memory memory audit` until it exits 0. Otherwise write indexes and hubs by hand and use personal-memory's manual checks.
+8. **Retire only the approved local source.** Archive uncommitted content before removal; follow code-repos.md for live references. An external source (another app or old workspace) stays untouched. Without a verified archive of content lacking committed history, leave the local source in place.
+9. **Check and finish.** Run project tests if code changed. In git, stage only your own paths, run hooks (never `--no-verify`) and commit; push only if the project already pushes and the owner agrees. Without git, finish with the file checks. Tell the owner what moved where, what stayed behind and why, and which checks were unavailable.
