@@ -4,7 +4,7 @@
   "files": {
     ".agents/setup/ADAPTING.md": {
       "class": "merge",
-      "sha256": "a8db0a47faa2ad259ccfcce6c70da9b20510724cbd533b7bda2adaf1a6205b47",
+      "sha256": "e5c1081defabd3d11ffdd43bf05008a84c702863f2a8bdfa0884900c367cfe28",
       "mode": "644"
     },
     ".agents/setup/MANIFEST.md": {
@@ -19,7 +19,7 @@
     },
     ".agents/setup/README.md": {
       "class": "merge",
-      "sha256": "145ae97bdc2d75a65280647e3fe3966ef8c8a8a4a644d80b16b7794e2a14a4b0",
+      "sha256": "7d40493d5c12894e82cc6403de000f3699fdae6fd580944a3f432468ae345721",
       "mode": "644"
     },
     ".agents/setup/WEEKLY-SWEEP.md": {
@@ -3067,6 +3067,41 @@
       "sha256": "a73b6d1e6a40930d0f0b35d733eeeab661464b960b8f01e0770a6bd484e33925",
       "mode": "644"
     },
+    ".agents/skills/memory-setup/SKILL.md": {
+      "class": "merge",
+      "sha256": "5d0927a8bb85b3f84fcb6ebc08c2a135cdfa9644cc87122a6c6fc1deb5b6295d",
+      "mode": "644"
+    },
+    ".agents/skills/memory-setup/code-repos.md": {
+      "class": "merge",
+      "sha256": "b28194d9917097764a309acd4dd176181aa2a9d093c4d74aa8d5a820774c7930",
+      "mode": "644"
+    },
+    ".agents/skills/memory-setup/sorting.md": {
+      "class": "merge",
+      "sha256": "33a85d1f265f4151b2e56e4636a163fe5d84a19373a1cea7eaa7f7d900875902",
+      "mode": "644"
+    },
+    ".agents/skills/memory-setup/subagent-brief.md": {
+      "class": "merge",
+      "sha256": "bacb600b084c74be9a98f3ae5edbdbcb536b44a3cd30ffaa22552f57b83d4713",
+      "mode": "644"
+    },
+    ".agents/skills/memory-setup/tests/test_layout.py": {
+      "class": "merge",
+      "sha256": "d724750fcf5abbebf001e45d6c38843eb22c832a504593fc4acb638d5c204023",
+      "mode": "644"
+    },
+    ".agents/skills/memory-setup/tracking-model.md": {
+      "class": "merge",
+      "sha256": "b784f77698ef7e80ba7b9423f8448d7cb6118304f4e5c2d3226ba8db407f2278",
+      "mode": "644"
+    },
+    ".agents/skills/memory-setup/where-things-go.md": {
+      "class": "merge",
+      "sha256": "517744b1a3a69af33d0cc4e3324f07120ed0e14c58de6141235857be3a17144b",
+      "mode": "644"
+    },
     ".agents/skills/motion-doctrine/SKILL.md": {
       "class": "merge",
       "sha256": "d4d20aa33a57784154ffe55b83424037842269e59cc1e821c1b18bd541877142",
@@ -4054,77 +4089,112 @@
     },
     ".agents/skills/personal-memory/SKILL.md": {
       "class": "merge",
-      "sha256": "c55471c95d71ee0c25f759ae3041d4bf9440e7c33efc54f85b39cd9ea7c6c855",
+      "sha256": "f60b741fd2b27de96f558b6c1da77a493c4f38c95d369e0262ec94f82181fe2f",
       "mode": "644"
     },
     ".agents/skills/personal-memory/gate.py": {
       "class": "merge",
-      "sha256": "fced0e128261aebde2d92ee21c605201e4ab0f1d787d3fdd5a58e26e0896d0c5",
+      "sha256": "650782308e096bee7efe0ce93ae92c627eee56d07d204ecd1a5f151424ac5273",
       "mode": "755"
     },
     ".agents/skills/personal-memory/hubs.py": {
       "class": "merge",
-      "sha256": "24b248a78ce036c98091c8a084fe1f65821365a40751c6aa370bbc7cc3a9c64b",
+      "sha256": "0b22a546aea4a3f28291dba9e7e7f5d2c9318f195e3d5b26b2ca936d0a7ffe05",
       "mode": "755"
     },
     ".agents/skills/personal-memory/indexes.py": {
       "class": "merge",
-      "sha256": "f0184adb1a9483d6dd6c1c90219b4e504da62d4a30859c839b519e291ad1359a",
+      "sha256": "8c53c170a1618a9abb73795bbb0b25b2a0fbb8cbd3cb16de9e207351a1fe57ee",
       "mode": "755"
     },
     ".agents/skills/personal-memory/links.py": {
       "class": "merge",
-      "sha256": "74fa5e9175448bd81e6be96748bc027e2b53066e76002a1fe24789b796827f7b",
+      "sha256": "a967d3733091733584acf29a96f60d4cd3a3ecadc96a8b247ef7316d8f2bf07f",
       "mode": "644"
     },
     ".agents/skills/personal-memory/reference.md": {
       "class": "merge",
-      "sha256": "74650ae404aa476e78ea20de86e1c7250371f911dfe7e9a88227be2f3777857a",
+      "sha256": "a02ebcc468144b1b2b9d2dc075a3220f2359927b34912e72255e5f124532a483",
+      "mode": "644"
+    },
+    ".agents/skills/personal-memory/scaffold/AGENTS-memory.md": {
+      "class": "merge",
+      "sha256": "358e5a807f76f2cd26ddb3ae03dc19b0f316795164fcf5135456b4b8dc0313f0",
+      "mode": "644"
+    },
+    ".agents/skills/personal-memory/scaffold/README.md": {
+      "class": "merge",
+      "sha256": "1fcc719a5f970db6e3eaf3633062282f5b8fb9f86b540978b7c620c4ce1b1208",
+      "mode": "644"
+    },
+    ".agents/skills/personal-memory/scaffold/TEMPLATES.md": {
+      "class": "merge",
+      "sha256": "ad2f61a057a1949a142318209475a852bbd95366f5cc1f7d397d1acd9651a39b",
+      "mode": "644"
+    },
+    ".agents/skills/personal-memory/scaffold/glossary.md": {
+      "class": "merge",
+      "sha256": "8d941d88c5f05853b64d567af786a875570e4bb2897a42d34644f82853e51a6a",
+      "mode": "644"
+    },
+    ".agents/skills/personal-memory/scaffold/index.md": {
+      "class": "merge",
+      "sha256": "942a7232bc9ee71d17e1ab20f1cd3bbc0c3784d14568cfdd29f5d2b0ca2c190c",
+      "mode": "644"
+    },
+    ".agents/skills/personal-memory/scaffold/rules.md": {
+      "class": "merge",
+      "sha256": "9e9f0ed4d7db16aabe4c2eaa4a99f37c66a62cdfc413b17df4f02658650d6532",
+      "mode": "644"
+    },
+    ".agents/skills/personal-memory/scaffold/schema.json": {
+      "class": "merge",
+      "sha256": "6f5865c9e7f7092ab2f3fe5811d37059d47ae57a0427c082a239faa0dd769ea5",
       "mode": "644"
     },
     ".agents/skills/personal-memory/schema.py": {
       "class": "merge",
-      "sha256": "cceef9d08e9a9687e9ed890409e8d2db8490fc13fc4ceca708d559c3d754c0e2",
+      "sha256": "aa508b102508562aec26591a22f5e1666d33b0036f3c35f5d7861dc8776d9d52",
       "mode": "755"
     },
     ".agents/skills/personal-memory/sweep.py": {
       "class": "merge",
-      "sha256": "e446c48ced8ff05cf0e37250549109b9dfb566669009b7cfa79f1fd38f8a8891",
+      "sha256": "4a938c816ae1fcb5d29ba59a00b25666844b5511d68bd28984b31dfd8310df7e",
       "mode": "755"
     },
     ".agents/skills/personal-memory/tests/test_bloat.py": {
       "class": "merge",
-      "sha256": "720ad9f7f69d9b2cf7be5e16dcc3a2cc6aefe6707bdbc7593a36177a54ef785b",
+      "sha256": "ace0f247c9847b7ca9c9a32a6b3027cb2270225bfed2a577db2f9713f55f837b",
       "mode": "644"
     },
     ".agents/skills/personal-memory/tests/test_hubs.py": {
       "class": "merge",
-      "sha256": "2392b6c0a32214362ed651d20275b10dda57cb9e690cb371674f347b9843f2c2",
+      "sha256": "33bc2527345f7af412af8649a5678adf92f8bc34f4da046fe8d63255424ce2fe",
       "mode": "644"
     },
     ".agents/skills/personal-memory/tests/test_indexes.py": {
       "class": "merge",
-      "sha256": "569d9ed5e55a3a559332c240e31bac54760f0a8db90dc5ddb90e337e13e434c5",
+      "sha256": "8209778e338fdaa9f68315aee45105afab6a7192e8938b875032344bdfd6978b",
       "mode": "644"
     },
     ".agents/skills/personal-memory/tests/test_links.py": {
       "class": "merge",
-      "sha256": "aa0de9d63f9ca1fba8d2ea0193f742242aae231b7e2b33630a86d11006fe8aee",
+      "sha256": "30c35de839b36c8ba075130a1a2ee3956aa4da9b88c2a23be8ca00b41fca2a47",
       "mode": "644"
     },
     ".agents/skills/personal-memory/tests/test_rules.py": {
       "class": "merge",
-      "sha256": "dc57dc4f92235e0b7cce4aa44c360f3b0f08bd3ecf0c3c31dc45d5fcc4017201",
+      "sha256": "47057b6f809475c2b9a5ca5a86763a0ec6e7f084293116e42c2646b74eee2d4c",
       "mode": "644"
     },
     ".agents/skills/personal-memory/tests/test_schema.py": {
       "class": "merge",
-      "sha256": "cdeb76c62561434ee0ed44470093fc2160b71cf7d4a85a05c679fc28ec84445c",
+      "sha256": "ff076c1af25e11e80629d90abbfbba9195a938b58cc5415ddcbe4b8e4b85370a",
       "mode": "644"
     },
     ".agents/skills/personal-memory/tests/test_sweep.py": {
       "class": "merge",
-      "sha256": "a6507a39a8a8d3a20fb841a876fb6119d2c92e6aefa632da0e5e90aeba5cf3ef",
+      "sha256": "8b87fafbecdf538317c020b6c87001884785a3d512ff2cdbadc43e6b47afa25f",
       "mode": "644"
     },
     ".agents/skills/pr-to-video/SKILL.md": {

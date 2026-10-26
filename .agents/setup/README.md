@@ -10,33 +10,15 @@ This Release is a ready workspace: `AGENTS.md`, skills, memory structure and hoo
 
 1. Copy every file and folder of the Release, dot folders included, into the owner's new folder. Leave out `.git`. (`robocopy "<release>" "<workspace>" /E /XD .git` on Windows, `rsync -a --exclude .git "<release>/" "<workspace>/"` elsewhere.) Never edit the Release or the old setup.
 2. Read `CHANGELOG.md`. Tell the owner in two or three lines what this workspace is.
-3. Settle the tracking model (`ADAPTING.md`, "Tracking model"): what people or things the owner keeps coming back to. Facts about them need that home before you file anything.
-4. Read the old setup, if there is one. Find the useful parts: instructions files (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`, pasted custom instructions), notes and saved memories, their own skills and prompts, tool connections (server names only, never tokens or passwords). Ask the owner to paste or export anything an app keeps out of reach.
-5. Decide where each part goes (table below). Show the owner the plan in one message, grouped by destination, and ask once per group. Ask about a single item only when it clashes with a shipped rule; show both and record the answer as a preference note. Leave junk behind (app config, installed packages, copies of shipped skills) and say so. Do not drop real content without the owner's OK.
-6. Move the content. Add a row to `memory/index.md` for each new note under `preferences/`, `docs/`, `email/`, `voice/` or `guides/`. With Python 3.11+, `python .agents/skills/personal-memory/indexes.py` and `hubs.py` do the generated indexes and hubs, and `python .agents/skills/personal-memory/gate.py --memory memory audit` checks the notes. Without Python, write the rows by hand.
-7. Fit it to the owner (`ADAPTING.md`), then tell the owner in plain words what moved where, what was left behind and why.
-8. Make the skills reachable in the owner's app ("Skills in the owner's app" below).
-9. Suggest rules ("Suggest rules" below).
-10. Remove the setup folder ("Remove the setup folder" below). Always last.
+3. Run the `memory-setup` skill for this workspace, with the old setup as the source (or none). It settles the tracking model, sorts, shows the owner the plan and moves the content.
+4. Fit it to the owner (`ADAPTING.md`), then tell the owner in plain words what moved where, what was left behind and why.
+5. Make the skills reachable in the owner's app ("Skills in the owner's app" below).
+6. Suggest rules ("Suggest rules" below).
+7. Remove the setup folder ("Remove the setup folder" below). Always last.
 
 ## Where things go
 
-| What the owner has | Destination |
-|---|---|
-| A rule about how the agent behaves (tone, format, "always", "never") | A preference note in `memory/preferences/` plus a row in `memory/rules.md` (`personal-memory` skill) |
-| A fact about the owner, their tools or machine | A doc note in `memory/docs/` |
-| Lasting facts about a person or thing they track | A Client Memory note under the subjects settled in the tracking model (`personal-memory` skill, then `hubs.py`) |
-| A repeatable process | `memory/workflows/<topic>/` (topics in `memory/schema.json`) |
-| A settled decision | `memory/decisions/<topic>/` |
-| Email or message style | `memory/email/` or `memory/voice/` |
-| A shorthand name | A row in `memory/glossary.md` |
-| A word used in a specific way | `CONTEXT.md` |
-| Unsorted notes worth keeping | `memory/candidates/` |
-| Raw material to keep as is (git-ignored) | `memory/raw/` |
-| Their own skill | `.agents/skills/<name>/`, copied whole |
-| An old copy of a shipped skill | Not copied; the shipped one wins. A difference the owner relies on becomes a preference note naming the skill. |
-| Documents, reports, research | The folder the folder map names (`memory/preferences/document-scaffolding.md`) |
-| A whole instructions file | Split by the rows above. Lines that repeat shipped `AGENTS.md` are dropped with the owner's OK. |
+For destinations, read `.agents/skills/memory-setup/where-things-go.md`.
 
 Keep personal content out of shipped files (`AGENTS.md`, shipped skills, this folder): a later Release replaces them, and memory is never replaced. A short `CLAUDE.md` that only says "Read AGENTS.md" is fine when the owner's app needs one.
 
@@ -47,7 +29,7 @@ Using Codex on Windows, with hooks skipped: `CODEX.md`.
 Neither is required, and neither is a first step. Do not probe for them up front and never install anything without the owner's OK; an enterprise computer may not allow it.
 
 - With Git: offer `git init` in the workspace, then `git config core.hooksPath .githooks` (secret scan, memory check, message length). If Python 3.11+ is missing, use `.githooks/nopython` instead, which keeps the message length check. Never use `--no-verify`.
-- With Python 3.11+: the memory tools above run.
+- With Python 3.11+: the `personal-memory` tools run.
 - Without either: the workspace still works. Tell the owner what is switched off.
 
 ## Skills in the owner's app
@@ -102,7 +84,7 @@ Then run `python .agents/skills/personal-memory/gate.py --memory memory audit` (
 
 ## Going back
 
-Use the previous workspace folder again. Anything written in the new one after the update is not in the old one: list those files by date and copy across only what the owner asks for, using the table above.
+Use the previous workspace folder again. Anything written in the new one after the update is not in the old one: list those files by date and copy across only what the owner asks for, using `.agents/skills/memory-setup/where-things-go.md`.
 
 ## Other pages
 
