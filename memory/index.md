@@ -13,6 +13,7 @@
 | [Meetings - Where Transcripts Land and How They Are Filed](memory/preferences/meetings.md) | preference | Settings the meeting skill reads first; transcripts folder, archive, record folder, work items, always/never rules. Setup fills it in. | 2026-10-22 |
 | [Memory Updates - Replace Before Appending](memory/preferences/memory-maintenance.md) | preference | Search memory first; replace or merge stale notes in place; append only when new; sweep references after. | 2026-10-18 |
 | [Writing Guideline - Plain Prose for Any Agent Output](memory/preferences/writing.md) | preference | Plain prose for anything the owner reads - answer first, one fact per line, expand acronyms, state what was and was not checked. | 2026-10-10 |
+| [Recommendation-Led Talk It Through](memory/preferences/talk-it-through.md) | preference | Talk-it-through sessions should state understanding and recommend a direction before asking only decision-changing questions. | 2026-10-27 |
 | [IT Client Subjects](memory/docs/it-client-subjects.md) | doc | James's IT workspaces use halo for client ticket-system facts and 365 for Microsoft tenant facts. | 2026-10-26 |
 
 ## Client Hubs

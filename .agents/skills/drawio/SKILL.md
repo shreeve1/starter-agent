@@ -47,8 +47,8 @@ node <skill-dir>/scripts/drawio.mjs stop
 ```
 
 - Always find the machine's NetBird IPv4 with `netbird status` or from the dotfiles `AGENTS.md` table, and pass it to both `--host` and `--url-host`. The printed link must use the NetBird IPv4, never `localhost`.
-- On a native host, bind directly to its NetBird IPv4. aidev is `100.95.230.15`; wrk is `100.95.235.60`; itan8n is `100.95.224.218`; surftop is `100.95.222.42`.
-- WSL on wrk is the exception: NetBird runs on Windows, so bind the WSL server to `0.0.0.0` but pass wrk's NetBird IPv4 (`100.95.235.60`) to `--url-host`. Use `node <skill-dir>/scripts/drawio.mjs start --dir <project root> --host 0.0.0.0 --url-host 100.95.235.60`.
+- On a native host, bind directly to its NetBird IPv4. aidev is `100.95.230.15`; work is `100.95.235.60`; itan8n is `100.95.224.218`; surftop is `100.95.222.42`.
+- WSL on work is the exception: NetBird runs on Windows, so bind the WSL server to `0.0.0.0` but pass work's NetBird IPv4 (`100.95.235.60`) to `--url-host`. Use `node <skill-dir>/scripts/drawio.mjs start --dir <project root> --host 0.0.0.0 --url-host 100.95.235.60`.
 - Run `status` before `start`. `start` replaces the running server, and another session may be using it: if it serves a different folder, ask James before replacing it (any tab open on the old folder switches saving off). Other flags: `--port`, `--idle-minutes` (default 240; it exits by itself after that long without a browser request).
 - Give James the printed `url`. Link straight to a diagram with `<url>edit?file=<path relative to --dir>`; a path that doesn't exist yet opens a blank diagram that is created on first Save.
 - Run `stop` when the session's diagram work is done.
@@ -68,7 +68,7 @@ Before writing or editing any `.drawio` XML, read [`reference/format.md`](refere
 
 When James invokes this skill along with a subject to talk about, invoking the skill means yes to the canvas. First find any relevant existing diagram. Your first message either asks James to confirm a matching diagram to open or gives him a new seed diagram to react to:
 
-1. **Load the brainstorming skill** and follow it for the conversation. This section replaces its visual companion offer; everything else in that skill still applies.
+1. **Load the `talk-it-through` skill** and follow it for the conversation. This section replaces its visual companion offer with the draw.io canvas; everything else in that skill still applies.
 2. **Look before you draw.** Read what the subject points at: the plan, spec, code, notes or earlier conversation it names or that obviously relates to it. Stop once you can sketch how it works today, or what he seems to want. When there is little or nothing to read, seed from the subject alone: a topic map of the usual parts of such a thing, mostly `?` labels, is still a better start than a blank page.
 3. **Pick the shape** that fits the subject:
    - **Flow** (steps, a process, a pipeline, a bot or agent loop, a request path): a rough flowchart of what you know.
@@ -76,13 +76,13 @@ When James invokes this skill along with a subject to talk about, invoking the s
    - **Topic map** (anything still fuzzy: an idea, a decision, a problem): the subject in the centre, branches for the parts, goals, constraints and options you found or he named.
 4. **Seed it:** 5 to 12 main shapes. Use his words for labels. Anything you filled in yourself ends its label with a question mark after a space ("Agent triages ?"). Add 2 to 4 yellow notes (200×80) in the right-hand question column for the open questions whose answers would change the diagram most. Keep the question column separate from the main flow or structure. Put it where the placement rules above say, named after the subject.
 5. **Serve it:** `status`, then `start` if needed, and check the XML.
-6. **First message:** the direct link; one or two lines on what you drew and what you based it on; then the brainstorming skill's first message (a one-line subject counts as "they haven't said what they want", even when the files you read fill in a lot), ending with its single question. Make that question one the canvas can answer too: "fix it in the text or on the diagram, whichever is quicker."
+6. **First message:** the direct link; one or two lines on what you drew and what you based it on; then the `talk-it-through` first-message pattern (a one-line subject counts as "they haven't said what they want", even when the files you read fill in a lot), ending with its single question. Make that question one the canvas can answer too: "fix it in the text or on the diagram, whichever is quicker."
 
 From then on, follow **Taking turns** and the rules below.
 
 ## In brainstorming
 
-This canvas is the editable form of the brainstorming skill's visual companion. When a flow, sequence of steps, set of states, or structure comes up, offer to sketch it on the canvas instead of describing it, in a message of its own. When he has already asked for a diagram, or opened with the kick-off above, skip the offer and follow **Find before create**: reuse a confirmed relevant diagram, or create one only when no relevant diagram exists. Then:
+This canvas is the editable form of the `talk-it-through` skill's visual companion. When a flow, sequence of steps, set of states, or structure comes up, offer to sketch it on the canvas instead of describing it, in a message of its own. When he has already asked for a diagram, or opened with the kick-off above, skip the offer and follow **Find before create**: reuse a confirmed relevant diagram, or create one only when no relevant diagram exists. Then:
 
 - Sketch the current understanding in the confirmed existing diagram or the newly created one: rough, labelled, few shapes. Put each open question or guess in a yellow note shape beside the step it concerns, so he can see what to correct.
 - Keep the diagram in step with the conversation: when he settles something in text, update the canvas in the same turn and say so.
