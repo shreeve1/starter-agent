@@ -4,6 +4,8 @@
 
 On top of Release 5, in this workspace only:
 
+- `AGENTS.md` "Check your answer before you send it": before a final answer that states facts, the agent rechecks each claim against its source and marks what it could not check; for a report, a client message or a long answer, a subagent with only the claims does the check.
+
 - Replaced `talk-it-through` with a recommendation-led brainstorming workflow based on superpowers brainstorming, and aligned its direct callers, memory routing, approval gates and draw.io handoff.
 
 - `drawio` is now starter-agent-owned; its complete `.agents/skills/drawio/**` tree is copied recursively into dotfiles. The dotfiles-only `tests/drawio.test.sh` wrapper remains outside that sync boundary.
