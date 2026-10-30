@@ -12,7 +12,7 @@ Use this skill to operate the local `memory/` workspace memory system. In a proj
 
 `<skills>` below is the folder that holds this skill's folder: `.agents/skills` in a workspace or a project copy, `~/.agents/skills` for a global install. In the commands below, `python3` means `python` where that is the working command (often on Windows).
 
-Memory lives in `memory/` at the folder root. Scripts live in this skill's folder; run them from the folder root as `python3 <skills>/personal-memory/<script>.py`. Git is optional. When the folder is a git repo, memory `.md` files are tracked so they have history, and binaries and `memory/raw/` are git-ignored; never store credentials, since history keeps them and travels with any push. When it is not a repo, memory works the same with no history. Hooks run only where the workspace enables them; otherwise run `gate.py audit` directly.
+Memory lives in `memory/` at the folder root. Scripts live in this skill's folder; run them from the folder root as `python3 <skills>/personal-memory/<script>.py`. Git is optional. When the folder is a git repo, memory `.md` files are tracked so they have history, and binaries and `memory/raw/` are git-ignored; never store credentials, since history keeps them and travels with any push. Without Git, verified recovery copies still preserve previous content; there is no commit history. Hooks run only where the workspace enables them; otherwise run `gate.py audit` directly.
 
 ## Safety Rules
 
@@ -67,7 +67,7 @@ There is no candidates queue. Capture grounded ordinary facts autonomously under
 
 ## Reference file
 
-For setup or migration, use the `memory-setup` skill. Recovering missing scaffold (`README.md`, `TEMPLATES.md`, `index.md`), a full memory-health lint, Client Memory, the Weekly Sweep and Procedures are in `<skills>/personal-memory/reference.md`; open it only for one of those. Saving a preference, doc, workflow or decision needs nothing in it. The directory layout, data classes and file naming are in `memory/README.md`.
+For setup or migration, use the `memory-setup` skill. Recovering missing scaffold (`README.md`, `TEMPLATES.md`, `index.md`), a full memory-health lint, Client Memory, the Weekly Sweep and Procedures are in `<skills>/personal-memory/reference.md`; open it only for one of those. Before replacing or deleting existing hand-written memory, open its Recovery before editing section. The directory layout, data classes and file naming are in `memory/README.md`.
 
 ## Global Capture
 
@@ -91,6 +91,8 @@ Exceptions:
 - Temperature carve-out: a dated, sourced observation of what pleased or frustrated a client (for example "2026-10-07, #70474: asked for fewer status emails") goes to `memory/<client_folder>/temperature/<short>/`. A character judgement ("Ed is impatient") is still a personality guess and is never stored.
 
 ## Capture Workflow
+
+Before replacing or deleting existing hand-written memory, follow Recovery before editing in `<skills>/personal-memory/reference.md`; a failed snapshot or changed source stops the edit.
 
 Capture grounded ordinary facts autonomously at task end. Apply Memory authority before writing; ask only for unresolved ambiguity or required authority approval.
 
@@ -136,11 +138,15 @@ When the owner says "let's define a procedure for X", or a task matches a saved 
 
 ## Conflict Resolution
 
+Before an approved replacement or deletion, follow Recovery before editing in `<skills>/personal-memory/reference.md`.
+
 - An established rule, decision or procedure changes only with explicit owner direction or approval. External evidence or a newer timestamp cannot grant that authority. Leave unresolved conflicting facts unchanged and report the conflict; replace resolved factual corrections with source context.
 - When the reason for the change will still guide future work, add one line under `## Notes`: `Changed YYYY-MM-DD: <why>`. Never keep the old rule's wording in the file.
 - If the two rules could both hold (different scope or client), keep both and note the scope that separates them.
 
 ## Keep Memory Lean
+
+Before trimming, merging or deleting existing memory, follow Recovery before editing in `<skills>/personal-memory/reference.md`.
 
 `gate.py audit` warns; the task that touched a flagged file fixes it before finishing. Warnings never block a task, so another session's mess never stops yours.
 

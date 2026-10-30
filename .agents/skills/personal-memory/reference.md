@@ -24,6 +24,20 @@ exists first, then recover the personal files:
   `TEMPLATES.md` from them.
 - Missing personal files are normal, not an error.
 
+## Recovery before editing
+
+Before replacing or deleting any existing hand-written memory, preserve its exact previous bytes, including uncommitted notes and memory/index.md, rules.md and glossary.md. New files need no snapshot; only generated topic indexes and hubs are rebuildable exceptions. Use the same protocol with or without Git.
+
+1. Read the source, check authority and confirm this task owns the intended edit.
+2. Run `python3 <skills>/personal-memory/recovery.py --root <workspace> snapshot memory/<path>.md`. Quote paths containing spaces for the shell. Success returns a verified unique copy under `<workspace>/.memory-recovery/<id>/memory/...`; failure means stop before editing. Absolute, drive, backslash, parent-traversal and symlink paths are rejected.
+3. Re-read the source immediately before editing and compare it with the snapshot. A changed source means stop, re-read and re-ground; preserve the intervening change. Only then replace or delete the intended content.
+
+Without Python, use file tools to copy into a unique `.memory-recovery/` location, re-read both and verify exact previous content before editing. Text-only tools cannot guarantee unknown encodings or binary bytes; if exact preservation cannot be verified, stop and ask for suitable tools. Disclose that automated audit and byte checks were unavailable; manually check links, rules, templates and size limits.
+
+This is a single-writer protocol, not a race-proof transaction or lock. The helper only makes backups; it never restores, replaces or deletes the source. Keep snapshots outside routine recall, ignored with `/.memory-recovery/` at the workspace root; never automatically prune. They may contain sensitive summaries: ignore rules are not encryption or access control, and secrets remain forbidden.
+
+To restore, show the selected snapshot and target, obtain owner approval, preserve the current target first with this protocol, verify the selected content, then restore and check indexes/hubs and audit (or disclosed manual equivalents). Retain the old workspace and recovery during upgrades; copy recovery separately only with owner approval, never as part of a release copy.
+
 ## Lint Workflow
 
 Use when asked to review memory health or before broad cleanup.
@@ -66,7 +80,7 @@ Only where a scheduled sweep is set up (`WEEKLY-SWEEP.md` in a starter workspace
 
 1. `python3 <skills>/personal-memory/sweep.py --apply`. It deletes `.sessions/` and `artifacts/` files older than 90 days, except `artifacts/startday/` (where used) and any file a note, skill or context file names. `reports/`, `memory/` and `clients/` are never aged out. Keep its output for the commit body.
 2. Run `gate.py audit`, `stale`, `crowded` and `links`.
-3. Act on what they show:
+3. Before any hand-written memory replacement, deletion, merge, trim or compact, apply Recovery before editing. Generated topic indexes and hubs are exempt, not memory/index.md, rules.md or glossary.md. Act on what they show:
    - `status: superseded`, or a note whose only content is history: delete it and its index row.
    - Stale (over 90 days): re-ground it against current files or tool output. Still true: set `updated`. False: delete it. Needs a live system you cannot reach: leave it and name it in the report. Never delete a note for age alone.
    - Two notes on the same subject: merge into one, delete the other, repoint links (`gate.py backlinks <path>` lists them).
@@ -89,7 +103,7 @@ A procedure is a verified set of steps the agent follows whenever its trigger co
 1. Read `memory/workflows/index.md`. If a procedure or workflow already covers X, propose changes to that file instead of a new one.
 2. State the current understanding and recommended procedure first. Ask only questions whose answers change the procedure: the trigger, where things are, defaults, then each step with its exact command or click. Mark each point where the owner must say yes as a ready check.
 3. Run the steps for real with the owner. A procedure holds only steps that were run and verified; when the run has to wait, say so, and save after that run.
-4. Pick a topic from `memory/schema.json` (a new topic only with the owner's OK). Show the owner the full file and save only after a clear yes.
+4. Before changing an existing procedure, apply Recovery before editing. Pick a topic from `memory/schema.json` (a new topic only with the owner's OK). Show the owner the full file and save only after a clear yes.
 5. Add a `memory/rules.md` row whose When is the trigger and whose Lead is procedure `memory/workflows/<topic>/<slug>.md`. Run `indexes.py`, then `gate.py audit` until it exits 0, and commit in a git repo.
 
 **Following one:** open the matching file and run its steps in order, stopping at each ready check until the owner says yes. When a step fails or no longer matches the system, stop and propose the change; edit the file only after the owner's yes.

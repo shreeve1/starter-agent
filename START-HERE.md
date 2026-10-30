@@ -7,6 +7,8 @@ This is a ready-made agent workspace: instructions (`AGENTS.md`), skills, memory
 - Claude Cowork or Codex.
 - Nothing else is required. Git and Python 3.11+ add version history and the commit checks; the setup works without them and your agent tells you what is off.
 
+Memory edits preserve verified previous content in `.memory-recovery/` even without Git. Without Python, the agent must copy and verify with file tools and disclose manual-only checks; if verification is unavailable, it stops. Recovery may contain sensitive summaries; it is ignored, not encrypted. Release copies exclude it; upgrades retain the old workspace and copy recovery separately only with owner approval.
+
 ## First setup
 
 1. Make a new, empty folder for your workspace.

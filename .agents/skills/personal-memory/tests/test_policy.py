@@ -19,6 +19,21 @@ class PolicyTests(unittest.TestCase):
             self.assertIn('Temporary directions remain temporary', instructions)
             self.assertIn('source context', instructions)
 
+    def test_recovery_contract_reached_in_both_modes(self):
+        reference = (PM / 'reference.md').read_text()
+        self.assertIn('## Recovery before editing', reference)
+        self.assertIn('recovery.py --root', reference)
+        self.assertIn('single-writer', reference)
+        self.assertIn('Without Python', reference)
+        self.assertIn('changed source', reference)
+        skill = (PM / 'SKILL.md').read_text()
+        for heading in ('Capture Workflow', 'Conflict Resolution', 'Keep Memory Lean'):
+            section = skill.split('## ' + heading)[1].split('\n## ')[0]
+            self.assertIn('Recovery before editing', section)
+        for mode in self.modes():
+            self.assertIn('Recovery before editing', mode)
+            self.assertIn('.memory-recovery/', mode)
+
     def test_conflict_requires_owner_direction(self):
         instructions = (PM / 'SKILL.md').read_text()
         conflict = instructions.split('## Conflict Resolution')[1].split('\n## ')[0]

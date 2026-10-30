@@ -8,7 +8,7 @@ This Release is a ready workspace: `AGENTS.md`, skills, memory structure and hoo
 
 ## First setup
 
-1. Copy every file and folder of the Release, dot folders included, into the owner's new folder. Leave out `.git`. (`robocopy "<release>" "<workspace>" /E /XD .git` on Windows, `rsync -a --exclude .git "<release>/" "<workspace>/"` elsewhere.) Never edit the Release or the old setup.
+1. Copy every file and folder of the Release, dot folders included, into the owner's new folder. Leave out `.git` and `.memory-recovery/`. (`robocopy "<release>" "<workspace>" /E /XD .git .memory-recovery` on Windows, `rsync -a --exclude .git --exclude .memory-recovery "<release>/" "<workspace>/"` elsewhere.) Never edit the Release or the old setup.
 2. Read `CHANGELOG.md`. Tell the owner in two or three lines what this workspace is.
 3. Run the `memory-setup` skill for this workspace, with the old setup as the source (or none). It settles the tracking model, sorts, shows the owner the plan and moves the content.
 4. Fit it to the owner (`ADAPTING.md`), then tell the owner in plain words what moved where, what was left behind and why.
@@ -69,7 +69,7 @@ Only at the very end, after the owner has finished `ADAPTING.md` or declined it.
 4. Content to copy whole: memory notes, `memory/index.md`, the glossary rows the owner added, `memory/rules.md`, `CONTEXT.md`, the folder map, `.gitignore`, their own skills, and every folder from the folder map.
 5. Merge `memory/schema.json` by hand: keep the new Release's topics and keys, add the owner's `client_subjects`, keep their `client_folder`. Without their `client_folder` their notes sit in a folder the new workspace does not look at and the memory audit fails. Run `hubs.py` and `indexes.py` afterwards if Python is present.
 6. Do not copy `MANIFEST.json`, `CHANGELOG.md`, `START-HERE.md` or anything under `.agents/setup/`: the new Release's copies win.
-7. Keep the old `.git` folder only if the owner wants the history; ask first. Tell the owner the old workspace can be deleted when they are happy.
+7. Keep the old workspace and its `.memory-recovery/` intact. Copy recovery separately only if the owner wants it; verify the copy. Retain `/.memory-recovery/` in the new `.gitignore` even when bringing the old ignore file across. Keep the old `.git` folder only if the owner wants the history; ask first. Tell the owner the old workspace can be deleted when they are happy.
 
 ### Older Releases
 
