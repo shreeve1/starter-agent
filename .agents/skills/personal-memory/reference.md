@@ -78,6 +78,8 @@ Only where a scheduled sweep is set up (`WEEKLY-SWEEP.md` in a starter workspace
 
 ## Procedures
 
+Stored procedure approval does not authorize the current action. Obtain current-conversation permission under workspace safety rules. Stop at approval checks, failed steps or changed conditions and propose changes to the owner; never silently revise the recipe.
+
 A procedure is a verified set of steps the agent follows whenever its trigger comes up: a `type: procedure` file in `memory/workflows/<topic>/<slug>.md`, shaped by "Procedure File" in `memory/TEMPLATES.md`. A runbook a person follows belongs in the project's `docs/` instead.
 
 **Readiness before execution:** `python3 <skills>/personal-memory/gate.py --memory memory procedures` checks shared procedures without writing. Full audit includes these findings. Without Python, compare against the Procedure File template: risk read-only/changes-state, real nonfuture approved/verified dates, Active memory with Trigger, Prerequisites, numbered Steps, Verify, Related and Notes; changes-state also needs Approval and Recovery. Empty sections and fenced examples do not count. Structure does not prove truth, owner approval, success or permission. Read incomplete legacy procedures as evidence only; ask the owner to repair and verify before executing.
