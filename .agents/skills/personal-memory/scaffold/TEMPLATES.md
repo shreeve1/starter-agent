@@ -56,18 +56,48 @@ What was decided and why, in a few sentences.
 
 ## Procedure File
 
-A Shared Procedure in `memory/workflows/<topic>/<slug>.md`, saved only with the owner's approval and made only of steps that were run and verified. `type: procedure` marks it: no agent writes or changes it without the owner's approval. Show the owner the full file and save only after a clear yes. Trigger, Steps, Related and Notes are required; add an optional section only when the procedure needs it. Over the 6144-byte limit: move failures and tuning into a sibling `<slug>-troubleshooting.md` and link it, rather than cutting steps.
+A shared procedure at `memory/workflows/<topic>/<slug>.md` contains only owner-approved, actually verified steps. Record real approval and verification dates, never dates invented to pass lint. Keep it within 6144 bytes and its summary within 160 characters; link optional troubleshooting separately.
 
 ```markdown
 ---
 title: Verb Phrase - What It Does
-summary: Trigger to outcome in one line, at most 160 characters
+summary: Trigger to outcome in at most 160 characters
 type: procedure
 status: promoted
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 topics: [<topic>]
+risk: read-only
+approved: YYYY-MM-DD
+verified: YYYY-MM-DD
 ---
+
+## Active memory
+
+Trigger: what starts this procedure.
+
+### Prerequisites
+
+Tools, inputs and access that must already be available.
+
+### Steps
+
+1. One verified action, with its exact command or click.
+
+### Verify
+
+Observable evidence that the intended result was reached.
+
+## Related
+
+None.
+
+## Notes
+
+Defined and tested with the owner; record the source of verification.
+```
+
+Use exactly `risk: read-only` or `risk: changes-state`. Changes-state procedures also require nonempty `### Approval` (the current-conversation ready check before action) and `### Recovery` (rollback, or explicit irreversibility and safe escalation), within Active memory. `approved` and `verified` are valid YYYY-MM-DD dates, not future dates. All shown sections and Trigger are required; Steps needs a numbered action. Fenced examples and empty sections do not count. Extra metadata and troubleshooting sections are allowed. `gate.py procedures` and `gate.py audit` check structure only, not truth, actual approval or permission to act.
 
 ## Active memory
 

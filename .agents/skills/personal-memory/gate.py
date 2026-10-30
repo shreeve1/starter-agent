@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import hubs  # noqa: E402
 import indexes  # noqa: E402
 import links  # noqa: E402
+import procedures  # noqa: E402
 import schema  # noqa: E402
 
 PROMOTED_DIRS = ["preferences", "docs", "voice", "email", "guides"]
@@ -415,6 +416,7 @@ def main():
     )
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("audit", help="Audit index alignment and Client Memory")
+    sub.add_parser("procedures", help="Check shared procedure structure, not authorization")
     sub.add_parser("crowded", help="Report memory folders holding more than 15 direct .md files")
     sub.add_parser("stale", help=f"List notes not updated or verified in over {STALE_DAYS} days")
     sub.add_parser("compact", help="Rewrite memory/index.md without table padding")
@@ -424,6 +426,18 @@ def main():
 
     args = ap.parse_args()
     mem_path = Path(args.memory)
+
+    if args.cmd in ("procedures", "audit"):
+        procedure_problems = procedures.audit(mem_path)
+        if procedure_problems:
+            print("Procedure problems:")
+            for line in procedure_problems:
+                print(f"- {line}")
+            if args.cmd == "procedures" or any("symlink" in p for p in procedure_problems):
+                sys.exit(1)
+        if args.cmd == "procedures":
+            print("Success: Procedures are structurally valid.")
+            sys.exit(0)
 
     if args.cmd == "crowded":
         for line in crowded(mem_path):
@@ -499,7 +513,7 @@ def main():
     topic_problems = audit_topic_dirs(mem_path, indexed)
     index_link_problems = audit_index_links(mem_path)
     client_problems = audit_clients(mem_path, indexed)
-    failed = False
+    failed = bool(procedure_problems)
     if missing or stale:
         print(
             "Memory index out of sync: missing_from_index=%s stale_in_index=%s" % (missing, stale)

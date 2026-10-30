@@ -126,7 +126,7 @@ Before writing or reading a client fact, read Client Memory in `<skills>/persona
 
 ## Procedures
 
-When the owner says "let's define a procedure for X", or a task matches a saved procedure, follow Procedures in `<skills>/personal-memory/reference.md`.
+When the owner says "let's define a procedure for X", or a task matches a saved procedure, follow Procedures in `<skills>/personal-memory/reference.md`. Before execution, run `gate.py procedures` or its manual readiness checks there. Incomplete legacy procedures remain evidence only until owner-assisted repair and verification; never invent approval dates.
 
 ## Conflict Resolution
 

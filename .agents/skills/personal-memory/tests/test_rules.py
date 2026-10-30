@@ -95,7 +95,12 @@ class ProcedureLeadTests(unittest.TestCase):
         mem = workspace(td, [f"| Review | {lead} | | |"])
         path = mem.parent / rel
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(f"---\ntitle: Review\ntype: {kind}\n---\nBody.\n", encoding="utf-8")
+        path.write_text(
+            f"---\ntitle: Review\ntype: {kind}\nrisk: read-only\napproved: 2026-10-01\nverified: 2026-10-01\n---\n"
+            "## Active memory\nTrigger: review\n### Prerequisites\nChange available.\n"
+            "### Steps\n1. Read change.\n### Verify\nReport findings.\n## Related\nNone.\n## Notes\nTested.\n",
+            encoding="utf-8",
+        )
         run_script(INDEXES, mem)
         return mem, path
 
@@ -149,7 +154,7 @@ class ProcedureLeadTests(unittest.TestCase):
                 self.skipTest(str(exc))
             result = audit(mem)
             self.assertEqual(result.returncode, 1)
-            self.assertIn('invalid procedure target', result.stdout)
+            self.assertTrue('invalid procedure target' in result.stdout or 'symlink' in result.stdout)
             self.assertNotIn('Traceback', result.stderr)
 
     def test_procedure_lead_accepts_unicode_path(self):

@@ -54,6 +54,10 @@ memory/
 └── raw/           # git-ignored
 ```
 
+## Procedure readiness
+
+Shared `type: procedure` notes in configured workflow topics use the Procedure File template in `memory/TEMPLATES.md`. Run `gate.py procedures` before execution; full audit includes the same findings. Without Python, check the template's metadata, dates, nonempty sections and numbered steps manually and disclose that the checker was not run. An incomplete legacy procedure stays readable as evidence, but execution waits for owner-assisted repair and real verification. Never invent approval dates or delete a note to pass checking. Ordinary workflow notes and client document layouts are unchanged.
+
 ## Capture
 
 There are no candidates and no approval step, except for Procedures: a shared one in `workflows/<area>/` is saved only through an owner-approved change. At the end of each task, when a capture trigger fired (a correction, a stated rule/preference, a described workflow/boundary, a settled decision, or a reusable fact discovered while working) and the item is not a one-off detail or work still in motion, the agent writes it to the proper topic file itself (workflows and decisions go into a topic folder from the `topics` list in `memory/schema.json`; lasting client facts go to Client Memory, then `hubs.py`), updates `index.md`, runs `python3 .agents/skills/personal-memory/indexes.py` for workflow/decision changes and `gate.py audit`, commits with a `memory: <what changed>` message (the commit is the log), and reports what it saved. Credentials are omitted automatically.

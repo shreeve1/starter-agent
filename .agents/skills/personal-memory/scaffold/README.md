@@ -40,6 +40,10 @@ memory/
 
 Create folders only as content needs them.
 
+## Procedure readiness
+
+Shared `type: procedure` notes in configured workflow topics use the Procedure File template in `memory/TEMPLATES.md`. Run `gate.py procedures` before execution; full audit includes the same findings. Without Python, check the template's metadata, dates, nonempty sections and numbered steps manually and disclose that the checker was not run. An incomplete legacy procedure stays readable as evidence, but execution waits for owner-assisted repair and real verification. Never invent approval dates or delete a note to pass checking. Ordinary workflow notes and client document layouts are unchanged.
+
 ## Capture
 
 No candidates and no approval step, except for procedures (`type: procedure`): one is saved only after the owner says yes to the full file. At the end of each task, when a capture trigger fired (a correction, a stated rule or preference, a described workflow, a settled decision, or a reusable fact discovered while working), the agent writes it to the right file, updates `index.md`, runs `indexes.py` for workflow/decision changes (and `hubs.py` for Client Memory) and `gate.py audit`, commits if the project is a git repo, and reports what it saved. Without Python, use the `personal-memory` skill's manual checks instead.
