@@ -6,7 +6,7 @@
 On your FIRST response in a session, before you answer, plan, load any skill or ask any question:
 
 1. Read `memory/index.md`, `memory/glossary.md` and `memory/rules.md`, then every file the `Always` row of `memory/rules.md` names. If a file does not exist, note it and move on. Do this even when the request seems unrelated or is itself a simple read.
-2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead skill runs the task, its Also load files add content.
+2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead procedure or skill runs the task, its Also load files add content.
 3. Treat index rows as pointers, not facts. Open the linked file before relying on a row.
 
 ## Memory capture: check at the end of every task

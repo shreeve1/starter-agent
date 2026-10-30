@@ -86,6 +86,6 @@ A procedure is a verified set of steps the agent follows whenever its trigger co
 2. State the current understanding and recommended procedure first. Ask only questions whose answers change the procedure: the trigger, where things are, defaults, then each step with its exact command or click. Mark each point where the owner must say yes as a ready check.
 3. Run the steps for real with the owner. A procedure holds only steps that were run and verified; when the run has to wait, say so, and save after that run.
 4. Pick a topic from `memory/schema.json` (a new topic only with the owner's OK). Show the owner the full file and save only after a clear yes.
-5. Add a `memory/rules.md` row whose When is the trigger and whose Also load is the file. Run `indexes.py`, then `gate.py audit` until it exits 0, and commit in a git repo.
+5. Add a `memory/rules.md` row whose When is the trigger and whose Lead is procedure `memory/workflows/<topic>/<slug>.md`. Run `indexes.py`, then `gate.py audit` until it exits 0, and commit in a git repo.
 
 **Following one:** open the matching file and run its steps in order, stopping at each ready check until the owner says yes. When a step fails or no longer matches the system, stop and propose the change; edit the file only after the owner's yes.

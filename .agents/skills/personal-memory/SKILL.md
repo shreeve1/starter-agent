@@ -36,7 +36,7 @@ Reads are routed by `memory/rules.md`; the session-start steps live in the folde
 `memory/rules.md` is one table: When | Lead | Also load | Note. A rule is a trigger plus pointers; the content it points to lives in a preference, email, workflow or other memory file.
 
 - Add a row when the owner says to remember something as a rule ("when X, use Y"), or when a new preference or email file is written: every file in `memory/preferences/` and `memory/email/` must be reachable from a row.
-- Lead holds at most one skill, the one that runs the workflow. Also load holds files and skills that only add content. Write skills as skill `name` (found in the project's skills folder, the global skills folder, or next to this skill) and paths backticked, folder-relative.
+- Lead is empty or exactly one skill `name` or procedure `memory/workflows/<topic>/<slug>.md`. Skills are found in the project's skills folder, the global skills folder, or next to this skill. A procedure must have type: procedure in a configured workflow topic. Also load adds supporting content, not a second execution sequence. Discovery through the workflow index selects the matching procedure as Lead before execution. Specific owner-approved procedures win over general skills; ask on unresolved equally specific matches. Client exceptions apply only to their matching client.
 - A plain "always do X" goes in the content file it governs; if none fits, write a preference file and add it to the Always row.
 - Edit an existing row before adding a near-duplicate. No rationale in rows; put it in a decision note.
 - After editing, run `gate.py audit`; it fails a row naming a missing skill or file, and any preference or email file no row reaches.

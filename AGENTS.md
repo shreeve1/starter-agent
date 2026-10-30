@@ -11,7 +11,7 @@ In all interactions and commit messages, be extremely concise, in plain full sen
 On your FIRST response in a session, before you answer, plan, load any skill, or ask any question, you MUST make these tool calls now. This is not background context — execute it as your first actions:
 
 1. Read `memory/index.md`, `memory/glossary.md` and `memory/rules.md` with the available file or shell tools (in Codex on Windows, `Get-Content -LiteralPath`; a tool named `read` is not required). Then read every file the `Always` row of `memory/rules.md` names. If a file does not exist, note it and move on. Do this even if the user's request seems unrelated — memory may change how you answer. Skip this step only when a "Session-start memory" message already holds these files.
-2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead skill runs the task, its Also load files add content.
+2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead procedure or skill runs the task, its Also load files add content.
 3. Treat index rows as pointers, not facts. Before relying on or acting on a row, open the file it links to.
 
 Do the above BEFORE acting on the user's request, even when the request tempts you to jump straight to another skill or answer. This applies EVEN when the request is itself a simple read or summary (e.g. "summarize AGENTS.md", "what does file X say") — do step 1 first, THEN read whatever the user asked about. Reading only the file the user named is NOT a substitute for step 1. Full policy: "Personal workspace memory" below.
@@ -165,7 +165,7 @@ Base suggestions on the live conversation and relevant promoted memory under `me
 Normal action suggestions:
 
 - Research results → save a Markdown file under `research/` (see `memory/preferences/document-scaffolding.md`).
-- Repeatable procedure → propose a new `.agents/skills/<name>/SKILL.md`.
+- Repeatable owner-specific procedure → propose `memory/workflows/<topic>/<slug>.md`.
 - Config or workspace convention changed → update `AGENTS.md` or a relevant skill.
 - Repeated workflow observed in the session → offer to create or use a skill/checklist/template.
 - A useful doc/path comes up → offer to consult that source before proceeding.
@@ -186,7 +186,8 @@ Keep this file as the high-level operating policy.
 
 Use reusable project files when behavior becomes repeated:
 
-- `.agents/skills/<skill-name>/SKILL.md` for repeatable workflows.
+- `memory/workflows/<topic>/<slug>.md` for verified owner-specific procedures.
+- `.agents/skills/<skill-name>/SKILL.md` for reusable capabilities, supporting code or native integrations.
 - `AGENTS.md` for team-shared operating rules.
 
 Create new skills or agents only when the user asks or agrees.

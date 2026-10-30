@@ -133,14 +133,43 @@ def audit_rules(memory_dir):
         return []
     root = memory_dir.resolve().parent
     skills, paths = set(), set()
+    problems = []
+    data = schema.load(memory_dir)
     for row in rule_rows(memory_dir):
+        cells = row.split("|")
+        lead = cells[2].strip() if len(cells) > 2 else ""
+        match = re.fullmatch(r"(skill|procedure) `([^`]+)`", lead)
+        if lead and not match:
+            problems.append("memory/rules.md: Lead must be one skill or procedure")
+            row = "|".join(cells[:2] + [""] + cells[3:])
+        elif match and match[1] == "procedure":
+            target = match[2]
+            parts = target.split("/")
+            path = root / target
+            try:
+                contained = path.resolve().is_relative_to(memory_dir.resolve() / "workflows")
+            except (OSError, RuntimeError):
+                contained = False
+            valid = (
+                len(parts) == 4 and parts[:2] == ["memory", "workflows"]
+                and parts[2] in data["topics"] and parts[3].endswith(".md")
+                and not any(p in ("", ".", "..") for p in parts)
+                and "\\" not in target and ":" not in target
+                and contained
+                and path.is_file()
+            )
+            if not valid:
+                problems.append(f"memory/rules.md: invalid procedure target {target}")
+                row = "|".join(cells[:2] + [""] + cells[3:])
+            elif hubs.parse_frontmatter(path).get("type") != "procedure":
+                problems.append(f"memory/rules.md: {target} must have type: procedure")
         skills |= set(RULE_SKILL.findall(row))
         paths |= {
             t
             for t in TICK.findall(row)
             if ("/" in t or t.endswith(".md")) and not any(c in t for c in "<*")
         }
-    problems = [
+    problems += [
         f"memory/rules.md: skill {s} not found"
         for s in sorted(skills)
         if not any(
@@ -459,12 +488,17 @@ def main():
     if not (mem_path / "index.md").exists():
         print("Alert: The memory index file (memory/index.md) was not found.")
         sys.exit(1)
+    rule_problems = audit_rules(mem_path)
+    if any("invalid procedure target" in line for line in rule_problems):
+        print("Rules problems:")
+        for line in rule_problems:
+            print(f"- {line}")
+        sys.exit(1)
     indexed = indexed_paths(mem_path)
     missing, stale = audit_index(mem_path, indexed)
     topic_problems = audit_topic_dirs(mem_path, indexed)
     index_link_problems = audit_index_links(mem_path)
     client_problems = audit_clients(mem_path, indexed)
-    rule_problems = audit_rules(mem_path)
     failed = False
     if missing or stale:
         print(
