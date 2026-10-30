@@ -7,6 +7,7 @@ On your FIRST response in a session, before you answer, plan, load any skill or 
 
 1. Read `memory/index.md`, `memory/glossary.md` and `memory/rules.md`, then every file the `Always` row of `memory/rules.md` names. If a file does not exist, note it and move on. Do this even when the request seems unrelated or is itself a simple read.
 2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead procedure or skill runs the task, its Also load files add content.
+- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures` or compare the full Procedure File template manually without Python. Missing approved/verified/risk, Prerequisites, Verify or other required sections blocks execution; report gaps and wait for owner-assisted repair.
 3. Treat index rows as pointers, not facts. Open the linked file before relying on a row.
 
 ## Memory recovery

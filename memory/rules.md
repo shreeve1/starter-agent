@@ -5,6 +5,7 @@ Read at session start. Load every Always row now. Before each task, load every r
 - One lead per task: empty, skill `name` or procedure `memory/workflows/<topic>/<slug>.md`. Also load adds supporting content, never an independent execution sequence. A discovery row opens the matching procedure and selects it as Lead before running it.
 - Specific owner-approved procedures take precedence over general skills. The more specific When wins; unresolved equally specific leads require asking the owner, not merging steps. Client exceptions apply only to their named client.
 - A lead's limits stay inside its own workflow.
+- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures` or compare the full Procedure File template manually without Python. Missing approved/verified/risk, Prerequisites, Verify or other required sections blocks execution; report gaps and wait for owner-assisted repair.
 - Rows point; they hold no guidance. Content lives in the files they name.
 - New rule: add a row (personal-memory "Rules"). `gate.py audit` fails a row naming a missing skill or file, and a preference or email file no row reaches.
 

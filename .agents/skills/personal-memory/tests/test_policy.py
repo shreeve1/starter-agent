@@ -34,6 +34,13 @@ class PolicyTests(unittest.TestCase):
             self.assertIn('Recovery before editing', mode)
             self.assertIn('.memory-recovery/', mode)
 
+    def test_router_stops_before_steps_on_ambiguity_or_incompleteness(self):
+        for path in (PM / 'scaffold/rules.md', PM / 'scaffold/AGENTS-memory.md'):
+            text = path.read_text()
+            self.assertIn('even when their steps are identical', text)
+            self.assertIn('before any procedure step', text)
+            self.assertIn('gate.py procedures', text)
+
     def test_conflict_requires_owner_direction(self):
         instructions = (PM / 'SKILL.md').read_text()
         conflict = instructions.split('## Conflict Resolution')[1].split('\n## ')[0]

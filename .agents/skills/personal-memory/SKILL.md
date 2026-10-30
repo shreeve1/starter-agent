@@ -33,6 +33,8 @@ Reads are routed by `memory/rules.md`; the session-start steps live in the folde
 
 ## Rules
 
+- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures` or compare the full Procedure File template manually without Python. Missing approved/verified/risk, Prerequisites, Verify or other required sections blocks execution; report gaps and wait for owner-assisted repair.
+
 `memory/rules.md` is one table: When | Lead | Also load | Note. A rule is a trigger plus pointers; the content it points to lives in a preference, email, workflow or other memory file.
 
 - Add a row when the owner says to remember something as a rule ("when X, use Y"), or when a new preference or email file is written: every file in `memory/preferences/` and `memory/email/` must be reachable from a row.
