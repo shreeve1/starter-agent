@@ -26,7 +26,7 @@ exists first, then recover the personal files:
 
 ## Recovery before editing
 
-Before replacing or deleting any existing hand-written memory, preserve its exact previous bytes, including uncommitted notes and memory/index.md, rules.md and glossary.md. New files need no snapshot; only generated topic indexes and hubs are rebuildable exceptions. Use the same protocol with or without Git.
+Before editing any existing hand-written memory (replacing, deleting or adding to it, including adding a row), preserve its exact previous bytes, including uncommitted notes and memory/index.md, rules.md and glossary.md. New files need no snapshot; only generated topic indexes and hubs are rebuildable exceptions. Use the same protocol with or without Git.
 
 1. Read the source, check authority and confirm this task owns the intended edit.
 2. Run `python3 <skills>/personal-memory/recovery.py --root <workspace> snapshot memory/<path>.md`. Quote paths containing spaces for the shell. Success returns a verified unique copy under `<workspace>/.memory-recovery/<id>/memory/...`; failure means stop before editing. If the source changed after a verified copy, the helper retains that copy and reports its path; it still grants no permission to edit. Absolute, drive, backslash, parent-traversal and symlink paths are rejected.

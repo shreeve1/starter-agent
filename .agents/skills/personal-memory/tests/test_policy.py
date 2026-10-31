@@ -34,6 +34,24 @@ class PolicyTests(unittest.TestCase):
             self.assertIn('Recovery before editing', mode)
             self.assertIn('.memory-recovery/', mode)
 
+    def test_index_row_addition_requires_recovery_at_write_points(self):
+        skill = (PM / 'SKILL.md').read_text()
+        step = skill.split('5. Create or update `memory/index.md`')[1].split('\n6. ')[0]
+        self.assertIn('Recovery before editing', step)
+        self.assertIn('including adding a row', step)
+        self.assertIn('without Python', step)
+        capture = skill.split('## Capture Workflow')[1].split('\n## ')[0]
+        self.assertIn('including adding a row', capture)
+        recovery_section = (PM / 'reference.md').read_text().split('## Recovery before editing')[1].split('\n## ')[0]
+        self.assertIn('including adding a row', recovery_section)
+        instruction_files = [PM / 'scaffold/AGENTS-memory.md', PM / 'scaffold/README.md']
+        if (ROOT / 'AGENTS.md').is_file() and (ROOT / 'memory/README.md').is_file():
+            instruction_files += [ROOT / 'AGENTS.md', ROOT / 'memory/README.md']
+        for path in instruction_files:
+            self.assertIn('adding a row', path.read_text())
+        bullet = (PM / 'scaffold/AGENTS-memory.md').read_text().split('**Write:**')[1].split('\n')[0]
+        self.assertIn('Recovery before editing', bullet)
+
     def test_router_stops_before_steps_on_ambiguity_or_incompleteness(self):
         for path in (PM / 'scaffold/rules.md', PM / 'scaffold/AGENTS-memory.md'):
             text = path.read_text()
