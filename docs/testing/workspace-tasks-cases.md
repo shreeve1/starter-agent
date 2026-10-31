@@ -55,6 +55,14 @@ Absent-index retry run `1fb51483a7b4481d9fbb92fe98ee66cc` also rebuilt exactly o
 
 Scoped code review `2b315026aa87422e91336c09450ce6b8` found no actionable issues. The initial review attempt could not inspect Git due to its shell restriction; it was rerun with read-only Git access and is not counted as a successful review. Python/Markdown style checks again skipped undeclared surfaces. Broader NOT RUN cases below remain outside this concrete-fix follow-up.
 
+## Focused snapshot-layout follow-up
+
+The earlier flattened snapshot is recoverable without guessing: ordered receipt `creation-fixed-calls.json` records the exact copy from `tasks/index.md` to `.task-recovery/20260611-vendor-index-repair/tasks-index.md`, and comparison against the pre-operation fixture confirms identical bytes. Original evidence was left untouched; the filename alone is not treated as the restore map.
+
+Fresh run `55cbe74c0a644feb91db0cbcb9f655bb` repeated the same owner request with the current installed instructions, without extra layout coaching. It created `.task-recovery/2026-10-31-vendor-index-retry/tasks/index.md` before the index append. Direct byte checks confirmed the snapshot matches the original index, the task record is unchanged, and there is one task record and one resolvable Vendor response row. The ordered receipt shows exclusive directory creation, the copy, and two successful source/snapshot comparisons before the append. This focused layout-and-content check passes; it does not establish universal agent compliance.
+
+Fixture, original bytes/hashes, old-source mapping, extracted calls and grading results are retained at `/tmp/starter-task-snapshot-layout-xf61jlyc/`; full receipt is under `/tmp/pi-fabric-runs-eg4ssz/55cbe74c0a644feb91db0cbcb9f655bb/`. No recovery instructions, helper, global install or existing snapshots were changed. A distinct deviation remains: the new index row uses document-relative `vendor.md`, which resolves to the existing task, instead of the requested workspace-relative pointer convention. The first grading assertion expected the exact workspace-relative link text; it was corrected to test the actual link destination. That does not erase the convention deviation or turn this run into full lifecycle compliance.
+
 ## Remaining case matrix
 
 Record actual follow-up results below before claiming coverage. Pending is not PASS.
