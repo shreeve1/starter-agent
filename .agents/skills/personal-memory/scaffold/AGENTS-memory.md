@@ -7,7 +7,7 @@ On your FIRST response in a session, before you answer, plan, load any skill or 
 
 1. Read `memory/index.md`, `memory/glossary.md` and `memory/rules.md`, then every file the `Always` row of `memory/rules.md` names. If a file does not exist, note it and move on. Do this even when the request seems unrelated or is itself a simple read.
 2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead procedure or skill runs the task, its Also load files add content.
-- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures` or compare the full Procedure File template manually without Python. Missing approved/verified/risk, Prerequisites, Verify or other required sections blocks execution; report gaps and wait for owner-assisted repair.
+- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures memory/workflows/<topic>/<slug>.md` or compare the full Procedure File template manually without Python. Missing approved/verified/risk, Prerequisites, Verify or other required sections blocks execution; report gaps and wait for owner-assisted repair.
 3. Treat index rows as pointers, not facts. Open the linked file before relying on a row.
 
 ## Memory recovery
@@ -38,7 +38,7 @@ Does not qualify: one-off task details, the status of work still in motion (save
 
 `memory/` holds this project's durable memory, operated by the `personal-memory` skill at `<skills>/personal-memory/`. `memory/README.md` is the layout contract; read it before creating a memory file.
 
-- **Write:** once per task, to the right file (workflows and decisions in a topic folder from `memory/schema.json`), update `memory/index.md`, then from the project root run `python3 <skills>/personal-memory/indexes.py` if a workflow or decision changed, `python3 <skills>/personal-memory/hubs.py` if a Client Memory note changed, and `python3 <skills>/personal-memory/gate.py --memory memory audit` until it exits 0. Without Python, use the skill's manual checks instead.
+- **Write:** once per task, to the right file (workflows and decisions in a topic folder from `memory/schema.json`), update `memory/index.md`, then from the project root run `python3 <skills>/personal-memory/indexes.py` if a workflow or decision changed, `python3 <skills>/personal-memory/hubs.py` if a Client Memory note changed, and `python3 <skills>/personal-memory/gate.py --memory memory audit`; fix safe structural issues, but stop and report owner-repair-only findings rather than looping. Without Python, use the skill's manual checks instead.
 - **Conflicts:** apply Memory authority; unresolved conflicts leave the existing note unchanged. Replace only resolved facts or explicitly owner-approved authority changes.
 - **Git:** if this project is a git repo, commit the memory files you wrote with the task (stage only your own). If not, the capture ends after the audit.
 - **Rules:** `memory/rules.md` routes tasks to skills and files, one row per trigger, pointers only. Add a row through the `personal-memory` skill.

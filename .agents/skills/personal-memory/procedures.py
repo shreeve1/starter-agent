@@ -8,8 +8,16 @@ import hubs
 import schema
 
 
-def unsafe_path(path: Path) -> bool:
-    return any(part.is_symlink() for part in (path, *path.parents))
+def unsafe_path(path: Path, boundary: Path | None = None) -> bool:
+    path = path.absolute()
+    boundary = boundary.absolute() if boundary is not None else path.parents[2]
+    current = path
+    while True:
+        if current.is_symlink():
+            return True
+        if current == boundary:
+            return False
+        current = current.parent
 
 
 def validate(path: Path, today: date | None = None) -> list[str]:
@@ -75,10 +83,23 @@ def validate(path: Path, today: date | None = None) -> list[str]:
     return problems
 
 
+def selected(memory_dir: Path, relative_path: str, today: date | None = None) -> list[str]:
+    parts = relative_path.split('/')
+    topics = schema.load(memory_dir)['topics']
+    if (len(parts) != 4 or parts[:2] != ['memory', 'workflows']
+            or not isinstance(topics, list) or parts[2] not in topics
+            or not re.fullmatch(r'[a-z0-9][a-z0-9-]*', parts[2])
+            or not parts[3].endswith('.md') or parts[3] in ('.', '..')
+            or '\\' in relative_path or ':' in relative_path):
+        return [f'{relative_path}: invalid procedure target']
+    path = memory_dir.joinpath(*parts[1:])
+    return validate(path, today)
+
+
 def audit(memory_dir: Path, today: date | None = None) -> list[str]:
     problems = []
     base = memory_dir / 'workflows'
-    if unsafe_path(base):
+    if unsafe_path(base, memory_dir):
         return [f"{base}: symlink components are not allowed"]
     topics = schema.load(memory_dir)['topics']
     if not isinstance(topics, list):
@@ -88,11 +109,11 @@ def audit(memory_dir: Path, today: date | None = None) -> list[str]:
             problems.append(f'{base}: invalid workflow topic {topic!r}')
             continue
         folder = base / topic
-        if unsafe_path(folder):
+        if unsafe_path(folder, memory_dir):
             problems.append(f"{folder}: symlink components are not allowed")
             continue
         for path in sorted(folder.glob('*.md')):
-            if unsafe_path(path):
+            if unsafe_path(path, memory_dir):
                 problems.append(f"{path}: symlink components are not allowed")
             elif hubs.parse_frontmatter(path).get('type') == 'procedure':
                 problems.extend(validate(path, today))

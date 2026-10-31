@@ -42,7 +42,7 @@ Create folders only as content needs them.
 
 ## Procedure readiness
 
-Shared `type: procedure` notes in configured workflow topics use the Procedure File template in `memory/TEMPLATES.md`. Run `gate.py procedures` before execution; full audit includes the same findings. Without Python, check the template's metadata, dates, nonempty sections and numbered steps manually and disclose that the checker was not run. An incomplete legacy procedure stays readable as evidence, but execution waits for owner-assisted repair and real verification. Never invent approval dates or delete a note to pass checking. Ordinary workflow notes and client document layouts are unchanged.
+Shared `type: procedure` notes in configured workflow topics use the Procedure File template in `memory/TEMPLATES.md`. Run `gate.py procedures memory/workflows/<topic>/<slug>.md` before execution; full audit includes the same findings. Without Python, check the template's metadata, dates, nonempty sections and numbered steps manually and disclose that the checker was not run. An incomplete legacy procedure stays readable as evidence, but execution waits for owner-assisted repair and real verification. Never invent approval dates or delete a note to pass checking. Ordinary workflow notes and client document layouts are unchanged.
 
 ## Memory recovery
 

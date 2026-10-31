@@ -61,6 +61,16 @@ class PolicyTests(unittest.TestCase):
             self.assertIn('ordinary facts', section)
             self.assertIn('owner direction or approval', section)
 
+    def test_owner_repair_stops_and_startday_caller(self):
+        self.assertIn('stop and report', (PM / 'SKILL.md').read_text())
+        if (ROOT / '.agents/setup/README.md').is_file():
+            setup = (ROOT / '.agents/setup/README.md').read_text().split('## A newer version arrived')[1]
+            self.assertIn('legacy procedures', setup)
+            caller = (ROOT / '.agents/skills/startday-spec/references/modules.md').read_text()
+            self.assertNotIn('A note that contradicts an older one replaces it in place', caller)
+            self.assertIn('owner direction or approval', caller)
+            self.assertIn('Recovery before editing', caller)
+
     def test_conflict_requires_owner_direction(self):
         instructions = (PM / 'SKILL.md').read_text()
         conflict = instructions.split('## Conflict Resolution')[1].split('\n## ')[0]

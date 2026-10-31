@@ -29,6 +29,18 @@ class RecoveryTests(unittest.TestCase):
             self.assertTrue(saved.is_relative_to(root / '.memory-recovery'))
             self.assertFalse((root / '.git').exists())
 
+    def test_safe_symlinked_ancestor(self):
+        with tempfile.TemporaryDirectory() as td:
+            base = Path(td)
+            root, source = self.source(base / 'real/project')
+            alias = base / 'alias'
+            try:
+                alias.symlink_to(base / 'real', target_is_directory=True)
+            except OSError as exc:
+                self.skipTest(str(exc))
+            saved = recovery.snapshot(alias / 'project', 'memory/docs/café.md')
+            self.assertEqual(saved.read_bytes(), source.read_bytes())
+
     def test_unique_snapshots(self):
         with tempfile.TemporaryDirectory() as td:
             root, source = self.source(td)
@@ -123,6 +135,9 @@ class RecoveryTests(unittest.TestCase):
             with patch.object(Path, 'read_bytes', changed), self.assertRaises(OSError):
                 recovery.snapshot(root, 'memory/docs/café.md')
             self.assertEqual(source.read_bytes(), b'intervening edit')
+            saved = list((root / '.memory-recovery').rglob('café.md'))
+            self.assertEqual(len(saved), 1)
+            self.assertEqual(saved[0].read_bytes(), b'\xef\xbb\xbfPrevious\r\n\x00exact bytes\r\n')
 
     def test_cli_spaces_unicode(self):
         with tempfile.TemporaryDirectory(prefix='space café ') as td:

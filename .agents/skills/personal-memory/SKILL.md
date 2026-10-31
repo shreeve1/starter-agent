@@ -33,7 +33,7 @@ Reads are routed by `memory/rules.md`; the session-start steps live in the folde
 
 ## Rules
 
-- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures` or compare the full Procedure File template manually without Python. Missing approved/verified/risk, Prerequisites, Verify or other required sections blocks execution; report gaps and wait for owner-assisted repair.
+- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures memory/workflows/<topic>/<slug>.md` or compare the full Procedure File template manually without Python. Missing approved/verified/risk, Prerequisites, Verify or other required sections blocks execution; report gaps and wait for owner-assisted repair.
 
 `memory/rules.md` is one table: When | Lead | Also load | Note. A rule is a trigger plus pointers; the content it points to lives in a preference, email, workflow or other memory file.
 
@@ -125,7 +125,7 @@ Direct promotion steps:
    - `memory/rules.md` — a rule (trigger plus pointers), and a row for any new preference or email file. See Rules.
 4. Update frontmatter to `status: promoted` where relevant.
 5. Create or update `memory/index.md` with the promoted row. Carry the file path either backticked (`` `memory/decisions/<topic>/decision-x.md` ``) or as a markdown link (`[title](memory/decisions/<topic>/decision-x.md)`) so `gate.py audit` can recognize the entry.
-6. Run `python3 <skills>/personal-memory/indexes.py` (regenerates the two topic sub-indexes; skip if no workflow/decision changed), then `python3 <skills>/personal-memory/gate.py --memory memory audit`. If audit fails, apply the safe deterministic fixes (add missing index rows, remove stale rows, fix topic placement), then re-run until it exits 0. If it prints a size, summary or history warning for a file you touched, trim that file now (see Keep Memory Lean).
+6. Run `python3 <skills>/personal-memory/indexes.py` (regenerates the two topic sub-indexes; skip if no workflow/decision changed), then `python3 <skills>/personal-memory/gate.py --memory memory audit`. If audit fails, apply the safe deterministic fixes (add missing index rows, remove stale rows, fix topic placement), then re-run. If findings need owner approval or real verification (including incomplete legacy procedures), stop and report them; never invent dates, delete authority, or loop waiting for exit 0. If it prints a size, summary or history warning for a file you touched, trim that file now (see Keep Memory Lean).
    **No Python** (`python3 --version` fails, as in many enterprise environments): skip both scripts and do their work by hand. Add the `memory/index.md` row from step 5. For a workflow or decision, also add one line under its topic heading in `memory/workflows/index.md` or `memory/decisions/index.md`, written like its neighbours: `- [Title](<path>) summary (date)`. Then re-read what you wrote and confirm each thing the audit would check: every path in the new index row and in any `memory/rules.md` row exists, a skill named in a row exists in the project's skills folder, the global skills folder, or next to this skill, a preference or email file is named by a `rules.md` row, the note has frontmatter like the other notes in its folder with a `summary` of at most 160 characters, and the note is at most 6144 bytes. Say in your reply that the audit was not run.
 7. If the project is a git repo, commit the memory files you wrote with the task's commit (or on their own as `memory: <what changed>`), with a body line for any omission or placement choice; stage only memory files you wrote. Read history with `git log -- memory/`. If it is not a repo, the capture ends after the audit.
 8. Report per Output Rules.
@@ -136,7 +136,7 @@ Before writing or reading a client fact, read Client Memory in `<skills>/persona
 
 ## Procedures
 
-When the owner says "let's define a procedure for X", or a task matches a saved procedure, follow Procedures in `<skills>/personal-memory/reference.md`. Before execution, run `gate.py procedures` or its manual readiness checks there. Incomplete legacy procedures remain evidence only until owner-assisted repair and verification; never invent approval dates.
+When the owner says "let's define a procedure for X", or a task matches a saved procedure, follow Procedures in `<skills>/personal-memory/reference.md`. Before execution, run `gate.py procedures memory/workflows/<topic>/<slug>.md` or its manual readiness checks there. Incomplete legacy procedures remain evidence only until owner-assisted repair and verification; never invent approval dates.
 
 ## Conflict Resolution
 

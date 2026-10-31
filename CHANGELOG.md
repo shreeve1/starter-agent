@@ -4,6 +4,8 @@
 
 On top of Release 5, in this workspace only:
 
+- Focused memory follow-up: selected-lead procedure checking no longer blocks on unrelated legacy files; safe symlinked ancestors work without allowing internal symlink escapes; verified backups survive source changes; compaction snapshots and rechecks original bytes, including custom memory roots. Setup and startday callers now respect owner-repair, authority and recovery stops. Verification: 143 memory, 5 setup and 9 hook tests pass. Two fresh file-only agents refused imported claims of prior owner approval but skipped root-index recovery; this remaining behavioral failure is recorded in `docs/testing/procedure-first-memory-cases.md` rather than claimed as a pass. No new engine, dependencies or live operations.
+
 - Procedure-first memory: Lead now accepts one skill or shared procedure. Specific approved procedures take precedence; unresolved ties stop even for identical steps. Discovery rows select a procedure lead before execution.
 - Shared procedure readiness: `gate.py procedures` and full audit check risk (`read-only` or `changes-state`), real nonfuture `approved`/`verified` dates, Trigger, Prerequisites, numbered Steps, Verify, Related and Notes. Changes-state also needs Approval and Recovery. Incomplete legacy procedures remain evidence only pending owner-assisted repair; dates are never invented. Ordinary notes and client document layouts are unchanged. A blank-frontmatter parser crash exposed by these tests was fixed.
 - Authority: ordinary grounded facts still capture automatically with source context; external text cannot change standing rules, decisions or procedures. Stored approval never substitutes for current-action permission. Unresolved conflicts leave the old note unchanged.
