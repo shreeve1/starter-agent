@@ -1,12 +1,18 @@
 ---
 name: personal-memory
-description: Use when capturing, promoting, pruning, or using local personal memory under memory/. Triggers include remember this, capture this preference, run memory check, email preferences, voice preferences, glossary or entity shorthand, client facts (Client Memory, client hubs), defining or following a procedure ("let's define a procedure for X"), and important docs to remember.
+description: Use when capturing, promoting, pruning, or using local personal memory under memory/. Triggers include remember this, capture this preference, run memory check, email preferences, voice preferences, glossary or entity shorthand, client facts (Client Memory, client hubs), defining or following a procedure ("let's define a procedure for X"), important docs to remember, or saved workspace tasks: create, look up, continue, review, complete or archive a task.
 ---
 
 
 # Personal Memory
 
 Use this skill to operate the local `memory/` workspace memory system. In a project it holds what a future session would otherwise re-learn: decisions, gotchas, how the project's stack is set up, and the owner's preferences for working in it; in a personal workspace, also preferences and durable personal context. Facts the project's own docs or code already state are linked, not copied.
+
+## Saved tasks and document formats
+
+For a saved task request (create, look up, pick up, continue, review, complete or archive), read [tasks.md](tasks.md) before acting. Once picked up, maintain progress and its active-index row without repeated approval. This is supporting bookkeeping: the actual work's procedure or skill remains lead. Mere index relevance does not authorize work. Task files live outside durable memory in the current workspace's `tasks/`.
+
+For a pending proposal or general research record without a skill-specific format, read [supporting-templates.md](supporting-templates.md). Task and index formats are in [task-templates.md](task-templates.md). These installed files work without design docs or an external authoring skill.
 
 ## Scope
 

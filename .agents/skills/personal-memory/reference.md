@@ -2,6 +2,10 @@
 
 Rare operations for the `personal-memory` skill: recovering missing scaffold, linting memory health, Client Memory, the weekly sweep and procedures. `SKILL.md` covers everyday capture and reads; open this file only for one of these. `<skills>` is defined in `SKILL.md`.
 
+## Task and document formats
+
+Saved workspace task operations are in [tasks.md](tasks.md); read it on create, lookup, continue, review, complete or archive requests. Copyable records/indexes are in [task-templates.md](task-templates.md). Pending proposal and general research formats are in [supporting-templates.md](supporting-templates.md), reached when producing those records. They ship beside this reference, including in global or copied installs.
+
 ## Setup Workflow
 
 For setup and migration, use the `memory-setup` skill.
