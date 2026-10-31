@@ -17,6 +17,8 @@ On top of Release 5, in this workspace only:
 - Recovery: before replacing/deleting hand-written memory, including rules/glossary/root index, preserve verified previous bytes under ignored `.memory-recovery/`, with or without Git. Optional standard-library `recovery.py` makes backups only. File-only operation requires verified copying and disclosed manual checks; stop if exact preservation cannot be verified. Snapshots may be sensitive and are not encrypted or pruned. New setup excludes them; upgrades retain old recovery and copy it separately only with owner approval.
 - Verification and limits: `docs/testing/procedure-first-memory-cases.md` records disposable fresh-agent observations, initial failures and reruns. Windows/macOS and native Codex/Claude/Cowork clients were not run. Public-release cleanup, adapters, licensing and advanced retrieval remain separate work. No manifest, remotes, hooks or dependencies were changed.
 
+- `AGENTS.md` "Check your answer before you send it": before a final answer that states facts, the agent rechecks each claim against its source and marks what it could not check; for a report, a client message or a long answer, a subagent with only the claims does the check.
+
 - Replaced `talk-it-through` with a recommendation-led brainstorming workflow based on superpowers brainstorming, and aligned its direct callers, memory routing, approval gates and draw.io handoff.
 
 - `drawio` is now starter-agent-owned; its complete `.agents/skills/drawio/**` tree is copied recursively into dotfiles. The dotfiles-only `tests/drawio.test.sh` wrapper remains outside that sync boundary.

@@ -127,7 +127,7 @@ For a project, write a plain design a capable builder can use without returning 
 - decisions made during the conversation
 - what remains for the builder to decide
 
-Prepare the complete design text before writing it. In a software repository, the eventual path is `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` unless the user specifies another path. For other projects, ask where the design should go. After the user approves the complete design, write it, commit it, and then run the builder check.
+Prepare the complete design text before writing it. In a software repository, the eventual path is `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` unless the user specifies another path. For other projects, ask where the design should go. After the user approves the complete design, write it, commit it if the project is a git repo, and then run the builder check.
 
 When the user approves the complete design text, tell them that a reviewer will read it first and may return with a few questions. Read `builder-check-prompt.md` from the installed superpowers brainstorming skill directory. In this workspace that is `/home/james/.pi/agent/git/github.com/obra/superpowers/skills/brainstorming/builder-check-prompt.md`. If it is unavailable, use this prompt: “Read the design and report only questions whose answers would change the implementation plan; skip details the builder can decide.” Dispatch a fresh general-purpose subagent with that prompt; if no subagent tool exists, read the design as the builder yourself. Sort the result into:
 
@@ -142,7 +142,7 @@ Bring only the last group back to the user, most important first. This is the on
 Nothing is built until the user approves the full description for the chosen size:
 
 - For a small change, approval is in chat.
-- For a project, approval is of the complete design text before it is written; after approval, write and commit the design, then run the builder check before implementation.
+- For a project, approval is of the complete design text before it is written; after approval, write the design (and commit it in a git repo), then run the builder check before implementation.
 - Reading, inspecting, researching, and discussing are not building.
 - A user-approved spike may be built as a throwaway experiment; keeping it is a new request.
 - The opt-out in the first-message section and the approved spike are the only exceptions to this approval gate.
@@ -212,10 +212,10 @@ Read `memory/index.md` and the relevant topic folder. Replace or merge an existi
 After writing memory:
 
 1. Update `memory/index.md` when needed.
-2. Run `python3 .agents/skills/personal-memory/indexes.py` when a workflow or decision changed.
-3. Run `python3 .agents/skills/personal-memory/gate.py --memory memory audit`.
+2. Run `python3 <skills>/personal-memory/indexes.py` when a workflow or decision changed.
+3. Run `python3 <skills>/personal-memory/gate.py --memory memory audit`. `<skills>` is the folder that holds the skill folders (`.agents/skills` in a workspace, `~/.agents/skills` for a global install); `python3` means `python` where that is the working command.
 4. Trim any touched memory file warned about by the audit.
-5. Commit the memory files written during this task, staging only those files.
+5. If the project is a git repo, commit the memory files written during this task, staging only those files.
 
 If Python is unavailable, do the index work by hand, re-read the files, and say the audit was not run.
 

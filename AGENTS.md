@@ -135,6 +135,12 @@ For multi-step office tasks, state a brief plan using numbered bullets, with eac
 
 Strong success criteria allow independent progress. Weak goals like “make it better” require clarification before broad rewrites.
 
+### Check your answer before you send it
+
+Before factual final answers, list claims and reopen sources now. Fix errors; mark unverified claims and actions not done.
+For reports, client messages or long answers, give a read-only subagent only claims: correct, wrong (correction), or can't tell. Revise. Without subagents, check yourself.
+Skip short replies, opinions and questions.
+
 ## Personal workspace memory
 
 This workspace uses `memory/` for local, personal, non-code memory. Populated memory `.md` files are tracked in git so they have version history. Hooks live in `.githooks/`: pre-commit scans for secrets, runs `gate.py audit` and the skill tests; commit-msg caps the subject at 72 characters. They are not enabled in this Codex workspace; run those checks directly before commits.
