@@ -94,7 +94,7 @@ An explicit completion request authorizes this whole sequence:
 
 1. Replace Outcome with the observed result, checks and any deliberately unfinished work; set `status: completed` and update `updated`.
 2. Review for durable facts, decisions or a reusable procedure. In Durable outputs, link authorized memory saved and any separate proposal still needing approval or verification. Write None if nothing qualifies. Apply existing memory permission and recovery rules.
-3. Preserve pending proposals outside the task, with a reference from Durable outputs. They do not hold up cleanup, and do not automatically become another active task.
+3. Preserve pending proposals outside the task, with a reference from Durable outputs. Use the Pending proposal template in `docs/superpowers/specs/2026-10-31-workspace-supporting-templates.md`. They do not hold up cleanup, and do not automatically become another active task.
 4. Move the complete record to `tasks/archive/` without overwriting an existing file. Confirm its archived location and preserved content; keep its ID unchanged.
 5. Remove its row from `tasks/index.md` and verify the row is gone.
 
