@@ -1,5 +1,7 @@
 """Shared procedures are structurally ready, not authorized by lint."""
+import json
 import sys
+from unittest.mock import patch
 import tempfile
 import unittest
 from datetime import date
@@ -40,6 +42,33 @@ def write_procedure(mem, risk='read-only', approved='2026-10-01', verified='2026
 
 
 class ProcedureTests(unittest.TestCase):
+    def test_invalid_schema_topics_never_read_outside(self):
+        for topic in ('../../outside', '/tmp/outside', 'C:/outside', '..\\outside', 42):
+            with self.subTest(topic=topic), tempfile.TemporaryDirectory() as td:
+                mem = workspace(td, [])
+                config = json.loads((mem / 'schema.json').read_text())
+                config['topics'] = [topic]
+                (mem / 'schema.json').write_text(json.dumps(config))
+                with patch.object(procedures.hubs, 'parse_frontmatter', side_effect=AssertionError('outside read')):
+                    problems = procedures.audit(mem, TODAY)
+                self.assertTrue(problems)
+                self.assertIn('invalid workflow topic', problems[0])
+                result = run_script(GATE, mem, 'audit')
+                self.assertEqual(result.returncode, 1)
+                self.assertNotIn('Traceback', result.stderr)
+
+    def test_blank_trigger_followed_by_prose_fails(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = write_procedure(Path(td), body=BODY.replace('Trigger: review a change', 'Trigger:\nUnrelated explanation.'))
+            self.assertTrue(procedures.validate(path, TODAY))
+
+    def test_required_subsections_outside_active_memory_fail(self):
+        misplaced = BODY.replace('## Active memory', '## Other').replace('## Notes', '## Active memory\nTrigger: review a change\n\n## Notes')
+        state = BODY + '\n### Approval\nAsk now.\n### Recovery\nStop and escalate.\n'
+        for body, risk in ((misplaced, 'read-only'), (state, 'changes-state')):
+            with self.subTest(risk=risk), tempfile.TemporaryDirectory() as td:
+                self.assertTrue(procedures.validate(write_procedure(Path(td), risk=risk, body=body), TODAY))
+
     def test_read_only_and_extra_metadata(self):
         with tempfile.TemporaryDirectory() as td:
             path = write_procedure(Path(td))

@@ -433,7 +433,7 @@ def main():
             print("Procedure problems:")
             for line in procedure_problems:
                 print(f"- {line}")
-            if args.cmd == "procedures" or any("symlink" in p for p in procedure_problems):
+            if args.cmd == "procedures" or any("symlink" in p or "invalid workflow topic" in p for p in procedure_problems):
                 sys.exit(1)
         if args.cmd == "procedures":
             print("Success: Procedures are structurally valid.")

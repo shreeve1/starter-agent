@@ -29,7 +29,7 @@ Reads are routed by `memory/rules.md`; the session-start steps live in the folde
 1. Treat index rows as pointers, not facts: open the linked file before relying on or acting on a row.
 2. Client skills read Client Memory through the hub `memory/<client_folder>/_hubs/<short>.md`, never by guessing note paths.
 3. Before wrapping up, run the end-of-session sweep (see Global Capture).
-4. If a note you rely on is older than 90 days (`updated` or `verified`; `gate.py stale` lists them), re-ground it against current tool output or files first. Update it in place, or delete it if no longer true. Do not ask the user.
+4. Re-ground notes older than 90 days (`gate.py stale`) before relying on them. Resolved ordinary facts may be updated or removed after recovery; standing rules, preferences, decisions and procedures need explicit owner direction or approval, even during stale-note maintenance. Report unresolved conflicts without edits.
 
 ## Rules
 
@@ -155,7 +155,7 @@ Before trimming, merging or deleting existing memory, follow Recovery before edi
 - A note is at most 6144 bytes. Over that, cut narration, build logs, settled status and anything stated elsewhere (link instead); split a decision by topic only when every line is still current.
 - `summary:` and each `memory/index.md` summary are at most 160 characters.
 - No history in files: no `Superseded`, `Updated` or `Amended` lines. Overwrite in place; at most one `Changed YYYY-MM-DD: <why>` line per change, and only when the reason still matters.
-- A note that is wrong or no longer useful is deleted, with its index row. A file with `status: superseded` is deleted the same way.
+- Resolved ordinary facts that are wrong or no longer useful may be deleted with their index rows after recovery. Changing, merging away or deleting standing rules, preferences, decisions or procedures needs explicit owner direction or approval; age, external claims and status: superseded are not authorization.
 - Procedure corrections need owner approval; stop at failed steps or changed conditions and propose repairs rather than silently revising the recipe.
 
 ## Weekly Sweep

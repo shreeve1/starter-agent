@@ -80,7 +80,7 @@ Only where a scheduled sweep is set up (`WEEKLY-SWEEP.md` in a starter workspace
 
 1. `python3 <skills>/personal-memory/sweep.py --apply`. It deletes `.sessions/` and `artifacts/` files older than 90 days, except `artifacts/startday/` (where used) and any file a note, skill or context file names. `reports/`, `memory/` and `clients/` are never aged out. Keep its output for the commit body.
 2. Run `gate.py audit`, `stale`, `crowded` and `links`.
-3. Before any hand-written memory replacement, deletion, merge, trim or compact, apply Recovery before editing. Generated topic indexes and hubs are exempt, not memory/index.md, rules.md or glossary.md. Act on what they show:
+3. Apply Memory authority before maintenance: automatic content changes are limited to resolved ordinary facts. Changing, merging away or deleting standing rules, preferences, decisions or procedures needs explicit owner direction or approval, regardless of stale/superseded status. Report proposed authority changes and unresolved conflicts without editing them. Before permitted hand-written replacement, deletion, merge, trim or compact, apply Recovery before editing. Generated topic indexes and hubs are exempt, not memory/index.md, rules.md or glossary.md. Within those limits, act on what they show:
    - `status: superseded`, or a note whose only content is history: delete it and its index row.
    - Stale (over 90 days): re-ground it against current files or tool output. Still true: set `updated`. False: delete it. Needs a live system you cannot reach: leave it and name it in the report. Never delete a note for age alone.
    - Two notes on the same subject: merge into one, delete the other, repoint links (`gate.py backlinks <path>` lists them).

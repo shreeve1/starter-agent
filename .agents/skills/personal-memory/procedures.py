@@ -32,6 +32,7 @@ def validate(path: Path, today: date | None = None) -> list[str]:
             problems.append(f"{path}: {key} requires a real YYYY-MM-DD date, not in the future")
     sections = {}
     current = None
+    parent = None
     fence = None
     text = hubs.read_note(path)
     if text.startswith('---\n'):
@@ -50,8 +51,14 @@ def validate(path: Path, today: date | None = None) -> list[str]:
             continue
         heading = re.match(r'^(#{1,6})\s+(.+?)\s*#*\s*$', line)
         if heading:
-            current = (len(heading[1]), heading[2])
-            sections.setdefault(current, [])
+            level = len(heading[1])
+            if level <= 2:
+                parent = heading[2] if level == 2 else None
+            current = (level, heading[2])
+            if level != 2 and not (level == 3 and parent == "Active memory"):
+                current = None
+            if current:
+                sections.setdefault(current, [])
         elif current:
             sections[current].append(line)
     required = [(2, 'Active memory'), (3, 'Prerequisites'), (3, 'Steps'),
@@ -61,7 +68,7 @@ def validate(path: Path, today: date | None = None) -> list[str]:
     for key in required:
         if not '\n'.join(sections.get(key, [])).strip():
             problems.append(f"{path}: requires nonempty {'#' * key[0]} {key[1]}")
-    if not re.search(r'^Trigger:\s*\S.*$', '\n'.join(sections.get((2, 'Active memory'), [])), re.M):
+    if not re.search(r'^Trigger:[ \t]*[^\s].*$', '\n'.join(sections.get((2, 'Active memory'), [])), re.M):
         problems.append(f"{path}: Active memory requires Trigger: text")
     if not re.search(r'^\s*\d+[.)]\s+\S', '\n'.join(sections.get((3, 'Steps'), [])), re.M):
         problems.append(f"{path}: Steps requires a numbered action")
@@ -73,7 +80,13 @@ def audit(memory_dir: Path, today: date | None = None) -> list[str]:
     base = memory_dir / 'workflows'
     if unsafe_path(base):
         return [f"{base}: symlink components are not allowed"]
-    for topic in schema.load(memory_dir)['topics']:
+    topics = schema.load(memory_dir)['topics']
+    if not isinstance(topics, list):
+        return [f'{base}: invalid workflow topic list']
+    for topic in topics:
+        if not isinstance(topic, str) or not re.fullmatch(r'[a-z0-9][a-z0-9-]*', topic):
+            problems.append(f'{base}: invalid workflow topic {topic!r}')
+            continue
         folder = base / topic
         if unsafe_path(folder):
             problems.append(f"{folder}: symlink components are not allowed")

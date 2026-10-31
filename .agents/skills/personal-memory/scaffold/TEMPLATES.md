@@ -99,40 +99,6 @@ Defined and tested with the owner; record the source of verification.
 
 Use exactly `risk: read-only` or `risk: changes-state`. Changes-state procedures also require nonempty `### Approval` (the current-conversation ready check before action) and `### Recovery` (rollback, or explicit irreversibility and safe escalation), within Active memory. `approved` and `verified` are valid YYYY-MM-DD dates, not future dates. All shown sections and Trigger are required; Steps needs a numbered action. Fenced examples and empty sections do not count. Extra metadata and troubleshooting sections are allowed. `gate.py procedures` and `gate.py audit` check structure only, not truth, actual approval or permission to act.
 
-## Active memory
-
-Trigger: what the owner says or what happens that starts this procedure.
-
-### Where everything is (optional)
-
-- Tools, hosts, file paths and where credentials live (never the credentials).
-
-### Defaults (optional)
-
-- Values the owner set once and should not be asked again.
-
-### Steps
-
-1. **Short name.** One action, with the exact command or click.
-2. **Ready check (hard stop).** The question to ask; continue only after the owner says yes in this conversation.
-
-### When something goes wrong (optional)
-
-- Known failures and fixes, or a link to `<slug>-troubleshooting.md`.
-
-### Do not (optional)
-
-- Actions that are never allowed while running this procedure.
-
-## Related
-
-- [Other procedure or note](memory/workflows/<topic>/other.md) - how it relates.
-
-## Notes
-
-- Last reviewed: YYYY-MM-DD
-- Defined YYYY-MM-DD with the owner; verified by a real run on YYYY-MM-DD.
-```
 
 ## Client Memory Note
 

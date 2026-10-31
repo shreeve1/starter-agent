@@ -41,6 +41,26 @@ class PolicyTests(unittest.TestCase):
             self.assertIn('before any procedure step', text)
             self.assertIn('gate.py procedures', text)
 
+    def test_templates_have_one_body_and_balanced_fences(self):
+        paths = [PM / 'scaffold/TEMPLATES.md']
+        if (ROOT / 'memory/TEMPLATES.md').exists():
+            paths.append(ROOT / 'memory/TEMPLATES.md')
+        for path in paths:
+            text = path.read_text()
+            self.assertEqual(sum(line.startswith('```') for line in text.splitlines()) % 2, 0)
+            self.assertEqual(text.count('Trigger: what starts this procedure.'), 1)
+            self.assertNotIn('Trigger: what the owner says or what happens', text)
+
+    def test_maintenance_preserves_authority(self):
+        skill = (PM / 'SKILL.md').read_text()
+        reference = (PM / 'reference.md').read_text()
+        self.assertNotIn('delete it if no longer true. Do not ask the user.', skill)
+        for section in (skill.split('## Memory Read Policy')[1].split('\n## ')[0],
+                        skill.split('## Keep Memory Lean')[1].split('\n## ')[0],
+                        reference.split('## Weekly Sweep')[1].split('\n## ')[0]):
+            self.assertIn('ordinary facts', section)
+            self.assertIn('owner direction or approval', section)
+
     def test_conflict_requires_owner_direction(self):
         instructions = (PM / 'SKILL.md').read_text()
         conflict = instructions.split('## Conflict Resolution')[1].split('\n## ')[0]
