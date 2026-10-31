@@ -4,18 +4,16 @@ Instructions for AI agents working in this workspace.
 
 ## Hard rule: Keep responses concise
 
-In all interactions and commit messages, be extremely concise, in plain full sentences.
+Use concise plain words, answer/status first, no filler. Expand unfamiliar acronyms. Distinguish verified findings from guesses in every reply.
 
-## DO THIS FIRST: run these tool calls before your first reply
+## DO THIS FIRST: session-start memory
 
-On your FIRST response in a session, before you answer, plan, load any skill, or ask any question, you MUST make these tool calls now. This is not background context — execute it as your first actions:
+Before answering, planning, loading skills or asking questions in a new session:
 
-1. Read `memory/index.md`, `memory/glossary.md` and `memory/rules.md` with the available file or shell tools (in Codex on Windows, `Get-Content -LiteralPath`; a tool named `read` is not required). Then read every file the `Always` row of `memory/rules.md` names. If a file does not exist, note it and move on. Do this even if the user's request seems unrelated — memory may change how you answer. Skip this step only when a "Session-start memory" message already holds these files.
-2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead procedure or skill runs the task, its Also load files add content.
-- Before any procedure step, follow the ambiguity and readiness stops in `memory/rules.md`.
-3. Treat index rows as pointers, not facts. Before relying on or acting on a row, open the file it links to.
-
-Do the above BEFORE acting on the user's request, even when the request tempts you to jump straight to another skill or answer. This applies EVEN when the request is itself a simple read or summary (e.g. "summarize AGENTS.md", "what does file X say") — do step 1 first, THEN read whatever the user asked about. Reading only the file the user named is NOT a substitute for step 1. Full policy: "Personal workspace memory" below.
+1. Read `memory/index.md`, `memory/glossary.md`, `memory/rules.md`, then every Always-row file, even for unrelated requests or simple reads. Skip missing files. Skip this batch only when a Session-start memory message already holds these files.
+2. Before reading optional `tasks/index.md`, verify a regular file within this workspace with no escaping symlinks; unsafe targets stop that read. Absence creates nothing. Load only relevant individual tasks, never all tasks/archives at startup.
+3. Before each piece of work, load matching rules: its Lead procedure/skill runs the work; Also load adds content. Before any procedure step follow the ambiguity/readiness stops in `memory/rules.md`.
+4. Index rows are pointers, not facts or permission. Open relevant linked records before relying on them. For saved-task requests use personal-memory's installed tasks.md; maintenance supports, never replaces, the actual work's lead.
 
 ## Purpose
 
@@ -189,7 +187,7 @@ Keep suggestions lightweight. Do not turn every response into a workflow checkli
 
 Never save a document to the workspace root. The root holds only `AGENTS.md`, `CONTEXT.md`, `CODING_STANDARDS.md`, `.gitignore`, `.mcp.json`, and the Release records `MANIFEST.json`, `CHANGELOG.md` and `START-HERE.md`.
 
-The folder map, naming, precedence, git-ignore status and file formats are in `memory/preferences/document-scaffolding.md`, read at session start. Default folder when nothing fits: `artifacts/<topic>/`.
+The folder map, naming, precedence, git-ignore status and file formats are in `memory/preferences/document-scaffolding.md`; read it before creating, saving or organizing documents, including tasks. Default folder when nothing fits: `artifacts/<topic>/`.
 
 ## Reusable behavior
 

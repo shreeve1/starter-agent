@@ -179,9 +179,20 @@ def audit_rules(memory_dir):
         )
         and not (Path(__file__).resolve().parents[1] / s / "SKILL.md").exists()
     ]
-    problems += [
-        f"memory/rules.md: {p} not found" for p in sorted(paths) if not (root / p).exists()
-    ]
+    for p in sorted(paths):
+        path = root / p
+        if p == "tasks/index.md":
+            try:
+                contained = path.resolve().is_relative_to(root)
+                valid = contained and (
+                    path.is_file() or (not path.exists() and not path.is_symlink())
+                )
+                if not valid:
+                    problems.append("memory/rules.md: unsafe task index tasks/index.md")
+            except (OSError, RuntimeError):
+                problems.append("memory/rules.md: unsafe task index tasks/index.md")
+        elif not path.exists():
+            problems.append(f"memory/rules.md: {p} not found")
     reached = set(paths)
     for p in paths:
         if p.startswith("memory/") and p.endswith(".md") and (root / p).exists():

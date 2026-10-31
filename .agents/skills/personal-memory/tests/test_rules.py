@@ -89,6 +89,59 @@ def index_row(path):
     return f"| [X]({path}) | preference | x | 2026-10-10 |\n"
 
 
+class TaskIndexPointerTests(unittest.TestCase):
+    def test_optional_task_index_absent_passes_without_writes(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, ["| Always | | `tasks/index.md` | |"])
+            proc = audit(mem)
+            self.assertEqual(proc.returncode, 0, proc.stdout)
+            self.assertFalse((mem.parent / "tasks").exists())
+
+    def test_task_index_existing_passes(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, ["| Always | | `tasks/index.md` | |"], files=[("tasks/index.md", "# Active tasks\n")])
+            self.assertEqual(audit(mem).returncode, 0)
+
+    def test_task_index_symlink_escape_fails(self):
+        with tempfile.TemporaryDirectory() as td, tempfile.TemporaryDirectory() as outside:
+            mem = workspace(td, ["| Always | | `tasks/index.md` | |"])
+            external = Path(outside) / "index.md"
+            external.write_text("outside", encoding="utf-8")
+            (mem.parent / "tasks").mkdir()
+            try:
+                (mem.parent / "tasks/index.md").symlink_to(external)
+            except OSError:
+                self.skipTest("Symlinks unavailable")
+            proc = audit(mem)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("unsafe task index", proc.stdout)
+            self.assertEqual(external.read_text(), "outside")
+
+    def test_dangling_task_directory_escape_fails(self):
+        with tempfile.TemporaryDirectory() as td, tempfile.TemporaryDirectory() as outside:
+            mem = workspace(td, ["| Always | | `tasks/index.md` | |"])
+            try:
+                (mem.parent / "tasks").symlink_to(outside, target_is_directory=True)
+            except OSError:
+                self.skipTest("Symlinks unavailable")
+            proc = audit(mem)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("unsafe task index", proc.stdout)
+
+    def test_task_index_directory_fails(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, ["| Always | | `tasks/index.md` | |"])
+            (mem.parent / "tasks/index.md").mkdir(parents=True)
+            self.assertNotEqual(audit(mem).returncode, 0)
+
+    def test_other_missing_pointer_still_fails(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, ["| Always | | `tasks/other.md` | |"])
+            proc = audit(mem)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertIn("tasks/other.md not found", proc.stdout)
+
+
 class ProcedureLeadTests(unittest.TestCase):
     def fixture(self, td, lead, kind="procedure", name="review.md"):
         rel = f"memory/workflows/projects/{name}"

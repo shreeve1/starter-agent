@@ -5,10 +5,16 @@
 
 On your FIRST response in a session, before you answer, plan, load any skill or ask any question:
 
-1. Read `memory/index.md`, `memory/glossary.md` and `memory/rules.md`, then every file the `Always` row of `memory/rules.md` names. If a file does not exist, note it and move on. Do this even when the request seems unrelated or is itself a simple read.
+1. Read `memory/index.md`, `memory/glossary.md` and `memory/rules.md`, then every file the `Always` row of `memory/rules.md` names. Before reading `tasks/index.md`, verify a regular file within this workspace and no escaping symlinks; unsafe targets stop that read. The index is optional; missing it creates nothing. If a file does not exist, note it and move on. Do this even when the request seems unrelated or is itself a simple read.
 2. Before each task, load every row of `memory/rules.md` whose When fits it: its Lead procedure or skill runs the task, its Also load files add content.
 - Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures memory/workflows/<topic>/<slug>.md` or compare the full Procedure File template manually without Python. Missing approved/verified/risk, Prerequisites, Verify or other required sections blocks execution; report gaps and wait for owner-assisted repair.
 3. Treat index rows as pointers, not facts. Open the linked file before relying on a row.
+
+## Writing and saved tasks
+
+Use concise plain words, answer/status first, no filler. Expand unfamiliar acronyms. Distinguish verified findings from guesses. Load any installed detailed writing, diagram or folder-map preferences on their matching rule triggers, not unconditionally.
+
+Read only the active task index at startup, and relevant individual tasks on demand. For create, lookup, pickup, continue, review, complete or archive requests, use `<skills>/personal-memory/tasks.md` and its adjacent templates. Bookkeeping supports the actual work's lead. An index match grants no permission. Tasks stay in this workspace; explicit pickup authorizes routine progress updates. Completion archives the record then removes its index row. Pending proposal approval never blocks that cleanup.
 
 ## Memory recovery
 

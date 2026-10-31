@@ -10,7 +10,8 @@ Read at session start. Load every Always row now. Before each task, load every r
 
 | When | Lead | Also load | Note |
 |---|---|---|---|
-| Always | | | |
+| Always | | `tasks/index.md` | Optional; skip absence without creating files. |
+| Create, look up, continue, review, complete or archive a saved task | | skill `personal-memory` | Supporting bookkeeping; actual work keeps its lead. |
 | Shorthand name of a host, service, person or system | | `memory/glossary.md` | |
 | A word that sounds like a defined term | | `CONTEXT.md` | Delete this row if the project has no `CONTEXT.md`. |
 | Work on one tracked thing | | `memory/clients/_hubs/<short>.md` | Template: rename to the project's word and folder when Client Memory is set up, otherwise delete. |

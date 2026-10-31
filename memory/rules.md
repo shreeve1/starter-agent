@@ -11,7 +11,11 @@ Read at session start. Load every Always row now. Before each task, load every r
 
 | When | Lead | Also load | Note |
 |---|---|---|---|
-| Always | | `memory/preferences/writing.md`, `memory/preferences/diagrams.md`, `memory/preferences/document-scaffolding.md` | |
+| Always | | `tasks/index.md` | Optional; skip absence without creating files. |
+| Drafting or editing substantive text for the owner or others | | `memory/preferences/writing.md` | |
+| Explaining or planning systems, flows, processes or relationships | | `memory/preferences/diagrams.md` | |
+| Creating, saving or organizing documents, including saved tasks | | `memory/preferences/document-scaffolding.md` | |
+| Create, look up, continue, review, complete or archive a saved task | | skill `personal-memory` | Supporting bookkeeping; actual work keeps its lead. |
 | Drafting any email | | skill `antislop`, skill `antislop-copywriting` | Run the antislop Delivery Gate and copywriting checklist silently; mention only a FAIL and fix it before delivering. |
 | A proposal, report or other document someone else will read | | skill `antislop`, skill `antislop-copywriting` | Run the gate silently; mention only a FAIL and fix it before delivering. |
 | Designing a visual output: HTML page, PDF, slide, UI | | skill `antislop`, skill `antislop-ui` | Show the full antislop PASS/FAIL report with the deliverable. |
