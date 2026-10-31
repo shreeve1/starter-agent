@@ -37,6 +37,24 @@ Basic read/write tools do not necessarily provide symlink metadata, exclusive sn
 - Review recommendation to add prose-matching safety tests is deferred: existing test guidance forbids treating instruction text matches as behavioral proof. The existing direct probes are stronger for covered cases; unrun cases below remain explicit acceptance gaps. No additional runtime helper or dependency was added.
 - Final formatter/linter check skipped Python and Markdown because this repository declares neither configuration; no tools or formatting configuration were installed. Runtime telemetry under `.pi-lens-probe-home/` is excluded from the commit, not deleted.
 
+## Independent-review concrete fixes
+
+Four accepted medium findings were repaired without changing the global install or adding a runner. The audit now rejects an existing non-directory task parent and dangling contained parent link, while genuinely absent directories remain optional. Two new real-audit regressions failed before the fix; all 29 rule tests pass afterward, including a third new positive case for an existing empty task directory. Tests verify owner bytes and link targets remain unchanged.
+
+Task Start now distinguishes a failed-creation retry from a confirmed new same-title task, restores the existing record's one row, and rebuilds an absent index from existing unfinished records instead of hiding them with an empty view. Setup checks required task files and scaffolds before selecting an install and asks for a complete-copy/update choice when the global install is incomplete. Linked-proposal edits now explicitly use the unique, exact-byte task-recovery protocol with their original workspace-relative paths; the memory-only helper remains unchanged.
+
+Paired disposable fixtures, original texts/hashes, and ordered tool-call extracts are at `/tmp/starter-task-review-fixes-rxcyogx3/`; full run receipts remain under `/tmp/pi-fabric-runs-eg4ssz/`. Each pair used the same owner request and `cliproxy/gpt-6-luna` on Linux:
+
+| Case | Control | Fixed instructions | Verified result / limit |
+| --- | --- | --- | --- |
+| Existing saved record, failed index append | `2918e686e0a748468aba20ea091ae516` already repaired correctly | `6d38cc0ff392409c9306e2643deb32e4` | One existing vendor record, unchanged bytes/status and one index row; exact prior index snapshot. The control did NOT reproduce duplication, so this is clarification and a passing regression, not proof of a prior behavioral failure. Fixed agent flattened the snapshot filename rather than preserving its relative layout; bytes survived, but protocol adherence remains partial. |
+| Closure with linked pending proposal | `1e629d68feaa4935acc9f371a3b71dc2` archived task but left the proposal's source path stale | `d79894cd61d44d05b51a2b91ccb17c9c` | Archived record exists, active source gone, index row absent; proposal points to archive and retains owner text and unapproved status. Exact original proposal bytes verified in `.task-recovery/.../notes/vendor-proposal.md`; task and index snapshots also exist. |
+| Old global skill containing only SKILL.md | `e3ac1ff9038f4255a3d6afe87e828cdc` selected the incomplete global despite noticing missing files | `82e064cd9673452787e4708e95b0b619` | Rejected incomplete global as the target, checked current release task/scaffold files and requested owner choice before changes. Fake global remained byte-identical; this is selection verification, not a full installation. |
+
+Absent-index retry run `1fb51483a7b4481d9fbb92fe98ee66cc` also rebuilt exactly one index row for the existing vendor record, with one record and byte-identical source verified afterward. Final affected suites: 161 memory, 6 setup and 9 hooks passed; generated indexes/hubs, procedure validation and audit passed.
+
+Scoped code review `2b315026aa87422e91336c09450ce6b8` found no actionable issues. The initial review attempt could not inspect Git due to its shell restriction; it was rerun with read-only Git access and is not counted as a successful review. Python/Markdown style checks again skipped undeclared surfaces. Broader NOT RUN cases below remain outside this concrete-fix follow-up.
+
 ## Remaining case matrix
 
 Record actual follow-up results below before claiming coverage. Pending is not PASS.

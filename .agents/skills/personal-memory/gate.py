@@ -184,7 +184,10 @@ def audit_rules(memory_dir):
         if p == "tasks/index.md":
             try:
                 contained = path.resolve().is_relative_to(root)
-                valid = contained and (
+                parent_valid = path.parent.is_dir() or (
+                    not path.parent.exists() and not path.parent.is_symlink()
+                )
+                valid = contained and parent_valid and (
                     path.is_file() or (not path.exists() and not path.is_symlink())
                 )
                 if not valid:

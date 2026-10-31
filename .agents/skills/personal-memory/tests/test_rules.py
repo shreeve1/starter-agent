@@ -128,6 +128,38 @@ class TaskIndexPointerTests(unittest.TestCase):
             self.assertNotEqual(proc.returncode, 0)
             self.assertIn("unsafe task index", proc.stdout)
 
+    def test_task_parent_file_fails_without_changes(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, ["| Always | | `tasks/index.md` | |"])
+            parent = mem.parent / "tasks"
+            parent.write_bytes(b"Owner content, not a directory.\n")
+            proc = audit(mem)
+            self.assertNotEqual(proc.returncode, 0, proc.stdout)
+            self.assertIn("unsafe task index", proc.stdout)
+            self.assertEqual(parent.read_bytes(), b"Owner content, not a directory.\n")
+
+    def test_dangling_contained_task_parent_fails(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, ["| Always | | `tasks/index.md` | |"])
+            parent = mem.parent / "tasks"
+            try:
+                parent.symlink_to(mem.parent / "missing", target_is_directory=True)
+            except OSError:
+                self.skipTest("Symlinks unavailable")
+            proc = audit(mem)
+            self.assertNotEqual(proc.returncode, 0, proc.stdout)
+            self.assertIn("unsafe task index", proc.stdout)
+            self.assertTrue(parent.is_symlink())
+            self.assertFalse((mem.parent / "missing").exists())
+
+    def test_existing_task_directory_without_index_passes(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, ["| Always | | `tasks/index.md` | |"])
+            (mem.parent / "tasks").mkdir()
+            proc = audit(mem)
+            self.assertEqual(proc.returncode, 0, proc.stdout)
+            self.assertFalse((mem.parent / "tasks/index.md").exists())
+
     def test_task_index_directory_fails(self):
         with tempfile.TemporaryDirectory() as td:
             mem = workspace(td, ["| Always | | `tasks/index.md` | |"])
