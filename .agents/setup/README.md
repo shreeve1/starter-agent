@@ -8,13 +8,17 @@ This Release is a ready workspace: `AGENTS.md`, skills, memory structure and hoo
 
 ## First setup
 
-1. Copy every file and folder of the Release, dot folders included, into the owner's new folder. Leave out `.git` and `.memory-recovery/`. (`robocopy "<release>" "<workspace>" /E /XD .git .memory-recovery` on Windows, `rsync -a --exclude .git --exclude .memory-recovery "<release>/" "<workspace>/"` elsewhere.) Never edit the Release or the old setup.
+1. Copy every file and folder of the Release, dot folders included, into the owner's new folder. Leave out `.git`, `.memory-recovery/` and `.task-recovery/`. (`robocopy "<release>" "<workspace>" /E /XD .git .memory-recovery .task-recovery` on Windows, `rsync -a --exclude .git --exclude .memory-recovery --exclude .task-recovery "<release>/" "<workspace>/"` elsewhere.) Never edit the Release or the old setup.
 2. Read `CHANGELOG.md`. Tell the owner in two or three lines what this workspace is.
 3. Run the `memory-setup` skill for this workspace, with the old setup as the source (or none). It settles the tracking model, sorts, shows the owner the plan and moves the content.
 4. Fit it to the owner (`ADAPTING.md`), then tell the owner in plain words what moved where, what was left behind and why.
 5. Make the skills reachable in the owner's app ("Skills in the owner's app" below).
 6. Suggest rules ("Suggest rules" below).
 7. Remove the setup folder ("Remove the setup folder" below). Always last.
+
+## Saved tasks
+
+The selected personal-memory install provides tasks.md and its adjacent record/index and supporting templates. Setup creates only an absent `tasks/index.md`, using the empty index format, and leaves existing tasks/index/archive/proposals intact. Startup reads the compact index; individual records load on demand. First creation or explicit pickup authorizes bookkeeping, not consequential actions. Complete archives the file before removing its row. All lookup stays in the current workspace; templates require neither an external authoring skill nor these setup/spec docs.
 
 ## Where things go
 
@@ -66,11 +70,11 @@ Only at the very end, after the owner has finished `ADAPTING.md` or declined it.
 1. Read the new Release's `CHANGELOG.md` and tell the owner in a few lines what changed.
 2. Copy the new Release into a new folder as in step 1 above. The current workspace stays untouched; it is the way back.
 3. Bring the owner's content across from the current workspace and judge the rest: shipped files come from the new Release. If the owner or their agent edited a shipped file, keep what the owner relies on as a preference note.
-4. Content to copy whole: memory notes, `memory/index.md`, the glossary rows the owner added, `memory/rules.md`, `CONTEXT.md`, the folder map, `.gitignore`, their own skills, and every folder from the folder map.
+4. Content to copy whole: memory notes, `memory/index.md`, the glossary rows the owner added, `memory/rules.md`, `CONTEXT.md`, the folder map, `.gitignore`, their own skills, complete `tasks/` (active index and archive), pending proposals, and every folder from the folder map. Preserve existing task IDs, index rows and work history; never reset tasks to the Release's empty index.
 5. Check legacy procedures with `python3 .agents/skills/personal-memory/gate.py --memory memory procedures` (or the manual Procedure File checks without Python). Report missing risk, approval/verification dates or sections and ask for owner-assisted repair based on real events. Never invent dates or delete notes to clear the audit. If repair cannot happen now, stop and report the blocked upgrade check, leaving the old workspace usable. Full audit still fails on incomplete legacy files; selected valid leads use `procedures memory/workflows/<topic>/<slug>.md`.
 6. Merge `memory/schema.json` by hand: keep the new Release's topics and keys, add the owner's `client_subjects`, keep their `client_folder`. Without their `client_folder` their notes sit in a folder the new workspace does not look at and the memory audit fails. Run `hubs.py` and `indexes.py` afterwards if Python is present.
 7. Do not copy `MANIFEST.json`, `CHANGELOG.md`, `START-HERE.md` or anything under `.agents/setup/`: the new Release's copies win.
-8. Keep the old workspace and its `.memory-recovery/` intact. Copy recovery separately only if the owner wants it; verify the copy. Retain `/.memory-recovery/` in the new `.gitignore` even when bringing the old ignore file across. Keep the old `.git` folder only if the owner wants the history; ask first. Tell the owner the old workspace can be deleted when they are happy.
+8. Keep the old workspace and its `.memory-recovery/` intact. Copy recovery separately only if the owner wants it; verify the copy. Keep old `.task-recovery/` intact too, copying it separately only with owner approval. Retain `/.memory-recovery/` and `/.task-recovery/` in the new `.gitignore` even when bringing the old ignore file across. Keep the old `.git` folder only if the owner wants the history; ask first. Tell the owner the old workspace can be deleted when they are happy.
 
 ### Older Releases
 

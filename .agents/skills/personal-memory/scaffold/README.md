@@ -14,6 +14,10 @@ Git is optional. In a git repo, memory `.md` files are tracked and `raw/` is git
 
 Not memory: what the project's own docs or code already state (link to them), one-off task details, work still in motion, and runbooks a person follows (those go in the project's `docs/`).
 
+## Saved work and document formats
+
+Workspace-local `tasks/` holds unfinished work separately from durable memory. Follow `tasks.md` beside the installed personal-memory skill for create, lookup, continue, review, complete and archive; the project's instructions name that project/global location. Adjacent `task-templates.md` and `supporting-templates.md` supply copyable records, indexes, proposals and research formats without external skills or design docs. Read only the active/waiting index at startup, and relevant records on demand. Completion archives the record then removes its row; pending approval never blocks that cleanup. A saved task does not authorize action.
+
 ## Safety
 
 - Do not store secrets, tokens, passwords, API keys, bearer strings, OAuth credentials, or credential-like config. Omit them automatically; never ask.

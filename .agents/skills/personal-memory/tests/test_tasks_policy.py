@@ -41,6 +41,23 @@ class TaskTemplateTests(unittest.TestCase):
         self.assertIn("## Findings:", blocks[1])
         self.assertIn("## Questions", blocks[1])
 
+    def test_workspace_starts_with_the_empty_index_format(self):
+        if not (ROOT / "AGENTS.md").is_file():
+            self.skipTest("Standalone skill install")
+        path = ROOT / "tasks/index.md"
+        self.assertTrue(path.is_file(), "Workspace task index missing")
+        self.assertEqual(path.read_text(encoding="utf-8"), markdown_blocks(PM / "task-templates.md")[1])
+
+    def test_task_recovery_is_excluded_from_git(self):
+        if not (ROOT / ".gitignore").is_file():
+            self.skipTest("Standalone skill install")
+        import subprocess
+        result = subprocess.run(
+            ["git", "check-ignore", "--no-index", ".task-recovery/probe/tasks/index.md"],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_operations_are_packaged_with_copied_skill(self):
         # A self-contained copy must contain the targets reached by its reader.
         for name in ("tasks.md", "task-templates.md", "supporting-templates.md"):
