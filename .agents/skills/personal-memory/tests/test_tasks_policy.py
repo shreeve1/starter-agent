@@ -1,5 +1,8 @@
 """Template and install contracts; agent behavior is verified with disposable probes."""
 import re
+import sys
+import tempfile
+from datetime import date
 import unittest
 from pathlib import Path
 
@@ -13,6 +16,22 @@ def markdown_blocks(path):
 
 
 class TaskTemplateTests(unittest.TestCase):
+    def test_changes_state_template_passes_real_procedure_validation(self):
+        sys.path.insert(0, str(PM))
+        from procedures import validate
+        paths = [PM / "scaffold/TEMPLATES.md"]
+        if (ROOT / "memory/TEMPLATES.md").is_file():
+            paths.append(ROOT / "memory/TEMPLATES.md")
+        for path in paths:
+            with self.subTest(path=path):
+                blocks = [block for block in markdown_blocks(path) if "risk: changes-state" in block]
+                self.assertEqual(len(blocks), 1, "Copyable changes-state template missing")
+                filled = blocks[0].replace("YYYY-MM-DD", "2026-10-30").replace("<topic>", "projects")
+                with tempfile.TemporaryDirectory() as td:
+                    fixture = Path(td) / "procedure.md"
+                    fixture.write_text(filled, encoding="utf-8")
+                    self.assertEqual(validate(fixture, today=date(2026, 10, 31)), [])
+
     def test_task_record_can_be_filled_without_design_documents(self):
         path = PM / "task-templates.md"
         self.assertTrue(path.is_file(), "Installed task template missing")
@@ -41,12 +60,27 @@ class TaskTemplateTests(unittest.TestCase):
         self.assertIn("## Findings:", blocks[1])
         self.assertIn("## Questions", blocks[1])
 
-    def test_workspace_starts_with_the_empty_index_format(self):
+    def test_workspace_index_keeps_template_header(self):
         if not (ROOT / "AGENTS.md").is_file():
             self.skipTest("Standalone skill install")
         path = ROOT / "tasks/index.md"
         self.assertTrue(path.is_file(), "Workspace task index missing")
-        self.assertEqual(path.read_text(encoding="utf-8"), markdown_blocks(PM / "task-templates.md")[1])
+        template = markdown_blocks(PM / "task-templates.md")[1]
+        self.assertTrue(path.read_text(encoding="utf-8").startswith(template))
+
+    def test_workspace_index_allows_real_task_rows(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "AGENTS.md").write_text("# Workspace\n", encoding="utf-8")
+            (root / "tasks").mkdir()
+            template = markdown_blocks(PM / "task-templates.md")[1]
+            (root / "tasks/index.md").write_text(
+                template + "| [Real work](tasks/real.md) | Work | active | Check | | 2026-10-31 |\n",
+                encoding="utf-8",
+            )
+            with patch.dict(globals(), ROOT=root):
+                self.test_workspace_index_keeps_template_header()
 
     def test_task_recovery_is_excluded_from_git(self):
         if not (ROOT / ".gitignore").is_file():
