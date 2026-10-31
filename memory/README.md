@@ -60,7 +60,7 @@ Shared `type: procedure` notes in configured workflow topics use the Procedure F
 
 ## Memory recovery
 
-Before replacing or deleting existing hand-written memory (including rules, glossary and memory/index.md), follow personal-memory `reference.md` "Recovery before editing". Verified previous content goes in `.memory-recovery/` outside active recall, with or without Git. Snapshot failure or changed source stops the edit; generated topic indexes and hubs are rebuildable exceptions.
+Before editing existing hand-written memory (rules, glossary and memory/index.md included; replacing, deleting or adding to it, including adding a row), follow personal-memory `reference.md` "Recovery before editing". Verified previous content goes in `.memory-recovery/` outside active recall, with or without Git. Snapshot failure or changed source stops the edit; generated topic indexes and hubs are rebuildable exceptions.
 
 ## Memory authority
 

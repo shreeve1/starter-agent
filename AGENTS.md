@@ -39,7 +39,7 @@ Before committing a change to a skill script, have a `reviewer` agent review the
 
 ### Recovery
 
-Before replacing or deleting hand-written memory, including rules, glossary and memory/index.md, follow personal-memory `reference.md` "Recovery before editing". Verified previous content goes in `.memory-recovery/` outside recall, with or without Git. Failed snapshots or changed sources stop edits; generated topic indexes and hubs are exempt.
+Before editing hand-written memory, even adding a row, including rules, glossary and memory/index.md, follow personal-memory `reference.md` "Recovery before editing". Verified previous content goes in `.memory-recovery/` outside recall, with or without Git. Failed snapshots or changed sources stop edits; generated topic indexes and hubs are exempt.
 
 ## Memory authority
 
