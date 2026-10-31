@@ -6,6 +6,8 @@ Three steps: settle the tracking model (what the owner needs remembered), make i
 
 Follow `.agents/skills/memory-setup/tracking-model.md`.
 
+Memory edits preserve verified previous content in `.memory-recovery/` even without Git. Without Python, the agent must copy and verify with file tools and disclose manual-only checks; if verification is unavailable, it stops. Recovery may contain sensitive summaries; it is ignored, not encrypted. Release copies exclude it; upgrades retain the old workspace and copy recovery separately only with owner approval.
+
 ## Part 1: harness and machine
 
 Codex reads `AGENTS.md` and `.agents/skills/` directly. For a Windows Codex workspace, read `CODEX.md`; no instruction alias or skill symlink is needed. Use PowerShell examples, available tools and capacity-aware collaboration.
