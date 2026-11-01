@@ -235,16 +235,19 @@ class HubProcedureTests(unittest.TestCase):
             (mem / "projects/setup/robot/note.md").write_text("---\ntitle: Setup\n---\n")
             design = root / "projects/robot/design"
             design.mkdir(parents=True)
-            for name in ("plan]draft.md", "plan[draft].md", "plan\\draft.md"):
+            for name in ("plan]draft.md", "plan[draft].md"):
                 (design / name).write_text("# Design\n", encoding="utf-8")
             self.assertEqual(run_script(HUBS, mem).returncode, 0)
             text = (mem / "projects/_hubs/robot.md").read_text(encoding="utf-8")
             for line in (
                 "- [plan\\]draft](projects/robot/design/plan%5Ddraft.md)",
                 "- [plan\\[draft\\]](projects/robot/design/plan%5Bdraft%5D.md)",
-                "- [plan\\\\draft](projects/robot/design/plan%5Cdraft.md)",
             ):
                 self.assertIn(line, text.splitlines())
+
+    def test_label_escapes_backslash(self):
+        # Not an end-to-end filename test: a backslash is a path separator on Windows.
+        self.assertEqual(hubs.label("plan\\draft"), "plan\\\\draft")
 
     def test_hub_sections_follow_schema_order_then_unknown_subjects(self):
         with tempfile.TemporaryDirectory() as td:

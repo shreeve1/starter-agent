@@ -1,6 +1,6 @@
 ---
 name: personal-memory
-description: Use when capturing, promoting, pruning, or using local personal memory under memory/. Triggers include remember this, capture this preference, run memory check, email preferences, voice preferences, glossary or entity shorthand, client facts (Client Memory, client hubs), defining or following a procedure ("let's define a procedure for X"), important docs to remember, or saved workspace tasks: create, look up, continue, review, complete or archive a task.
+description: Use when capturing, promoting, pruning, or using local personal memory under memory/. Triggers include remember this, capture this preference, run memory check, email preferences, voice preferences, glossary or entity shorthand, client facts (Client Memory, client hubs), defining or following a procedure ("let's define a procedure for X"), important docs to remember, or saved workspace tasks (create, look up, continue, review, complete or archive a task).
 ---
 
 
