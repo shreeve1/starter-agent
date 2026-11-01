@@ -223,6 +223,29 @@ class HubProcedureTests(unittest.TestCase):
             (project / "design/new.md").write_text("# New\n")
             self.assertEqual(run_script(HUBS, mem, "--check").returncode, 1)
 
+    def test_document_labels_escape_markdown_label_characters(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mem = root / "memory"
+            (mem / "projects/setup/robot").mkdir(parents=True)
+            make_schema(mem, client_subjects=["setup"])
+            data = json.loads((mem / "schema.json").read_text(encoding="utf-8"))
+            data.update(client_folder="projects", client_dirs=["design"])
+            (mem / "schema.json").write_text(json.dumps(data), encoding="utf-8")
+            (mem / "projects/setup/robot/note.md").write_text("---\ntitle: Setup\n---\n")
+            design = root / "projects/robot/design"
+            design.mkdir(parents=True)
+            for name in ("plan]draft.md", "plan[draft].md", "plan\\draft.md"):
+                (design / name).write_text("# Design\n", encoding="utf-8")
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            text = (mem / "projects/_hubs/robot.md").read_text(encoding="utf-8")
+            for line in (
+                "- [plan\\]draft](projects/robot/design/plan%5Ddraft.md)",
+                "- [plan\\[draft\\]](projects/robot/design/plan%5Bdraft%5D.md)",
+                "- [plan\\\\draft](projects/robot/design/plan%5Cdraft.md)",
+            ):
+                self.assertIn(line, text.splitlines())
+
     def test_hub_sections_follow_schema_order_then_unknown_subjects(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

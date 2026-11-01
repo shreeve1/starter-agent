@@ -101,6 +101,11 @@ def doc_links(vault_root, folder, short, kind):
     )
 
 
+def label(text):
+    """Backslash-escape the characters that end or break a Markdown link label."""
+    return re.sub(r"([\\\[\]])", r"\\\1", text)
+
+
 def render(short, subjects, vault_root, subject_order, folder, document_dirs):
     lines = [
         "---",
@@ -131,7 +136,7 @@ def render(short, subjects, vault_root, subject_order, folder, document_dirs):
         if links:
             lines.append(f"## {kind}")
             lines.append("")
-            lines.extend(f"- [{Path(link).stem}]({quote(link)})" for link in links)
+            lines.extend(f"- [{label(Path(link).stem)}]({quote(link)})" for link in links)
             lines.append("")
     return "\n".join(lines).rstrip("\n") + "\n"
 
