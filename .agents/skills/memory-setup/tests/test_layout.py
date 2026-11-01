@@ -26,6 +26,7 @@ class LayoutTests(unittest.TestCase):
         description = fields["description"].lower()
         self.assertIn("set up memory", description)
         self.assertIn("migrate", description)
+        self.assertIn("add saved tasks to an existing project", description)
         self.assertNotIn("remember this", description)
 
     def test_every_reference_linked(self):

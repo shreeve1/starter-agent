@@ -1,6 +1,6 @@
 ---
 name: memory-setup
-description: Use when asked to set up memory in a folder, project or repo, give a project memory, or migrate an old wiki, notes, saved memories or agent setup into memory. Saving a single fact belongs to personal-memory instead.
+description: Use when asked to set up memory in a folder, project or repo, give a project memory, add saved tasks to an existing project, or migrate an old wiki, notes, saved memories or agent setup into memory. Saving a single fact belongs to personal-memory instead.
 ---
 
 # Memory setup

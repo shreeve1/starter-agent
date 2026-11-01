@@ -6,6 +6,8 @@ import unittest
 from datetime import date
 from pathlib import Path
 
+from install_helpers import is_starter_workspace
+
 PM = Path(__file__).resolve().parents[1]
 ROOT = PM.parents[2]
 
@@ -20,7 +22,7 @@ class TaskTemplateTests(unittest.TestCase):
         sys.path.insert(0, str(PM))
         from procedures import validate
         paths = [PM / "scaffold/TEMPLATES.md"]
-        if (ROOT / "memory/TEMPLATES.md").is_file():
+        if is_starter_workspace(ROOT) and (ROOT / "memory/TEMPLATES.md").is_file():
             paths.append(ROOT / "memory/TEMPLATES.md")
         for path in paths:
             with self.subTest(path=path):
@@ -64,7 +66,7 @@ class TaskTemplateTests(unittest.TestCase):
         self.assertIn("## Questions", research[0])
 
     def test_workspace_index_keeps_template_header(self):
-        if not (ROOT / "AGENTS.md").is_file():
+        if not is_starter_workspace(ROOT):
             self.skipTest("Standalone skill install")
         path = ROOT / "tasks/index.md"
         self.assertTrue(path.is_file(), "Workspace task index missing")
@@ -76,6 +78,8 @@ class TaskTemplateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             (root / "AGENTS.md").write_text("# Workspace\n", encoding="utf-8")
+            (root / "MANIFEST.json").write_text("{}\n", encoding="utf-8")
+            (root / "START-HERE.md").write_text("# Start\n", encoding="utf-8")
             (root / "tasks").mkdir()
             template = markdown_blocks(PM / "task-templates.md")[1]
             (root / "tasks/index.md").write_text(
@@ -86,7 +90,7 @@ class TaskTemplateTests(unittest.TestCase):
                 self.test_workspace_index_keeps_template_header()
 
     def test_task_recovery_is_excluded_from_git(self):
-        if not (ROOT / ".gitignore").is_file():
+        if not is_starter_workspace(ROOT):
             self.skipTest("Standalone skill install")
         import subprocess
         result = subprocess.run(

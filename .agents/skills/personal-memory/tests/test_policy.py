@@ -2,6 +2,8 @@
 import unittest
 from pathlib import Path
 
+from install_helpers import is_starter_workspace
+
 PM = Path(__file__).resolve().parents[1]
 ROOT = PM.parents[2]
 
@@ -9,7 +11,7 @@ ROOT = PM.parents[2]
 class PolicyTests(unittest.TestCase):
     def modes(self):
         yield (PM / 'scaffold/AGENTS-memory.md').read_text() + (PM / 'scaffold/README.md').read_text()
-        if (ROOT / 'AGENTS.md').is_file() and (ROOT / 'memory/README.md').is_file():
+        if is_starter_workspace(ROOT) and (ROOT / 'AGENTS.md').is_file() and (ROOT / 'memory/README.md').is_file():
             yield (ROOT / 'AGENTS.md').read_text() + (ROOT / 'memory/README.md').read_text()
 
     def test_authority_contract_in_both_install_modes(self):
@@ -45,7 +47,7 @@ class PolicyTests(unittest.TestCase):
         recovery_section = (PM / 'reference.md').read_text().split('## Recovery before editing')[1].split('\n## ')[0]
         self.assertIn('including adding a row', recovery_section)
         instruction_files = [PM / 'scaffold/AGENTS-memory.md', PM / 'scaffold/README.md']
-        if (ROOT / 'AGENTS.md').is_file() and (ROOT / 'memory/README.md').is_file():
+        if is_starter_workspace(ROOT) and (ROOT / 'AGENTS.md').is_file() and (ROOT / 'memory/README.md').is_file():
             instruction_files += [ROOT / 'AGENTS.md', ROOT / 'memory/README.md']
         for path in instruction_files:
             self.assertIn('adding a row', path.read_text())
@@ -61,7 +63,7 @@ class PolicyTests(unittest.TestCase):
 
     def test_templates_have_one_body_and_balanced_fences(self):
         paths = [PM / 'scaffold/TEMPLATES.md']
-        if (ROOT / 'memory/TEMPLATES.md').exists():
+        if is_starter_workspace(ROOT) and (ROOT / 'memory/TEMPLATES.md').exists():
             paths.append(ROOT / 'memory/TEMPLATES.md')
         for path in paths:
             text = path.read_text()

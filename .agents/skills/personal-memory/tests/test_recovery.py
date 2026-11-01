@@ -5,6 +5,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+
+from install_helpers import is_starter_workspace
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -158,7 +160,10 @@ class RecoveryTests(unittest.TestCase):
             root, _ = self.source(td)
             subprocess.run(['git', 'init', '-q', str(root)], check=True)
             repo = Path(__file__).resolve().parents[4]
-            (root / '.gitignore').write_bytes((repo / '.gitignore').read_bytes())
+            if is_starter_workspace(repo):
+                (root / '.gitignore').write_bytes((repo / '.gitignore').read_bytes())
+            else:
+                (root / '.gitignore').write_text('/.memory-recovery/\n', encoding='utf-8')
             saved = recovery.snapshot(root, 'memory/docs/café.md')
             ignored = subprocess.run(['git', '-C', str(root), 'check-ignore', str(saved)], capture_output=True)
             self.assertEqual(ignored.returncode, 0)

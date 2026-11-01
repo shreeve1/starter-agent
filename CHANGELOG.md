@@ -4,6 +4,8 @@
 
 On top of Release 5, in this workspace only:
 
+- Memory-setup discovery now includes adding saved tasks to an existing project, matching its existing upgrade steps. The setup frontmatter test checks that trigger. Copied personal-memory tests distinguish a starter Release from an unrelated host project, so installing the shared skill does not require upgrading that project's instructions, templates or task index; a disposable copy regression covers this.
+
 - Purpose-led workspace setup: non-client agents use independent project READMEs and chosen document folders, not renamed ticket scaffolding. Client work and other tracked things remain supported; tasks, lasting memory and verified agent procedures keep distinct homes. Setup chooses procedure topics and can finish with honest empty indexes. Upgrades preserve owner schema choices and project files. Hubs link existing READMEs and configured document folders, rejecting unsafe folder values and escaping document links. Existing task setup wording was aligned with its already-decided index-recovery behavior. Checks and limits are recorded in `docs/testing/flexible-workspace-setup-cases.md`; `testy-bot`, the incoming manifest, dependencies and live systems were not changed.
 
 - Saved-task review fixes: setup checks task/scaffold capabilities before selecting a global install, with an owner-approved complete-copy/update fallback; creation retries repair existing records/indexing before allocating a new ID; linked proposals have explicit exact-content recovery under task snapshots; audit rejects a file or dangling link as the task-directory parent. Three new audit regressions and paired disposable probes are recorded in `docs/testing/workspace-tasks-cases.md`. No global install was changed.
