@@ -10,6 +10,13 @@ PM = Path(__file__).resolve().parents[1]
 
 
 class InstallModeTests(unittest.TestCase):
+    def test_plain_description_is_valid_yaml_scalar(self):
+        text = (PM / "SKILL.md").read_text(encoding="utf-8")
+        description = next(line for line in text.splitlines() if line.startswith("description: "))
+        value = description.removeprefix("description: ")
+        self.assertNotIn(": ", value, "Plain YAML descriptions cannot contain mapping separators")
+        self.assertIn("saved workspace tasks", value)
+
     def test_global_copy_does_not_require_host_workspace_upgrade(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
