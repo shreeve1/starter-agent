@@ -87,4 +87,3 @@ Add one row per active or waiting task, using this shape; replace every placehol
 ```
 
 Use workspace-relative paths, interpreted from the workspace root. Keep each cell brief; detailed context belongs in the task record. Leave Review after blank when absent. On meaningful changes to indexed fields, update the row as part of routine task maintenance. Do not retain completed or archived rows in another section of this index.
-

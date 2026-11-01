@@ -3,7 +3,7 @@
 Use this table when sorting old material. The owner approves what moves and what stays behind. Rows marked **workspace only** assume a full starter workspace; in another folder, use its existing document and skill conventions instead.
 
 | What the owner has | Destination |
-|---|---|
+| --- | --- |
 | An independent project: a goal with related work and files (**workspace only**) | `projects/<short>/README.md` plus useful project subfolders; use personal-memory's installed `supporting-templates.md`. Link tasks rather than duplicate their status. |
 | A rule about how the agent behaves (tone, format, "always", "never") | A preference note in `memory/preferences/` plus a row in `memory/rules.md` (`personal-memory` skill) |
 | A fact about the owner, their tools or machine | A doc note in `memory/docs/` |

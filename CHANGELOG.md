@@ -4,6 +4,8 @@
 
 On top of Release 5, in this workspace only:
 
+- Memory skill formatting now matches the installed dotfiles style checks. Python formatting/imports, an unused test import and binding, Markdown table spacing and an extra trailing blank line were cleaned up without changing task or memory behavior.
+
 - Hub fix: document links now backslash-escape `\`, `[` and `]` in file-name labels, so a file such as `plan]draft.md` renders as a link. URL quoting is unchanged; one regression in `tests/test_hubs.py` covers the generated text; the `marked` rendering was checked by hand.
 
 - Memory-setup discovery now includes adding saved tasks to an existing project, matching its existing upgrade steps. The setup frontmatter test checks that trigger. Personal-memory's saved-task description no longer uses a YAML mapping separator inside its plain scalar; an install regression covers the loader failure. Copied personal-memory tests distinguish a starter Release from an unrelated host project, so installing the shared skill does not require upgrading that project's instructions, templates or task index; a disposable copy regression covers this.

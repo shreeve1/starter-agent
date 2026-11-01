@@ -1,4 +1,5 @@
 """Template and install contracts; agent behavior is verified with disposable probes."""
+
 import re
 import sys
 import tempfile
@@ -21,14 +22,19 @@ class TaskTemplateTests(unittest.TestCase):
     def test_changes_state_template_passes_real_procedure_validation(self):
         sys.path.insert(0, str(PM))
         from procedures import validate
+
         paths = [PM / "scaffold/TEMPLATES.md"]
         if is_starter_workspace(ROOT) and (ROOT / "memory/TEMPLATES.md").is_file():
             paths.append(ROOT / "memory/TEMPLATES.md")
         for path in paths:
             with self.subTest(path=path):
-                blocks = [block for block in markdown_blocks(path) if "risk: changes-state" in block]
+                blocks = [
+                    block for block in markdown_blocks(path) if "risk: changes-state" in block
+                ]
                 self.assertEqual(len(blocks), 1, "Copyable changes-state template missing")
-                filled = blocks[0].replace("YYYY-MM-DD", "2026-10-30").replace("<topic>", "projects")
+                filled = (
+                    blocks[0].replace("YYYY-MM-DD", "2026-10-30").replace("<topic>", "projects")
+                )
                 with tempfile.TemporaryDirectory() as td:
                     fixture = Path(td) / "procedure.md"
                     fixture.write_text(filled, encoding="utf-8")
@@ -41,7 +47,15 @@ class TaskTemplateTests(unittest.TestCase):
         record = blocks[0]
         for key in ("id", "title", "status", "created", "updated"):
             self.assertRegex(record, rf"(?m)^{key}: .+")
-        for heading in ("Purpose", "Current position", "Next action", "References", "Progress", "Outcome", "Durable outputs"):
+        for heading in (
+            "Purpose",
+            "Current position",
+            "Next action",
+            "References",
+            "Progress",
+            "Outcome",
+            "Durable outputs",
+        ):
             self.assertIn("## " + heading, record)
         self.assertEqual(record.count("\n---"), 1)
 
@@ -75,6 +89,7 @@ class TaskTemplateTests(unittest.TestCase):
 
     def test_workspace_index_allows_real_task_rows(self):
         from unittest.mock import patch
+
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             (root / "AGENTS.md").write_text("# Workspace\n", encoding="utf-8")
@@ -83,7 +98,8 @@ class TaskTemplateTests(unittest.TestCase):
             (root / "tasks").mkdir()
             template = markdown_blocks(PM / "task-templates.md")[1]
             (root / "tasks/index.md").write_text(
-                template + "| [Real work](tasks/real.md) | Work | active | Check | | 2026-10-31 |\n",
+                template
+                + "| [Real work](tasks/real.md) | Work | active | Check | | 2026-10-31 |\n",
                 encoding="utf-8",
             )
             with patch.dict(globals(), ROOT=root):
@@ -93,9 +109,12 @@ class TaskTemplateTests(unittest.TestCase):
         if not is_starter_workspace(ROOT):
             self.skipTest("Standalone skill install")
         import subprocess
+
         result = subprocess.run(
             ["git", "check-ignore", "--no-index", ".task-recovery/probe/tasks/index.md"],
-            cwd=ROOT, capture_output=True, text=True,
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
 
