@@ -4,6 +4,8 @@
 
 On top of Release 5, in this workspace only:
 
+- Task layout matches the approved central-index model: root `tasks/index.md` links active/waiting project/client-local records, each with its own archive. Shared operations, templates, setup guidance and the folder map cover discovery, progress, recovery and reopening across approved homes. Legacy root tasks remain supported; no existing records were relocated. Preserve these local `.agents/skills/personal-memory/`, `.agents/skills/memory-setup/`, `.agents/setup/` and task/folder-map changes on update; `MANIFEST.json` remains the incoming Release record.
+
 - Memory skill formatting now matches the installed dotfiles style checks. Python formatting/imports, an unused test import and binding, Markdown table spacing and an extra trailing blank line were cleaned up without changing task or memory behavior.
 
 - Hub fix: document links now backslash-escape `\`, `[` and `]` in file-name labels, so a file such as `plan]draft.md` renders as a link. URL quoting is unchanged; one regression in `tests/test_hubs.py` covers the generated text; the `marked` rendering was checked by hand.

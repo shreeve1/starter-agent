@@ -15,14 +15,15 @@ topics: [preference, documents, workspace-layout]
   - `reports/`: finished reports and analyses, `<topic>-YYYY-MM-DD.md`.
   - `research/`: research notes and investigations, `<topic>-YYYY-MM-DD.md`.
   - `notes/`: quick personal notes, scratch lists and pending proposals.
-  - `tasks/`: saved work in progress, `index.md` for active/waiting work, `archive/` for closed records.
+  - `tasks/`: one root `index.md` linking active/waiting records; unassigned and legacy work may keep records here.
+  - `projects/<subject>/tasks/`, `clients/<client>/tasks/`: records for that project or client; each task home keeps closed records in its own `archive/`. Preserve existing locations and indexes unless a migration is approved.
   - `projects/<short>/`: independent project work, starting with `README.md` (Project README format in `.agents/skills/personal-memory/supporting-templates.md`). It links the goal, scope, completion check, tasks, files and authoritative memory. Create only useful subfolders; setup may choose `research`, `design` and `procedures`, never ticket folders by default.
   - `clients/<short>/`: client documents when client work applies; `client_dirs` in `memory/schema.json` lists their document folders. Client-owned projects can stay under `clients/<short>/projects/`.
   - `<client_folder>/<short>/`: when the owner tracks projects, devices or another kind of thing, setup replaces the client entry with that home and chooses suitable `client_dirs`. If the folder is `projects`, use the project entry above, not a duplicate or nested `projects/` default. With clients plus independent projects, keep both distinct homes.
   - `artifacts/<topic>/`: generated working files (diagrams, spreadsheets, drafts). The default when nothing else fits.
   - `tmp/`: throwaway files, deletable any time.
   - `.handoff/`, `youtube/`: owned by their skills; nothing else goes there.
-- For project work, open the relevant README before acting; follow its task and memory links. A project groups related work, `tasks/` tracks individual saved work, and `memory/` holds lasting knowledge and approved agent procedures. Project runbooks stay documents, not execution authority.
+- For project work, open the relevant README before acting; follow its task and memory links. A project groups related work, task records track individual saved work with one root `tasks/index.md`, and `memory/` holds lasting knowledge and approved agent procedures. Project runbooks stay documents, not execution authority.
 - Precedence: a path the user names wins, then a skill's own output path, then this map.
 - Naming: lowercase, hyphenated, date last as `YYYY-MM-DD`. A task producing several files groups them in one `<topic>-YYYY-MM-DD/` subfolder.
 - Git: `memory/`, `tasks/`, `projects/`, selected tracked-thing documents, `research/`, `notes/` and `reports/` are tracked; binaries, raw transcripts, `artifacts/` and `tmp/` are ignored. Check with `git check-ignore -v <path>`. Credentials go nowhere; keep only references to where they live.

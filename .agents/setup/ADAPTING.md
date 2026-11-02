@@ -4,7 +4,7 @@ Three steps: settle the tracking model (what the owner needs remembered), make i
 
 ## Tracking model (before filing old notes)
 
-Follow `.agents/skills/memory-setup/tracking-model.md`. Settle the agent or bot's purpose, tracked things, project layout and procedure topics together before filing notes. Recommend from what the owner already said; do not assume client work or merely rename `clients/` while retaining its folders.
+Follow `.agents/skills/memory-setup/tracking-model.md`. Settle the agent or bot's purpose, tracked things, project layout and procedure topics together before filing notes. Recommend from what the owner already said; preserve the owner's existing organization unless a change is agreed. Treat layouts as starting points, not a requirement to organize every workspace alike; do not assume client work or merely rename `clients/` while retaining its folders. Keep one root `tasks/index.md` linking active/waiting records in `projects/<subject>/tasks/`, `clients/<client>/tasks/` or other task homes agreed in the folder map. Root `tasks/` supports unassigned and legacy work. Do not move existing tasks or remove existing indexes without approval. Use personal-memory's tasks.md for discovery, progress, recovery and archival across these homes.
 
 Memory edits preserve verified previous content in `.memory-recovery/` even without Git. Without Python, the agent must copy and verify with file tools and disclose manual-only checks; if verification is unavailable, it stops. Recovery may contain sensitive summaries; it is ignored, not encrypted. Release copies exclude it; upgrades retain the old workspace and copy recovery separately only with owner approval.
 
