@@ -153,8 +153,13 @@ class TaskTemplateTests(unittest.TestCase):
         closure = policy.split("## Complete and archive", 1)[1].split("## Recovery", 1)[0]
         for safeguard in (
             "If movement fails after references changed",
-            "verify which record path exists",
-            "restore the links to the retained source",
+            "re-read both copies",
+            "identical copies are retained together with the index row",
+            "incomplete movement with no deletion",
+            "differing copies are both preserved",
+            "task edits stop until reconciliation",
+            "never selecting or overwriting an authoritative copy",
+            "Restore the changed links only to the verified retained source when the archive is absent or differs",
             "preserve current reference bytes before each repair",
             "report unresolved reference repairs as incomplete cleanup",
         ):
