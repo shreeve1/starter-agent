@@ -1,0 +1,2 @@
+# Vendored minified libraries: not ours to reformat.
+**/*.min.js
