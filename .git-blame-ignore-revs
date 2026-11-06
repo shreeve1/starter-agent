@@ -1,0 +1,5 @@
+# Mechanical reformats; git blame skips these.
+# Enable locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+28a3a50b82133b60b84cd65294ce527cb3f14791 # style: baseline reformat (shell)
+8bc4c0eadab469369e64400d32f7d7022d7b9d85 # style: baseline reformat (python)
+b235a13c66717df6c5e986fb8c21a4612de8f092 # style: baseline reformat (ts)
