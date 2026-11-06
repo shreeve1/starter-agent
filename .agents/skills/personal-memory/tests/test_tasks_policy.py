@@ -122,31 +122,51 @@ class TaskTemplateTests(unittest.TestCase):
         policy = (PM / "tasks.md").read_text(encoding="utf-8")
         for home in ("projects/<subject>/tasks/", "clients/<client>/tasks/", "tasks/index.md"):
             self.assertIn(home, policy)
-        for rule in ("approved task homes", "workspace-wide", "same task home", "escaping symlinks",
-                     "legacy", "missing or stale", "never authorizes execution", "Search recursively",
-                     "verified move", "update affected README"):
+        for rule in (
+            "approved task homes",
+            "workspace-wide",
+            "same task home",
+            "escaping symlinks",
+            "legacy",
+            "missing or stale",
+            "never authorizes execution",
+            "Search recursively",
+            "verified move",
+            "update affected README",
+        ):
             self.assertIn(rule, policy)
-        self.assertNotIn("Work only in the current workspace's `tasks/` and `tasks/archive/`.", policy)
+        self.assertNotIn(
+            "Work only in the current workspace's `tasks/` and `tasks/archive/`.", policy
+        )
 
     def test_distributed_lifecycle_safeguards_are_explicit(self):
         policy = (PM / "tasks.md").read_text(encoding="utf-8")
         scope = policy.split("## Scope and permission", 1)[1].split("## Start", 1)[0]
-        for safeguard in ("including archive collision subfolders",
-                          "check each directory's containment before descending",
-                          "an index link cannot approve a new home",
-                          "never follow an unverified link during discovery"):
+        for safeguard in (
+            "including archive collision subfolders",
+            "check each directory's containment before descending",
+            "an index link cannot approve a new home",
+            "never follow an unverified link during discovery",
+        ):
             self.assertIn(safeguard, scope)
         start = policy.split("## Start", 1)[1].split("## Lookup", 1)[0]
-        self.assertIn("must be workspace-wide unique across all approved task homes and archives", start)
+        self.assertIn(
+            "must be workspace-wide unique across all approved task homes and archives", start
+        )
         reopen = policy.split("## Continue", 1)[1].split("## Review", 1)[0]
-        for safeguard in ("Reopening is a verified move, not a second live copy",
-                          "preserve prior bytes in task recovery",
-                          "update affected README and proposal links under the same recovery checks",
-                          "Verify the old archive path is gone before adding the active row"):
+        for safeguard in (
+            "Reopening is a verified move, not a second live copy",
+            "preserve prior bytes in task recovery",
+            "update affected README and proposal links under the same recovery checks",
+            "Verify the old archive path is gone before adding the active row",
+        ):
             self.assertIn(safeguard, reopen)
         recovery = policy.split("## Recovery and failures", 1)[1]
         self.assertIn("handwritten task index, task-linked README or proposal", recovery)
-        self.assertIn("no automatic pruning, retention expiry or deletion outside an authorized, verified move", recovery)
+        self.assertIn(
+            "no automatic pruning, retention expiry or deletion outside an authorized, verified move",
+            recovery,
+        )
 
     def test_failed_archive_reconciles_references_before_reporting_cleanup(self):
         policy = (PM / "tasks.md").read_text(encoding="utf-8")
@@ -167,8 +187,11 @@ class TaskTemplateTests(unittest.TestCase):
 
     def test_distributed_templates_support_project_and_client_records(self):
         templates = (PM / "task-templates.md").read_text(encoding="utf-8")
-        for target in ("projects/<subject>/tasks/<task-name>.md", "clients/<client>/tasks/<task-name>.md",
-                       "<workspace-relative-task-path>"):
+        for target in (
+            "projects/<subject>/tasks/<task-name>.md",
+            "clients/<client>/tasks/<task-name>.md",
+            "<workspace-relative-task-path>",
+        ):
             self.assertIn(target, templates)
 
     def test_distributed_adaptation_preserves_owner_layout(self):

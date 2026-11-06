@@ -28,7 +28,9 @@ class AuditTriggerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
             (root / "memory").mkdir()
-            (root / "memory/schema.json").write_text('{"client_folder": "students"}', encoding="utf-8")
+            (root / "memory/schema.json").write_text(
+                '{"client_folder": "students"}', encoding="utf-8"
+            )
             old = Path.cwd()
             os.chdir(root)
             try:
@@ -44,7 +46,9 @@ def clean_env(**extra):
 
 
 def git(repo, *args):
-    return subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True, check=True, env=clean_env())
+    return subprocess.run(
+        ["git", "-C", str(repo), *args], capture_output=True, text=True, check=True, env=clean_env()
+    )
 
 
 class DeleteRunsAuditTests(unittest.TestCase):
@@ -54,22 +58,35 @@ class DeleteRunsAuditTests(unittest.TestCase):
             git(repo, "init", "-q")
             git(repo, "config", "user.email", "t@t")
             git(repo, "config", "user.name", "t")
-            shutil.copytree(GATE_DIR, repo / ".agents/skills/personal-memory",
-                            ignore=shutil.ignore_patterns("tests", "__pycache__"))
+            shutil.copytree(
+                GATE_DIR,
+                repo / ".agents/skills/personal-memory",
+                ignore=shutil.ignore_patterns("tests", "__pycache__"),
+            )
             mem = repo / "memory"
             (mem / "preferences").mkdir(parents=True)
             (mem / "schema.json").write_text(
-                '{"client_subjects": [], "topics": [], "topic_dirs": [], "client_dirs": []}', encoding="utf-8")
+                '{"client_subjects": [], "topics": [], "topic_dirs": [], "client_dirs": []}',
+                encoding="utf-8",
+            )
             (mem / "preferences/p.md").write_text("---\ntitle: P\n---\nx\n", encoding="utf-8")
-            (mem / "index.md").write_text("| [P](memory/preferences/p.md) | preference | x | 2026-10-10 |\n", encoding="utf-8")
+            (mem / "index.md").write_text(
+                "| [P](memory/preferences/p.md) | preference | x | 2026-10-10 |\n", encoding="utf-8"
+            )
             (mem / "rules.md").write_text(
                 "| When | Lead | Also load | Note |\n|---|---|---|---|\n| Always | | `memory/preferences/p.md` | |\n",
-                encoding="utf-8")
+                encoding="utf-8",
+            )
             git(repo, "add", "-A")
             git(repo, "commit", "-qm", "base", "--no-verify")
             git(repo, "rm", "-q", "memory/preferences/p.md")
-            return subprocess.run([sys.executable, str(HOOK)], cwd=repo, capture_output=True, text=True,
-                                  env=clean_env(GIT_DIR=str(repo / ".git")))
+            return subprocess.run(
+                [sys.executable, str(HOOK)],
+                cwd=repo,
+                capture_output=True,
+                text=True,
+                env=clean_env(GIT_DIR=str(repo / ".git")),
+            )
 
     @unittest.skipUnless(GATE_DIR.is_dir(), "personal-memory skill not present")
     def test_deleting_a_rule_target_fails_the_commit(self):
@@ -86,7 +103,6 @@ class DeleteRunsAuditTests(unittest.TestCase):
                 run = self.run_delete_scenario()
             self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
             self.assertFalse(outer.exists(), "fixture wrote into the outer commit's index")
-
 
 
 if __name__ == "__main__":
