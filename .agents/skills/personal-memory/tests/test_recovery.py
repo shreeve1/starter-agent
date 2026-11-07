@@ -1,5 +1,6 @@
 """Recovery must preserve exact previous bytes, including without Git."""
 
+import os
 import shutil
 import subprocess
 import sys
@@ -196,7 +197,10 @@ class RecoveryTests(unittest.TestCase):
             self.skipTest("Git unavailable")
         with tempfile.TemporaryDirectory() as td:
             root, _ = self.source(td)
-            subprocess.run(["git", "init", "-q", str(root)], check=True)
+            clean = {
+                k: v for k, v in os.environ.items() if not k.startswith("GIT_")
+            }  # never reach the outer repo
+            subprocess.run(["git", "init", "-q", str(root)], check=True, env=clean)
             repo = Path(__file__).resolve().parents[4]
             if is_starter_workspace(repo):
                 (root / ".gitignore").write_bytes((repo / ".gitignore").read_bytes())
@@ -204,7 +208,7 @@ class RecoveryTests(unittest.TestCase):
                 (root / ".gitignore").write_text("/.memory-recovery/\n", encoding="utf-8")
             saved = recovery.snapshot(root, "memory/docs/café.md")
             ignored = subprocess.run(
-                ["git", "-C", str(root), "check-ignore", str(saved)], capture_output=True
+                ["git", "-C", str(root), "check-ignore", str(saved)], capture_output=True, env=clean
             )
             self.assertEqual(ignored.returncode, 0)
             self.assertFalse(saved.is_relative_to(root / "memory"))

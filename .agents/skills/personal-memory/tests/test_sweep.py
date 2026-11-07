@@ -30,6 +30,9 @@ def git(root, *args):
         capture_output=True,
         text=True,
         check=True,
+        env={
+            k: v for k, v in os.environ.items() if not k.startswith("GIT_")
+        },  # never reach the outer repo
     )
 
 

@@ -21,7 +21,10 @@ NEW = "api" + "_key: " + "abcdefgh" + "12345678"
 
 
 def git(args, cwd):
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+    env = {
+        k: v for k, v in os.environ.items() if not k.startswith("GIT_")
+    }  # never reach the outer repo
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, env=env)
 
 
 class PreCommitAllowTests(unittest.TestCase):

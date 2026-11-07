@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import hashlib
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -96,8 +97,10 @@ def main():
             print("pre-commit: memory warnings (not blocking). Trim any file this session touched:", file=sys.stderr)
             print("\n".join(warnings), file=sys.stderr)
     if any(p.startswith((".agents/skills/", ".githooks/")) for p in staged):
+        # Git exports GIT_DIR/GIT_INDEX_FILE to hooks; tests that inherit them write fixture repos into the real one.
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
         for tests in test_dirs():
-            run = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", tests, "-q"], capture_output=True, encoding="utf-8", errors="replace")
+            run = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", tests, "-q"], capture_output=True, encoding="utf-8", errors="replace", env=env)
             if run.returncode not in (0, 5):  # 5 = no unittest tests in that folder (for example other test frameworks)
                 print(f"pre-commit: tests failed in {tests}.", file=sys.stderr)
                 print(run.stderr[-4000:], file=sys.stderr)
