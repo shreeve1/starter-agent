@@ -5,7 +5,7 @@
 ```xml
 <mxfile host="embed.diagrams.net">
   <diagram id="page-1" name="Page-1">
-    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="800" dy="600" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -17,7 +17,8 @@
 ```
 
 - Cells `0` and `1` are required: `0` is the root, `1` the default layer. Never remove or renumber them.
-- Each `<diagram>` is a page (tab). Most files have one.
+- Each `<diagram>` is a page (tab). Most files have one; see "Splitting across pages" below for when to add more.
+- **Grid and page view are off:** write `grid="0"` and `page="0"` on every new `<mxGraphModel>` (the server's editor also defaults both off). They are view settings only: coordinates still snap to 10, and James can switch either back on under View. On an existing diagram, leave whatever he saved.
 - **Shape (vertex):** `<mxCell id="…" value="label" style="…" vertex="1" parent="1"><mxGeometry x="…" y="…" width="…" height="…" as="geometry"/></mxCell>`
 - **Arrow (edge):** `<mxCell id="…" value="optional label" style="…" edge="1" parent="1" source="<shape id>" target="<shape id>"><mxGeometry relative="1" as="geometry"/></mxCell>`. An edge's `<mxGeometry>` may contain `<Array as="points">` waypoints James added; keep them.
 - **Compressed pages:** if `<diagram>` contains a base64 blob instead of `<mxGraphModel>`, it was saved compressed elsewhere (`encodeURIComponent`, then deflate-raw, then base64). The server's editor saves uncompressed. Decode it to edit (`node -e` with `zlib.inflateRawSync` then `decodeURIComponent`), or ask James to open and Save it once through the server page.
@@ -31,8 +32,21 @@
 - **Labels:** XML-escape (`&amp;` `&lt;` `&gt;` `&quot;`). With `html=1` in the style, a line break is `&lt;br&gt;`.
 - **Placement:** put new shapes in empty space, near what they connect to, continuing the flow's direction. Reserve a clear right-hand column for yellow question and decision notes; stack active notes there and place answered notes below them or consolidate them into an answered-decisions note. Find free space from existing geometries before choosing `x`/`y`.
 - **Grid:** snap to 10. Default shape 160×60 (decisions 160×80), 80 px gap along the flow, 60 px between parallel branches. Flow runs top to bottom unless the existing diagram runs left to right.
+- **Splitting across pages:** one page should read at a glance. When a page passes about 15 main shapes, or its arrows can't be routed without crossing shapes, split it: page 1 is the overview (one box per stage), and each busy stage gets its own `<diagram>` with a unique `id` and a `name` saying what it shows. Link an overview box to its detail page with `link="data:page/id,<diagram id>"` on the `<mxCell>`, and end the box's label with " →" so James knows it's clickable. Keep the question notes on the page they concern. Splitting an existing diagram is a layout change: propose it to James, don't just do it.
 - If your additions came out cramped, tell James that **Arrange > Layout** (vertical flow) tidies the whole diagram in one click; whether to use it is his call.
 - After editing, check the file is still well-formed XML: `python3 -c "import sys,xml.dom.minidom as m; m.parse(sys.argv[1])" <file>` (silent means good). Where python is missing, open the diagram through the server page yourself, or ask James to reload; the editor reports malformed XML.
+
+## Avoiding overlap
+
+Overlap is the most common way a generated diagram goes wrong. Plan coordinates before writing, then check them.
+
+- **Shapes never touch.** Keep at least 40 px between any two shapes' boxes (`x`, `y`, `width`, `height`), including notes and lane edges; inside a swimlane, keep 20 px from the lane's walls and below its 30 px title bar.
+- **Text fits its shape.** At the default 12 px font, allow about 7 px per character plus 20 px padding per line. If the label won't fit in two or three lines, widen or heighten the shape, or shorten the label. Never let text spill out of a shape.
+- **An arrow touches only its two ends.** Before adding an edge, trace its path. If the straight or elbow route would cross another shape, add waypoints (`<Array as="points"><mxPoint x="…" y="…"/></Array>` inside its `<mxGeometry>`) that run it through the empty gap between shapes, or move the new shape so the path is clear. Long arrows crossing lanes go along a free channel at least 20 px from any shape, not through the middle of a lane.
+- **Arrows don't share a path.** Two edges into or out of one shape use different sides or points: set `exitX`/`exitY` and `entryX`/`entryY` (0 to 1 across the shape, e.g. `exitX=1;exitY=0.3;` and `exitX=1;exitY=0.7;`). Never draw two edges between the same pair in the same direction; merge their labels instead.
+- **Edge labels sit on a clear stretch.** Keep labels to one or two words, and place them where the line crosses empty space, not over a shape, another label or a crossing. Move one along its edge with the geometry's `x` (-1 to 1, 0 is the middle) and off it with `<mxPoint as="offset" x="…" y="…"/>`.
+- **Reduce crossings first, route second.** Order shapes so connected ones are neighbours in the flow; most crossings disappear before any waypoint is needed. Prefer one lane per actor over long cross-diagram lines; if a single link would cross the whole page, consider splitting the page instead.
+- **Check before handing over.** List every shape's box and every edge's path (its waypoints, or the elbow between its ends) and confirm: no two boxes within 40 px, no edge passing through a box other than its source and target, no label on top of a shape or another label. Fix what fails before telling James it's ready.
 
 ## Flowchart vocabulary
 
@@ -63,7 +77,7 @@ Start → step → decision → two ends:
 ```xml
 <mxfile host="embed.diagrams.net">
   <diagram id="page-1" name="Page-1">
-    <mxGraphModel grid="1" gridSize="10" guides="1" connect="1" arrows="1" page="1" pageWidth="850" pageHeight="1100">
+    <mxGraphModel grid="0" gridSize="10" guides="1" connect="1" arrows="1" page="0" pageWidth="850" pageHeight="1100">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />

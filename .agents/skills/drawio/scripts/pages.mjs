@@ -189,7 +189,7 @@ window.addEventListener("message", (e) => {
   if (e.origin !== EDITOR_ORIGIN || e.source !== frame.contentWindow || typeof e.data !== "string") return;
   let msg;
   try { msg = JSON.parse(e.data); } catch { return; }
-  if (msg.event === "configure") post({ action: "configure", config: { compressXml: false } });
+  if (msg.event === "configure") post({ action: "configure", config: { compressXml: false, defaultGridEnabled: false, defaultPageVisible: false } });
   else if (msg.event === "init") load();
   else if (msg.event === "autosave") { currentXml = msg.xml; modified = true; state.textContent = "Unsaved changes"; }
   else if (msg.event === "save") save(msg.xml);
