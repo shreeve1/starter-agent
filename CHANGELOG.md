@@ -8,7 +8,7 @@ On top of Release 5, in this workspace only:
 
 - Task layout matches the approved central-index model: root `tasks/index.md` links active/waiting project/client-local records, each with its own archive. Shared operations, templates, setup guidance and the folder map cover discovery, progress, recovery and reopening across approved homes. Legacy root tasks remain supported; no existing records were relocated. Preserve these local `.agents/skills/personal-memory/`, `.agents/skills/memory-setup/`, `.agents/setup/` and task/folder-map changes on update; `MANIFEST.json` remains the incoming Release record.
 
-- drawio: grid and page view start off (editor config and new-file XML); `reference/format.md` gains "Avoiding overlap" rules and when to split a diagram across linked pages.
+- drawio: the editor uses the Simple theme with dark mode following the system setting; grid and page view start off (editor config and new-file XML); `reference/format.md` gains "Avoiding overlap" rules and when to split a diagram across linked pages.
 
 - Memory skill formatting now matches the installed dotfiles style checks. Python formatting/imports, an unused test import and binding, Markdown table spacing and an extra trailing blank line were cleaned up without changing task or memory behavior.
 

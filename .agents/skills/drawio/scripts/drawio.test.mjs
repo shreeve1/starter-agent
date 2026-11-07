@@ -147,6 +147,7 @@ test("edit page embeds diagrams.net and the file name", async (t) => {
   assert.ok(html.includes("compressXml"));
   assert.ok(html.includes("defaultGridEnabled: false"));
   assert.ok(html.includes("defaultPageVisible: false"));
+  assert.ok(html.includes("ui=simple&dark=auto"));
 });
 
 test("edit page sends no referrer to the editor host", async (t) => {

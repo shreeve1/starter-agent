@@ -1,5 +1,5 @@
 const EMBED_URL =
-  "https://embed.diagrams.net/?embed=1&proto=json&spin=1&configure=1&saveAndExit=0&noExitBtn=1&libraries=1&ui=atlas";
+  "https://embed.diagrams.net/?embed=1&proto=json&spin=1&configure=1&saveAndExit=0&noExitBtn=1&libraries=1&ui=simple&dark=auto";
 
 const escapeHtml = (s) =>
   s.replace(
