@@ -47,8 +47,8 @@ node <skill-dir>/scripts/drawio.mjs stop
 ```
 
 - Always find the machine's NetBird IPv4 with `netbird status` or from the dotfiles `AGENTS.md` table, and pass it to both `--host` and `--url-host`. The printed link must use the NetBird IPv4, never `localhost`.
-- On a native host, bind directly to its NetBird IPv4. aidev is `100.95.230.15`; work is `100.95.235.60`; itan8n is `100.95.224.218`; surftop is `100.95.222.42`.
-- WSL on work is the exception: NetBird runs on Windows, so bind the WSL server to `0.0.0.0` but pass work's NetBird IPv4 (`100.95.235.60`) to `--url-host`. Use `node <skill-dir>/scripts/drawio.mjs start --dir <project root> --host 0.0.0.0 --url-host 100.95.235.60`.
+- On a native host, bind directly to its NetBird IPv4. Get the address from `netbird status`; keep any table of machine addresses in private dotfiles, not in this repository.
+- WSL is the exception: NetBird runs on Windows, so bind the WSL server to `0.0.0.0` but pass the Windows host's NetBird IPv4 to `--url-host`. Use `node <skill-dir>/scripts/drawio.mjs start --dir <project root> --host 0.0.0.0 --url-host <Windows NetBird IPv4>`.
 - Run `status` before `start`. `start` replaces the running server, and another session may be using it: if it serves a different folder, ask James before replacing it (any tab open on the old folder switches saving off). Other flags: `--port`, `--idle-minutes` (default 240; it exits by itself after that long without a browser request).
 - Give James the printed `url`. Link straight to a diagram with `<url>edit?file=<path relative to --dir>`; a path that doesn't exist yet opens a blank diagram that is created on first Save.
 - Run `stop` when the session's diagram work is done.
