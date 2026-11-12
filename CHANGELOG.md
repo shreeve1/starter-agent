@@ -4,6 +4,10 @@
 
 On top of Release 5, in this workspace only:
 
+- Workflow notes are loaded as reference; only `type: procedure` files can be selected as Lead and gated. The installed `memory-audit` skill has pre-approved authority for non-deleting changes, with deletions still requiring the owner's yes.
+
+On top of Release 5, in this workspace only:
+
 - Failed archive movement now checks both record copies, preserves differing versions for reconciliation, and repairs changed links under byte-preserving recovery. Identical retained copies and the index remain marked incomplete; no automatic deletion or authority selection.
 
 - Task layout matches the approved central-index model: root `tasks/index.md` links active/waiting project/client-local records, each with its own archive. Shared operations, templates, setup guidance and the folder map cover discovery, progress, recovery and reopening across approved homes. Legacy root tasks remain supported; no existing records were relocated. Preserve these local `.agents/skills/personal-memory/`, `.agents/skills/memory-setup/`, `.agents/setup/` and task/folder-map changes on update; `MANIFEST.json` remains the incoming Release record.

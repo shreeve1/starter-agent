@@ -81,6 +81,31 @@ class PolicyTests(unittest.TestCase):
             self.assertIn("before any procedure step", text)
             self.assertIn("gate.py procedures", text)
 
+    def test_workflow_notes_are_reference_not_lead(self):
+        for path in (PM / "SKILL.md", PM / "scaffold/rules.md"):
+            text = path.read_text()
+            self.assertIn("type: workflow", text)
+            self.assertIn("loaded as reference", text)
+            self.assertNotIn("selects the matching procedure as Lead", text)
+            self.assertNotIn("opens the matching procedure and selects it as Lead", text)
+        row = next(
+            line
+            for line in (PM / "scaffold/rules.md").read_text().splitlines()
+            if line.startswith("| A task a saved procedure or workflow covers")
+        )
+        self.assertIn("type: procedure", row)
+        self.assertIn("reference", row)
+
+    def test_memory_audit_grant_in_authority(self):
+        section = (
+            (PM / "SKILL.md")
+            .read_text()
+            .split("## Memory authority")[1]
+            .split("\n## ")[0]
+        )
+        self.assertIn("memory-audit", section)
+        self.assertIn("deletion", section)
+
     def test_templates_have_one_body_and_balanced_fences(self):
         paths = [PM / "scaffold/TEMPLATES.md"]
         if is_starter_workspace(ROOT) and (ROOT / "memory/TEMPLATES.md").exists():
