@@ -195,6 +195,8 @@ class TaskTemplateTests(unittest.TestCase):
             self.assertIn(target, templates)
 
     def test_distributed_adaptation_preserves_owner_layout(self):
+        if not is_starter_workspace(ROOT):
+            self.skipTest("Standalone skill install")
         path = ROOT / ".agents/skills/memory-setup/tracking-model.md"
         if not path.is_file():
             self.skipTest("Standalone skill install has no setup guide")
