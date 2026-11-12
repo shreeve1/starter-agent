@@ -97,12 +97,7 @@ class PolicyTests(unittest.TestCase):
         self.assertIn("reference", row)
 
     def test_memory_audit_grant_in_authority(self):
-        section = (
-            (PM / "SKILL.md")
-            .read_text()
-            .split("## Memory authority")[1]
-            .split("\n## ")[0]
-        )
+        section = (PM / "SKILL.md").read_text().split("## Memory authority")[1].split("\n## ")[0]
         self.assertIn("memory-audit", section)
         self.assertIn("deletion", section)
 
