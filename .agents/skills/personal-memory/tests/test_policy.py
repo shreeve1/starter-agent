@@ -100,6 +100,8 @@ class PolicyTests(unittest.TestCase):
         section = (PM / "SKILL.md").read_text().split("## Memory authority")[1].split("\n## ")[0]
         self.assertIn("memory-audit", section)
         self.assertIn("deletion", section)
+        for path in (PM / "scaffold/AGENTS-memory.md", PM / "scaffold/README.md"):
+            self.assertIn("memory-audit", path.read_text())
 
     def test_templates_have_one_body_and_balanced_fences(self):
         paths = [PM / "scaffold/TEMPLATES.md"]
