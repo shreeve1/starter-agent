@@ -101,7 +101,7 @@ def matches_head(root, rel, path=None):
 
 
 def candidates(root, now):
-    """(relative path, age in days, size) of every file past its limit, unprotected and tracked."""
+    """(relative path, age in days, size, mtime_ns) of every file past its limit, unprotected and tracked."""
     keep = tracked_paths(root)
     if keep is None:
         return []
@@ -130,8 +130,20 @@ def candidates(root, now):
                     text = corpus(root) if text is None else text
                     if referenced(rel, text):
                         continue
-                found.append((rel, int(age), st.st_size))
+                found.append((rel, int(age), st.st_size, st.st_mtime_ns))
     return sorted(found)
+
+
+def still_listed(root, rel, size, mtime):
+    """(True, "") when the file still has the size and modification time it had when listed. Otherwise
+    (False, note): another session rewrote it, so it is left alone."""
+    try:
+        st = os.lstat(root / rel)
+    except OSError as e:
+        return False, f"gone or unreadable ({e})"
+    if (st.st_size, st.st_mtime_ns) != (size, mtime):
+        return False, "changed since it was listed; left in place"
+    return True, ""
 
 
 def delete_if_restorable(root, rel):
@@ -187,8 +199,12 @@ def main():
         print(f"sweep: stopped, nothing deleted ({e})")
         sys.exit(2)
     done, size = [], 0
-    for rel, age, nbytes in found:
+    for rel, age, nbytes, mtime in found:
         if args.apply:
+            listed, note = still_listed(root, rel, nbytes, mtime)
+            if not listed:
+                print(f"skipped {rel}: {note}")
+                continue
             deleted, note = delete_if_restorable(root, rel)
             if not deleted:
                 print(f"skipped {rel}: {note}")

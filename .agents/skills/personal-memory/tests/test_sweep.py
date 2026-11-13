@@ -228,6 +228,35 @@ class SweepTests(unittest.TestCase):
             proc = sweep(td, "--apply", commit=False)
             self.assertTrue((Path(td) / ".sessions/after.md").exists(), proc.stdout)
 
+    def test_file_changed_after_listing_is_kept(self):
+        sys.path.insert(0, str(SWEEP.parent))
+        import sweep as sw
+
+        with tempfile.TemporaryDirectory() as td:
+            old = make(td, ".sessions/old.md", 200, "committed text")
+            commit_all(td)
+            root = Path(td).resolve()
+            ((rel, _, size, mtime),) = sw.candidates(root, time.time())
+            old.write_text("edited by another session, longer text", encoding="utf-8")
+            ok, note = sw.still_listed(root, rel, size, mtime)
+            self.assertFalse(ok, note)
+            self.assertIn("changed since it was listed", note)
+            self.assertEqual(
+                old.read_text(encoding="utf-8"), "edited by another session, longer text"
+            )
+
+    def test_file_unchanged_since_listing_is_still_listed(self):
+        sys.path.insert(0, str(SWEEP.parent))
+        import sweep as sw
+
+        with tempfile.TemporaryDirectory() as td:
+            old = make(td, ".sessions/old.md", 200, "committed text")
+            commit_all(td)
+            root = Path(td).resolve()
+            ((rel, _, size, mtime),) = sw.candidates(root, time.time())
+            self.assertEqual(sw.still_listed(root, rel, size, mtime), (True, ""))
+            self.assertTrue(old.exists())
+
     def test_a_file_edited_after_listing_survives_with_its_new_text(self):
         sys.path.insert(0, str(SWEEP.parent))
         import sweep as sw
