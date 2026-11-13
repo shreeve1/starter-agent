@@ -157,6 +157,47 @@ class PolicyTests(unittest.TestCase):
         readme = (PM / "scaffold/README.md").read_text()
         self.assertIn("memory/<client_folder>/_hubs/index.md", readme)
 
+    def test_fresh_scaffold_install_audits_without_index_findings(self):
+        import shutil
+        import subprocess
+        import sys
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td) / "memory"
+            mem.mkdir()
+            for name in ("index.md", "rules.md", "glossary.md"):
+                shutil.copy(PM / "scaffold" / name, mem / name)
+            (mem / "workflows").mkdir()
+            (mem / "decisions").mkdir()
+            (mem / "schema.json").write_text(
+                '{"client_subjects": [], "topics": ["knowledge"], "topic_dirs": ["workflows", "decisions"], "client_dirs": []}',
+                encoding="utf-8",
+            )
+            # The scaffold rules row for CONTEXT.md is deleted by the owner when the project has no CONTEXT.md.
+            rules = (mem / "rules.md").read_text(encoding="utf-8")
+            rules = (
+                "\n".join(line for line in rules.splitlines() if "CONTEXT.md" not in line) + "\n"
+            )
+            (mem / "rules.md").write_text(rules, encoding="utf-8")
+            for script in ("indexes.py", "hubs.py"):
+                run = subprocess.run(
+                    [sys.executable, str(PM / script), "--memory", str(mem)],
+                    capture_output=True,
+                    text=True,
+                )
+                self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+            audit = subprocess.run(
+                [sys.executable, str(PM / "gate.py"), "--memory", str(mem), "audit"],
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotIn("out of sync", audit.stdout)
+            self.assertNotIn("broken link memory/clients/_hubs/index.md", audit.stdout)
+            self.assertNotIn("memory/clients/_hubs/index.md", audit.stdout)
+            self.assertNotIn("memory/workflows/index.md", audit.stdout)
+            self.assertNotIn("memory/decisions/index.md", audit.stdout)
+
     def test_main_index_holds_every_session_material_only(self):
         skill = (PM / "SKILL.md").read_text()
         step5 = skill.split("5. Create or update `memory/index.md`")[1].split("\n6. ")[0]
@@ -169,13 +210,11 @@ class PolicyTests(unittest.TestCase):
         )
         self.assertIn("open the topic page it points to", rules)
         index = (PM / "scaffold/index.md").read_text()
-        for row in (
-            "memory/workflows/index.md",
-            "memory/decisions/index.md",
-            "memory/clients/_hubs/index.md",
-        ):
+        for row in ("memory/workflows/index.md", "memory/decisions/index.md"):
             self.assertIn(row, index)
-        self.assertIn("client hub index", step5)
+        self.assertNotIn("memory/clients/_hubs/index.md", index)
+        self.assertIn("when `hubs.py` first creates it", step5)
+        self.assertIn("gate.py` warns until that row exists", step5)
         for mode in self.modes():
             self.assertNotIn("add an index row for every promoted note", mode)
 

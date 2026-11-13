@@ -57,7 +57,7 @@ It reports promoted files missing from the index that lists them (`memory/index.
 Then also check for:
 
 - Index rows pointing to missing files.
-- Promoted files missing from `memory/index.md`.
+- Promoted files missing from the index that lists them (`memory/index.md`, or the generated topic or hub index).
 - Empty promoted topic files.
 - Conflicting active promoted rules.
 - Cross-links pointing to memory files that do not exist (report only — broken links are tolerated, not auto-removed).
