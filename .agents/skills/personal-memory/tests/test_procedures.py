@@ -38,11 +38,13 @@ Owner tested the read-only steps.
 """
 
 
-def write_procedure(mem, risk="read-only", approved="2026-10-01", verified="2026-10-01", body=BODY):
+def write_procedure(
+    mem, risk="read-only", approved="2026-10-01", verified="2026-10-01", body=BODY, extra=""
+):
     path = mem / "workflows/projects/review.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        f"---\ntype: procedure\ntitle: Review\nrisk: {risk}\napproved: {approved}\nverified: {verified}\n---\n{body}",
+        f"---\ntype: procedure\ntitle: Review\nrisk: {risk}\napproved: {approved}\nverified: {verified}\n{extra}---\n{body}",
         encoding="utf-8",
     )
     return path
@@ -326,6 +328,128 @@ class ProcedureTests(unittest.TestCase):
             except OSError as exc:
                 self.skipTest(str(exc))
             self.assertTrue(procedures.audit(mem, TODAY))
+            self.assertTrue(procedures.validate(path, TODAY))
+
+
+GAPS_BODY = BODY.replace("## Related", "### Gaps\nNone.\n\n## Related")
+TRUSTED_BODY = BODY.replace(
+    "## Related",
+    "### Approval\nAsk now before changing it.\n\n### Recovery\n- Step 1: Reopen the item.\n\n## Related",
+)
+THREE_STEPS = TRUSTED_BODY.replace(
+    "1. Read the proposed change.", "1. Read the proposed change.\n2. Summarize.\n3. Stop."
+).replace(
+    "- Step 1: Reopen the item.",
+    "- Step 1: Reopen the item.\n- Step 2: Reopen the item.\n- Step 3: Reopen the item.",
+)
+TRUSTED = "status: promoted\ntrusted: 2026-10-01\ntrusted_steps: [1]\n"
+
+
+class LadderRuleTests(unittest.TestCase):
+    def test_draft_needs_gaps_not_dates(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = write_procedure(
+                Path(td), approved="", verified="", extra="status: draft\n", body=GAPS_BODY
+            )
+            self.assertEqual(procedures.validate(path, TODAY), [])
+            path = write_procedure(
+                Path(td), approved="", verified="", extra="status: draft\n", body=BODY
+            )
+            problems = procedures.validate(path, TODAY)
+            self.assertEqual(len(problems), 1, problems)
+            self.assertIn("### Gaps", problems[0])
+
+    def test_draft_with_invalid_date_still_fails(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = write_procedure(
+                Path(td),
+                approved="2026-10-31",
+                verified="",
+                extra="status: draft\n",
+                body=GAPS_BODY,
+            )
+            problems = procedures.validate(path, TODAY)
+            self.assertEqual(len(problems), 1, problems)
+            self.assertIn("approved requires", problems[0])
+
+    def test_legacy_promoted_stays_valid_rung_one(self):
+        with tempfile.TemporaryDirectory() as td:
+            self.assertEqual(
+                procedures.validate(write_procedure(Path(td), extra="status: promoted\n"), TODAY),
+                [],
+            )
+            self.assertEqual(procedures.validate(write_procedure(Path(td)), TODAY), [])
+
+    def test_trust_requires_promoted_changes_state_and_real_undo(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = write_procedure(Path(td), risk="changes-state", extra=TRUSTED, body=TRUSTED_BODY)
+            self.assertEqual(procedures.validate(path, TODAY), [])
+        cases = {
+            "changes-state": dict(risk="read-only", extra=TRUSTED, body=TRUSTED_BODY),
+            "promoted": dict(
+                risk="changes-state",
+                extra="trusted: 2026-10-01\ntrusted_steps: [1]\n",
+                body=TRUSTED_BODY,
+            ),
+            "undo": dict(
+                risk="changes-state",
+                extra=TRUSTED,
+                body=TRUSTED_BODY.replace("Reopen the item.", "not possible."),
+            ),
+        }
+        for name, kwargs in cases.items():
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as td:
+                problems = procedures.validate(write_procedure(Path(td), **kwargs), TODAY)
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn(name, problems[0])
+
+    def test_trusted_steps_must_be_numbered_steps(self):
+        with tempfile.TemporaryDirectory() as td:
+            ok = write_procedure(
+                Path(td),
+                risk="changes-state",
+                extra="status: promoted\ntrusted: 2026-10-01\ntrusted_steps: [1, 3]\n",
+                body=THREE_STEPS,
+            )
+            self.assertEqual(procedures.validate(ok, TODAY), [])
+            for steps in ("[4]", "[2b]"):
+                with self.subTest(steps=steps):
+                    path = write_procedure(
+                        Path(td),
+                        risk="changes-state",
+                        extra=f"status: promoted\ntrusted: 2026-10-01\ntrusted_steps: {steps}\n",
+                        body=THREE_STEPS,
+                    )
+                    self.assertTrue(procedures.validate(path, TODAY))
+
+    def test_trusted_date_not_future(self):
+        for when in ("2026-10-31", "2026-02-30"):
+            with self.subTest(when=when), tempfile.TemporaryDirectory() as td:
+                path = write_procedure(
+                    Path(td),
+                    risk="changes-state",
+                    extra=f"status: promoted\ntrusted: {when}\ntrusted_steps: [1]\n",
+                    body=TRUSTED_BODY,
+                )
+                problems = procedures.validate(path, TODAY)
+                self.assertEqual(len(problems), 1, problems)
+                self.assertIn("trusted requires a real", problems[0])
+
+    def test_revoked_trust_keeps_steps_valid(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = write_procedure(
+                Path(td),
+                risk="changes-state",
+                extra="status: promoted\ntrusted:\ntrusted_steps: [1]\n",
+                body=TRUSTED_BODY,
+            )
+            self.assertEqual(procedures.validate(path, TODAY), [])
+            path = write_procedure(
+                Path(td),
+                risk="changes-state",
+                extra="status: promoted\ntrusted:\ntrusted_steps: [2b]\n",
+                body=TRUSTED_BODY,
+            )
             self.assertTrue(procedures.validate(path, TODAY))
 
 

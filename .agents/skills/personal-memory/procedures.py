@@ -8,6 +8,9 @@ from pathlib import Path
 import hubs
 import schema
 
+NOT_UNDO = ("<", "not known", "none", "n/a", "...", "not possible", "cannot", "irreversible")
+UNDO_LINE = re.compile(r"^\s*-\s+Steps?\s+(\d+(?:\s*(?:,|and)\s*\d+)*)\s*:\s*(.*)$", re.I)
+
 
 def unsafe_path(path: Path, boundary: Path | None = None) -> bool:
     path = path.absolute()
@@ -21,24 +24,17 @@ def unsafe_path(path: Path, boundary: Path | None = None) -> bool:
         current = current.parent
 
 
-def validate(path: Path, today: date | None = None) -> list[str]:
-    today = today or date.today()
-    if unsafe_path(path) or not path.is_file():
-        return [f"{path}: expected a regular file without symlink components"]
+def real_date(value: str, today: date) -> bool:
+    try:
+        return (
+            bool(re.fullmatch(r"\d{4}-\d{2}-\d{2}", value)) and date.fromisoformat(value) <= today
+        )
+    except ValueError:
+        return False
+
+
+def parse_sections(path: Path) -> tuple[dict, dict]:
     fields = hubs.parse_frontmatter(path)
-    problems = []
-    if fields.get("type") != "procedure":
-        problems.append(f"{path}: requires type: procedure")
-    risk = fields.get("risk")
-    if risk not in ("read-only", "changes-state"):
-        problems.append(f"{path}: risk must be read-only or changes-state")
-    for key in ("approved", "verified"):
-        value = fields.get(key, "")
-        try:
-            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value) or date.fromisoformat(value) > today:
-                raise ValueError
-        except ValueError:
-            problems.append(f"{path}: {key} requires a real YYYY-MM-DD date, not in the future")
     sections = {}
     current = None
     parent = None
@@ -74,6 +70,89 @@ def validate(path: Path, today: date | None = None) -> list[str]:
                 sections.setdefault(current, [])
         elif current:
             sections[current].append(line)
+    return fields, sections
+
+
+def step_ids(sections: dict) -> set[str]:
+    found = set()
+    for line in sections.get((3, "Steps"), []):
+        m = re.match(r"^\s*(\d+)[.)]\s+\S", line)
+        if m:
+            found.add(m[1])
+    return found
+
+
+def _recovery_lines(sections: dict):
+    for line in sections.get((3, "Recovery"), []):
+        m = UNDO_LINE.match(line)
+        if m:
+            yield re.findall(r"\d+", m[1]), m[2].strip()
+
+
+def undo_steps(sections: dict) -> set[str]:
+    return {
+        step
+        for nums, undo in _recovery_lines(sections)
+        if not undo.lower().startswith(NOT_UNDO)
+        for step in nums
+    }
+
+
+def recovery_steps(sections: dict) -> set[str]:
+    return {step for nums, _ in _recovery_lines(sections) for step in nums}
+
+
+def trusted_step_ids(value: str) -> list[str] | None:
+    if not re.fullmatch(r"\[\s*\d+(?:\s*,\s*\d+)*\s*\]", value):
+        return None
+    return re.findall(r"\d+", value)
+
+
+def trust_problems(path: Path, fields: dict, sections: dict, today: date) -> list[str]:
+    problems = []
+    raw = fields.get("trusted_steps", "")
+    ids = trusted_step_ids(raw)
+    if raw and ids is None:
+        problems.append(f"{path}: trusted_steps requires [<n>, ...] with whole step numbers")
+    if not fields.get("trusted", ""):
+        return problems
+    if fields.get("status") != "promoted":
+        problems.append(f"{path}: trusted requires status: promoted")
+    if fields.get("risk") != "changes-state":
+        problems.append(f"{path}: trusted requires risk: changes-state")
+    if not real_date(fields["trusted"], today):
+        problems.append(f"{path}: trusted requires a real YYYY-MM-DD date, not in the future")
+    if not ids:
+        problems.append(f"{path}: trusted requires trusted_steps: [<n>, ...]")
+        return problems
+    numbered = step_ids(sections)
+    undo = undo_steps(sections)
+    for step in ids:
+        if step not in numbered:
+            problems.append(f"{path}: trusted step {step} is not a numbered step")
+        elif step not in undo:
+            problems.append(f"{path}: trusted step {step} has no real undo under ### Recovery")
+    return problems
+
+
+def validate(path: Path, today: date | None = None) -> list[str]:
+    today = today or date.today()
+    if unsafe_path(path) or not path.is_file():
+        return [f"{path}: expected a regular file without symlink components"]
+    fields, sections = parse_sections(path)
+    problems = []
+    if fields.get("type") != "procedure":
+        problems.append(f"{path}: requires type: procedure")
+    risk = fields.get("risk")
+    if risk not in ("read-only", "changes-state"):
+        problems.append(f"{path}: risk must be read-only or changes-state")
+    draft = fields.get("status") == "draft"
+    for key in ("approved", "verified"):
+        value = fields.get(key, "")
+        if draft and not value:
+            continue
+        if not real_date(value, today):
+            problems.append(f"{path}: {key} requires a real YYYY-MM-DD date, not in the future")
     required = [
         (2, "Active memory"),
         (3, "Prerequisites"),
@@ -84,6 +163,8 @@ def validate(path: Path, today: date | None = None) -> list[str]:
     ]
     if risk == "changes-state":
         required += [(3, "Approval"), (3, "Recovery")]
+    if draft:
+        required.append((3, "Gaps"))
     for key in required:
         if not "\n".join(sections.get(key, [])).strip():
             problems.append(f"{path}: requires nonempty {'#' * key[0]} {key[1]}")
@@ -93,6 +174,7 @@ def validate(path: Path, today: date | None = None) -> list[str]:
         problems.append(f"{path}: Active memory requires Trigger: text")
     if not re.search(r"^\s*\d+[.)]\s+\S", "\n".join(sections.get((3, "Steps"), [])), re.M):
         problems.append(f"{path}: Steps requires a numbered action")
+    problems.extend(trust_problems(path, fields, sections, today))
     return problems
 
 
