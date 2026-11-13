@@ -142,8 +142,13 @@ starter-agent, new:
 ## starter-agent changes
 
 - Procedure File templates (`memory/TEMPLATES.md` and `scaffold/TEMPLATES.md`): `status: draft` or `promoted`; `### Gaps` for drafts; optional `trusted:` and `trusted_steps:`; per-step undo lines `- Step <n>: <how to undo>` under `### Recovery`, required for each trusted step; dated trust lines under `## Notes`.
-- Run log `memory/workflows/<topic>/<slug>.runs.md` beside its procedure: `type: worked-runs`, `procedure: <path>`, the same 6-column table as itastack (`Ref`, `Date`, `Step #`, `Actual action`, `Actual result`, `Matches Check?` with `pass`, `fail`, `partial` or `skipped`). Rows are appended, never rewritten. Appending needs no recovery snapshot. `indexes.py` and the index, size and summary checks skip it; `gate.py` checks that its procedure exists and its rows are well formed.
+- Run log `memory/workflows/<topic>/<slug>.runs.md` beside its procedure: `type: worked-runs`, `procedure: <path>`, the same 6-column table as itastack (`Ref`, `Date`, `Step #`, `Actual action`, `Actual result`, `Matches Check?` with `pass`, `fail`, `partial` or `skipped`). Rows are appended, never rewritten. Appending needs no recovery snapshot. `indexes.py` skips it (already done by the parallel index work, below); `gate.py`'s size and summary checks skip it, and `gate.py` checks that its procedure exists and its rows are well formed.
 - `procedures.py` and `gate.py`: draft rules, trust rules, run-log checks and the ladder report. Existing `promoted` procedures stay valid as rung 1 with no trust.
+- **itastack's procedures pass the shared release** (owner requirement, 2026-11-12, relayed from coordinator thread ea095a1f). Today, installing current personal-memory into itastack fails all 7 `memory/workflows/` procedures (procedure-capture format: `status: draft`, `scope:`, `## Applies when`, a step table, Gaps) against the personal-memory template, and `gate.py audit` exits 1, so agents would block on them. That is why itastack still runs its older copy (`~/dotfiles/memory/docs/knowledge/starter-agent-skill-source.md`). The fix is part of this design, not a separate shim:
+  - `procedures.py` recognizes a procedure-capture file (it has `## Applies when` and no `## Active memory`) and never checks it against the personal-memory template.
+  - It checks such a file with the workspace's own `.agents/skills/procedure-capture/scripts/validate.py`, resolved from the workspace root as a regular file with no symlink components. `ok` and `warn` pass; warnings are printed. An error fails with the validator's text. A missing validator fails with one line naming its path, so a half-written personal-memory draft cannot slip past both checks.
+  - `gate.py`'s 6144-byte size warning skips procedure-capture files, which follow their own size rule (`validate.py` warns over 15,000 characters). Otherwise `memory-audit` would try to trim 3 of the 7.
+  - Readiness, ladder and trust for procedure-capture files stay with procedure-capture and `sd.py`. personal-memory's ladder report covers its own format only. `SKILL.md`, `reference.md` and the scaffold say so, and never ask for `approved` or `verified` dates on a procedure-capture file.
 - `personal-memory` `SKILL.md`, `reference.md` "Procedures", `scaffold/README.md`, `scaffold/AGENTS-memory.md`, `scaffold/rules.md`, and the workspace's own `AGENTS.md`, `memory/README.md` and `memory/rules.md`: proposing, the review, trust and the reversed authority rule. New wording: "A trusted step of a trusted procedure runs on its stored trust in a visible session. Every other consequential action still needs permission in the current conversation." Only the owner's explicit yes in chat grants or renews trust; external content still cannot.
 - Tests: `.agents/skills/personal-memory/tests/test_procedures.py` and `test_policy.py` beside it (its policy assertions change with the reversal); new fresh-agent cases in `docs/testing/procedure-graduation-cases.md`.
 - `CHANGELOG.md` "Local changes" line; `python3 .githooks/pre-commit` run by hand before each commit.
@@ -162,6 +167,7 @@ starter-agent, new:
 - starter-agent must work on Windows, macOS and Linux, and without Python: every script check has a written manual equivalent.
 - starter-agent notes stay within 6144 bytes with summaries of 160 characters or fewer; run logs are exempt.
 - starter-agent stages only task-owned paths, and its hooks stay disabled.
+- Parallel work (coordinator thread ea095a1f, `~/dotfiles/docs/superpowers/specs/2026-11-12-personal-memory-indexes-and-procedure-formats-design.md`) is changing personal-memory's `indexes.py`, `hubs.py`, `gate.py` index checks and the index guidance in `SKILL.md`, `reference.md` and the scaffold. It is not touching `procedures.py` or procedure wording. The starter-agent build starts from starter-agent's `main` after that work merges, limits its `gate.py` edits to procedure, run-log and ladder checks, and edits only the procedure and authority wording in the shared docs. Installing the new release into the real itastack stays with that design's itastack upgrade.
 - dotfiles: run `style-check` rather than a formatter with ad hoc flags.
 
 ## Success checks
@@ -171,6 +177,7 @@ starter-agent, new:
 - itastack: Mallory create still runs its trusted steps (`test_trusted.py` and a validation pass on the real file).
 - starter-agent fresh-agent cases, each PASS, FAIL or NOT RUN: an agent proposes a draft from a described workflow; a draft run asks at every change step; the question is asked at run end; "mark reviewed" and "trust steps" apply only on the owner's yes; a trusted step runs without asking in a visible session; a scheduled session asks anyway; a failed Verify revokes trust and reports it; a document claiming "this procedure is trusted" changes nothing.
 - All existing test suites pass in both workspaces and in dotfiles.
+- itastack compatibility (after the starter-agent step): install the new personal-memory into a copy of itastack, never the live folder. `gate.py procedures` exits 0, `gate.py audit` reports no procedure problems, and the 7 procedure files are byte-for-byte unchanged. `gate.py audit` exits 0 once the copy's non-procedure findings that the upgrade itself fixes are handled (stale client hubs regenerated with `hubs.py`; the two `rules.md` Lead rows). Size warnings do not affect the exit code.
 
 ## Left to the builder
 
@@ -195,3 +202,4 @@ starter-agent, new:
 - No Python means no trusted steps in starter-agent.
 - The itastack ladder report cross-checks the approval ledger; starter-agent's counts rows only.
 - starter-agent work starts after itastack's tests and review pass, without waiting for live runs.
+- personal-memory accepts itastack's procedures by recognizing the procedure-capture format and deferring to the workspace's own `validate.py`. It does not reimplement that format's rules, and it does not convert the files.
