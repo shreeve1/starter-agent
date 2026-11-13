@@ -2,6 +2,7 @@
 
 ## Local changes
 
+- Added the `memory-audit` skill (user-invoked): audits a project's agent instructions and memory for steering conflicts, stale facts and oversized files; non-deleting fixes are pre-approved, read-only live checks verify facts, and deletions, procedure-step changes and global-instruction changes wait for the owner. starter-agent is its source; dotfiles syncs it with `bin/sync-starter-skills`.
 - Removed `memory/docs/it-client-subjects.md` and its `memory/index.md` row: this workspace sets no `client_subjects`, and the `halo`/`365` examples already live in `memory/README.md`.
 - `AGENTS.md` trimmed under the 16384-byte audit warning (16672 to 16184 bytes) by removing repeats: the credential and client-information sentence (kept in Safety rules), the hook description (kept in Codex runtime), a second "no candidates" line and two Answer-style bullets already in the concise rule. Also fixed "Memory authority below" to "above".
 - Index sizing: `memory/index.md` lists only every-session material. Workflows, decisions and client hubs are listed in their generated indexes; a topic index that would exceed 10240 bytes splits into one page per topic, and `gate.py audit` warns on a duplicate row in `memory/index.md`.
