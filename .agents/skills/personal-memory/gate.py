@@ -43,23 +43,57 @@ CHANGED_LINE = re.compile(r"(?im)^\s*-?\s*changed\s+\d{4}-\d{2}-\d{2}")
 TABLE_PADDING = re.compile(r"(?:[^|\s]|\|) {2,}\|")
 SEPARATOR_ROW = re.compile(r"\|[\s:|-]+\|")
 COMPACT_FILES = ("index.md", "rules.md", "glossary.md")
-INDEX_LIMIT = 10240
+INDEX_LIMIT = indexes.INDEX_LIMIT
 ROOT_LIMITS = {"AGENTS.md": 16384, "CONTEXT.md": 24576}
 
 
+def generated_index_paths(memory_dir):
+    """Existing generated indexes whose links count as listed: topic dir, per-topic and hub indexes."""
+    data = schema.load(memory_dir)
+    paths = []
+    for d in data["topic_dirs"]:
+        paths.append(memory_dir / d / "index.md")
+        paths.extend(memory_dir / d / topic / "index.md" for topic in data["topics"])
+    paths.append(memory_dir / data["client_folder"] / hubs.HUB_DIR / hubs.INDEX)
+    return [p for p in paths if p.is_file()]
+
+
 def indexed_paths(memory_dir):
-    """Paths linked from memory/index.md plus the two sub-indexes."""
+    """Paths linked from memory/index.md plus the generated sub-indexes."""
     content = hubs.read_note(memory_dir / "index.md")
     backticks = re.findall(r"`(memory/[^`]+)`", content)
     links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)
     paths = {path for _, path in links} | set(backticks)
-    topic_dirs = schema.load(memory_dir)["topic_dirs"]
-    for d in topic_dirs:
-        idx = memory_dir / d / "index.md"
-        if idx.exists():
-            text = hubs.read_note(idx)
-            paths |= {p for _, p in re.findall(r"\[([^\]]+)\]\(([^)]+)\)", text)}
+    for idx in generated_index_paths(memory_dir):
+        paths |= {p for _, p in re.findall(r"\[([^\]]+)\]\(([^)]+)\)", hubs.read_note(idx))}
     return paths
+
+
+def duplicate_rows(memory_dir):
+    """Warnings for memory/index.md rows that a generated index already lists."""
+    content = hubs.read_note(memory_dir / "index.md")
+    rows = {p for _, p in re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)}
+    out = []
+    for idx in generated_index_paths(memory_dir):
+        owner = "memory/" + idx.relative_to(memory_dir).as_posix()
+        listed = {p for _, p in re.findall(r"\[([^\]]+)\]\(([^)]+)\)", hubs.read_note(idx))}
+        out.extend(
+            f"memory/index.md: row {row} duplicates {owner}" for row in sorted(rows & listed)
+        )
+    return out
+
+
+def missing_hub_index_row(memory_dir, indexed):
+    """Warning when hub pages exist but memory/index.md does not list the hub index."""
+    folder = schema.load(memory_dir)["client_folder"]
+    hub_dir = memory_dir / folder / hubs.HUB_DIR
+    index = "memory/" + (hub_dir / hubs.INDEX).relative_to(memory_dir).as_posix()
+    has_hubs = (
+        any(p.name != hubs.INDEX for p in hub_dir.glob("*.md")) if hub_dir.is_dir() else False
+    )
+    if has_hubs and index not in indexed:
+        return [f"memory/index.md: no row for {index}; add one (it lists every hub)"]
+    return []
 
 
 def audit_index(memory_dir, indexed):
@@ -98,12 +132,13 @@ def audit_topic_dirs(memory_dir, indexed):
         for topic in topics:
             tdir = base / topic
             if tdir.is_dir():
-                for p in sorted(tdir.glob("*.md")):
+                for p in sorted(f for f in tdir.glob("*.md") if indexes.is_entry(f)):
                     rel = "memory/" + p.relative_to(memory_dir).as_posix()
                     if rel not in indexed:
                         problems.append(f"{rel}: missing from memory/{d}/index.md")
-    changed, _ = indexes.drift(memory_dir)
+    changed, stale = indexes.drift(memory_dir)
     problems.extend(f"index drift: {p} (run indexes.py)" for p in changed)
+    problems.extend(f"index stale: {p} (run indexes.py)" for p in stale)
     return problems
 
 
@@ -420,9 +455,13 @@ def audit_clients(memory_dir, indexed):
     hub_dir = root / hubs.HUB_DIR
     if hub_dir.is_dir():
         for h in sorted(hub_dir.glob("*.md")):
+            if h.name == hubs.INDEX:
+                continue
             rel = "memory/" + h.relative_to(memory_dir).as_posix()
             if rel not in indexed:
-                problems.append(f"{rel}: hub has no memory/index.md row")
+                problems.append(
+                    f"{rel}: hub has no memory/index.md or memory/{folder}/{hubs.HUB_DIR}/{hubs.INDEX} row"
+                )
     return problems
 
 
@@ -454,6 +493,7 @@ def main():
     args = ap.parse_args()
     mem_path = Path(args.memory)
 
+    procedure_problems = []
     if args.cmd in ("procedures", "audit"):
         procedure_problems = (
             procedures.selected(mem_path, args.path)
@@ -583,6 +623,8 @@ def main():
         failed = True
     graph = links.build(mem_path)
     warnings = crowded(mem_path) + bloat(mem_path) + budgets(mem_path, args.root)
+    warnings += duplicate_rows(mem_path)
+    warnings += missing_hub_index_row(mem_path, indexed)
     warnings.extend(f"{src}: broken link {target}" for src, target in links.broken(graph, mem_path))
     for line in warnings:
         print(f"Warning: {line}")

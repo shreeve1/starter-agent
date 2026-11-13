@@ -51,6 +51,12 @@ def sweep(root, *args, commit=True):
     )
 
 
+def aged_times():
+    """(atime, mtime) for a file 200 days old, typed for os.utime."""
+    t = time.time() - 200 * 86400
+    return (t, t)
+
+
 class GitSafetyTests(unittest.TestCase):
     def test_untracked_and_modified_files_are_never_deleted(self):
         with tempfile.TemporaryDirectory() as td:
@@ -58,7 +64,7 @@ class GitSafetyTests(unittest.TestCase):
             clean = make(td, ".sessions/clean.md", 200)
             commit_all(td)
             modified.write_text("v2 edited after the commit", encoding="utf-8")
-            os.utime(modified, (time.time() - 200 * 86400,) * 2)
+            os.utime(modified, aged_times())
             untracked = make(td, ".sessions/untracked.md", 200)
             proc = sweep(td, "--apply", commit=False)
             self.assertEqual(
@@ -224,9 +230,38 @@ class SweepTests(unittest.TestCase):
             make(td, ".sessions/before.md", 200, "same text")
             commit_all(td)
             git(td, "mv", ".sessions/before.md", ".sessions/after.md")
-            os.utime(Path(td) / ".sessions/after.md", (time.time() - 200 * 86400,) * 2)
+            os.utime(Path(td) / ".sessions/after.md", aged_times())
             proc = sweep(td, "--apply", commit=False)
             self.assertTrue((Path(td) / ".sessions/after.md").exists(), proc.stdout)
+
+    def test_file_changed_after_listing_is_kept(self):
+        sys.path.insert(0, str(SWEEP.parent))
+        import sweep as sw
+
+        with tempfile.TemporaryDirectory() as td:
+            old = make(td, ".sessions/old.md", 200, "committed text")
+            commit_all(td)
+            root = Path(td).resolve()
+            ((rel, _, size, mtime),) = sw.candidates(root, time.time())
+            old.write_text("edited by another session, longer text", encoding="utf-8")
+            ok, note = sw.still_listed(root, rel, size, mtime)
+            self.assertFalse(ok, note)
+            self.assertIn("changed since it was listed", note)
+            self.assertEqual(
+                old.read_text(encoding="utf-8"), "edited by another session, longer text"
+            )
+
+    def test_file_unchanged_since_listing_is_still_listed(self):
+        sys.path.insert(0, str(SWEEP.parent))
+        import sweep as sw
+
+        with tempfile.TemporaryDirectory() as td:
+            old = make(td, ".sessions/old.md", 200, "committed text")
+            commit_all(td)
+            root = Path(td).resolve()
+            ((rel, _, size, mtime),) = sw.candidates(root, time.time())
+            self.assertEqual(sw.still_listed(root, rel, size, mtime), (True, ""))
+            self.assertTrue(old.exists())
 
     def test_a_file_edited_after_listing_survives_with_its_new_text(self):
         sys.path.insert(0, str(SWEEP.parent))
@@ -249,10 +284,10 @@ class SweepTests(unittest.TestCase):
             old = Path(td) / ".sessions" / "old.md"
             old.parent.mkdir()
             old.write_bytes(b"line one\nline two\n")
-            os.utime(old, (time.time() - 200 * 86400,) * 2)
+            os.utime(old, aged_times())
             commit_all(td)
             old.write_bytes(b"line one\r\nline two\r\n")
-            os.utime(old, (time.time() - 200 * 86400,) * 2)
+            os.utime(old, aged_times())
             proc = sweep(td, "--apply", commit=False)
             self.assertEqual(old.read_bytes(), b"line one\r\nline two\r\n", proc.stdout)
 
@@ -287,7 +322,7 @@ class SweepTests(unittest.TestCase):
             commit_all(td)
             git(td, "update-index", "--assume-unchanged", ".sessions/old.md")
             old.write_text("uncommitted edit git cannot see", encoding="utf-8")
-            os.utime(old, (time.time() - 200 * 86400,) * 2)
+            os.utime(old, aged_times())
             proc = sweep(td, "--apply", commit=False)
             self.assertEqual(
                 old.read_text(encoding="utf-8"), "uncommitted edit git cannot see", proc.stdout
