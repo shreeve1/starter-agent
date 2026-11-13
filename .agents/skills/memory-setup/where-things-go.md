@@ -9,7 +9,7 @@ Use this table when sorting old material. The owner approves what moves and what
 | A fact about the owner, their tools or machine | A doc note in `memory/docs/` |
 | Lasting facts about a person or thing they track | A Client Memory note under the subjects settled in the tracking model (`personal-memory` skill, then `hubs.py`) |
 | A process the agent runs, learned from use | `memory/workflows/<topic>/` (topics in `memory/schema.json`) |
-| Verified steps the agent follows when a trigger comes up | A procedure in `memory/workflows/<topic>/` (`personal-memory` reference.md "Procedures"), saved only with the owner's yes |
+| Verified steps the agent follows when a trigger comes up | A procedure in `memory/workflows/<topic>/` (`personal-memory` reference.md "Procedures"), an agent may propose it as a draft; it becomes verified only through a run review with the owner's yes |
 | A runbook a person follows | The project's `docs/` or `procedures/`, or wherever its runbooks already live; these documents are not executable agent leads. |
 | A settled decision | `memory/decisions/<topic>/` |
 | Email or message style | `memory/email/` or `memory/voice/` |

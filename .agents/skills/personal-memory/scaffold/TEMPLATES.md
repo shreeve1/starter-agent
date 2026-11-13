@@ -56,7 +56,7 @@ What was decided and why, in a few sentences.
 
 ## Procedure File
 
-A shared procedure at `memory/workflows/<topic>/<slug>.md` contains only owner-approved, actually verified steps. Record real approval and verification dates, never dates invented to pass lint. Keep it within 6144 bytes and its summary within 160 characters; link optional troubleshooting separately.
+A shared procedure at `memory/workflows/<topic>/<slug>.md` is either a `status: draft` proposal (agent-written; approved and verified left empty; unverified steps listed under `### Gaps`) or a promoted procedure with only owner-approved, actually verified steps. Record real approval and verification dates, never dates invented to pass lint. Keep it within 6144 bytes and its summary within 160 characters; link optional troubleshooting separately.
 
 ```markdown
 ---
@@ -99,6 +99,25 @@ Defined and tested with the owner; record the source of verification.
 
 Use exactly `risk: read-only` or `risk: changes-state`. Changes-state procedures also require nonempty `### Approval` (the current-conversation ready check before action) and `### Recovery` (rollback, or explicit irreversibility and safe escalation), within Active memory. `approved` and `verified` are valid YYYY-MM-DD dates, not future dates. All shown sections and Trigger are required; Steps needs a numbered action. Fenced examples and empty sections do not count. Extra metadata and troubleshooting sections are allowed. `gate.py procedures` and `gate.py audit` check structure only, not truth, actual approval or permission to act.
 
+
+Optional trust, set only by the owner's yes (see reference.md "Procedures"): `trusted: <date>` and `trusted_steps: [<n>, ...]`. Each trusted step needs a real undo line under `### Recovery` for changes-state procedures, written `- Step <n>: <how to undo>`. A revoked procedure keeps `trusted_steps:`, sets `trusted:` empty and records `- <date>: trust revoked: <reason>` under Notes.
+
+## Run Log
+
+Runs file beside its procedure: `memory/workflows/<topic>/<slug>.runs.md`. Append rows; never rewrite them. Results use `pass`, `fail`, `partial` or `skipped`. Add a `renumbered:` line to the frontmatter only after a renumbering Correction, naming the last Ref under the old numbering.
+
+```markdown
+---
+type: worked-runs
+procedure: memory/workflows/<topic>/<slug>.md
+---
+
+## Worked runs
+
+| Ref | Date | Step # | Actual action | Actual result | Matches Check? |
+|---|---|---|---|---|---|
+| <ref> | YYYY-MM-DD | 1 | What was done. | What was seen. | pass |
+```
 
 ## Changes-state Procedure File
 

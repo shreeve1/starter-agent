@@ -6,6 +6,8 @@
 
 On top of Release 5, in this workspace only:
 
+- Procedure ladder, run review and trusted steps: procedures can be agent-proposed drafts (`status: draft`); run logs sit beside each procedure (`<slug>.runs.md`); `gate.py ladder` reports the rung without writing; `gate.py procedures` checks draft and trust rules and defers procedure-capture files to the workspace's own validator. A trusted step of a trusted procedure runs on its stored trust in a visible session; only the owner's yes in chat grants or renews trust.
+
 - Workflow notes are loaded as reference; only `type: procedure` files can be selected as Lead and gated. The installed `memory-audit` skill has pre-approved authority for non-deleting changes, with deletions still requiring the owner's yes.
 
 - Failed archive movement now checks both record copies, preserves differing versions for reconciliation, and repairs changed links under byte-preserving recovery. Identical retained copies and the index remain marked incomplete; no automatic deletion or authority selection.
