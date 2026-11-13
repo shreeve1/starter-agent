@@ -854,5 +854,131 @@ class LadderReportTests(unittest.TestCase):
             self.assertNotIn("Traceback", missing.stderr)
 
 
+CAPTURE_BODY = "## Applies when\nA change to a file.\n\n## Steps\n1. Do it.\n"
+FAKE_OK = "import sys\nprint('ok   ' + sys.argv[1])\nprint('warn  long row')\nsys.exit(0)\n"
+FAKE_BAD = "import sys\nprint('   - bad row')\nsys.exit(1)\n"
+
+
+def capture_procedure(mem, body=CAPTURE_BODY):
+    path = mem / "workflows/projects/review.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("---\ntype: procedure\ntitle: Review\n---\n" + body, encoding="utf-8")
+    return path
+
+
+def fake_validator(root, script):
+    path = root / ".agents/skills/procedure-capture/scripts/validate.py"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(script, encoding="utf-8")
+    return path
+
+
+class CaptureFormatTests(unittest.TestCase):
+    def test_capture_format_uses_workspace_validator(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = capture_procedure(mem)
+            fake_validator(mem.parent, FAKE_OK)
+            self.assertEqual(
+                procedures.validate(path, TODAY, mem.parent),
+                [procedures.WARN_PREFIX + f"{path}: long row"],
+            )
+            result = run_script(GATE, mem, "procedures", "memory/workflows/projects/review.md")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Warning:", result.stdout)
+            self.assertIn("Success", result.stdout)
+
+    def test_capture_format_validator_errors_fail(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = capture_procedure(mem)
+            fake_validator(mem.parent, FAKE_BAD)
+            self.assertEqual(procedures.validate(path, TODAY, mem.parent), [f"{path}: bad row"])
+            result = run_script(GATE, mem, "procedures", "memory/workflows/projects/review.md")
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("bad row", result.stdout)
+
+    def test_capture_format_without_validator_fails_one_line(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = capture_procedure(mem)
+            problems = procedures.validate(path, TODAY, mem.parent)
+            self.assertEqual(len(problems), 1, problems)
+            self.assertIn(
+                "procedure-capture procedures need .agents/skills/procedure-capture/scripts/validate.py",
+                problems[0],
+            )
+
+    def test_capture_validator_symlink_refused(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = capture_procedure(mem)
+            real = mem.parent / "real_validate.py"
+            real.write_text(FAKE_OK, encoding="utf-8")
+            link = mem.parent / ".agents/skills/procedure-capture/scripts/validate.py"
+            link.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                link.symlink_to(real)
+            except OSError as exc:
+                self.skipTest(str(exc))
+            problems = procedures.validate(path, TODAY, mem.parent)
+            self.assertEqual(len(problems), 1, problems)
+            self.assertIn("need .agents/skills/procedure-capture/scripts/validate.py", problems[0])
+
+    def test_half_written_draft_still_checked(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = capture_procedure(mem, body="## Steps\n1. Do it.\n")
+            problems = procedures.validate(path, TODAY, mem.parent)
+            self.assertTrue(
+                any("requires nonempty ## Active memory" in p for p in problems), problems
+            )
+
+    def test_capture_format_exempt_from_size_warning(self):
+        import gate
+
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = capture_procedure(mem, body=CAPTURE_BODY + "x" * (gate.SIZE_LIMIT + 100) + "\n")
+            self.assertGreater(path.stat().st_size, gate.SIZE_LIMIT)
+            self.assertEqual([line for line in gate.bloat(mem) if "review.md" in line], [])
+
+    def test_capture_check_uses_argument_list(self):
+        import subprocess
+
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = capture_procedure(mem)
+            fake_validator(mem.parent, FAKE_OK)
+            done = subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
+            with patch.object(procedures.subprocess, "run", return_value=done) as run:
+                procedures.capture_check(path, mem.parent)
+            args, kwargs = run.call_args
+            self.assertIsInstance(args[0], list)
+            self.assertFalse(kwargs.get("shell", False))
+            self.assertEqual(kwargs.get("timeout"), 60)
+            self.assertEqual(
+                args[0][1], str(mem.parent / ".agents/skills/procedure-capture/scripts/validate.py")
+            )
+
+    def test_capture_format_ladder_points_to_workspace_ladder(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            capture_procedure(mem)
+            result = run_script(GATE, mem, "ladder", "memory/workflows/projects/review.md")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("sd.py procedure ladder", result.stdout)
+
+    def test_capture_files_bytes_unchanged(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = capture_procedure(mem)
+            fake_validator(mem.parent, FAKE_OK)
+            before = path.read_bytes()
+            run_script(GATE, mem, "procedures", "memory/workflows/projects/review.md")
+            run_script(GATE, mem, "audit")
+            self.assertEqual(before, path.read_bytes())
+
+
 if __name__ == "__main__":
     unittest.main()

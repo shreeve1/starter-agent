@@ -321,7 +321,7 @@ def bloat(memory_dir):
         fm = hubs.parse_frontmatter(p)
         size = p.stat().st_size
         runs_log = p.name.endswith(".runs.md")
-        if size > SIZE_LIMIT and not runs_log:
+        if size > SIZE_LIMIT and not runs_log and not procedures.is_capture_format(p):
             compactable = p.parent == memory_dir and p.name in COMPACT_FILES
             fix = (
                 "run gate.py compact"
@@ -497,12 +497,19 @@ def main():
     mem_path = Path(args.memory)
 
     procedure_problems = []
+    workspace_root = Path(args.root) if args.root else None
     if args.cmd in ("procedures", "audit"):
         procedure_problems = (
-            procedures.selected(mem_path, args.path)
+            procedures.selected(mem_path, args.path, root=workspace_root)
             if args.cmd == "procedures" and args.path
-            else procedures.audit(mem_path)
+            else procedures.audit(mem_path, root=workspace_root)
         )
+        for line in procedure_problems:
+            if line.startswith(procedures.WARN_PREFIX):
+                print(f"Warning: {line[len(procedures.WARN_PREFIX) :]}")
+        procedure_problems = [
+            p for p in procedure_problems if not p.startswith(procedures.WARN_PREFIX)
+        ]
         if procedure_problems:
             print("Procedure problems:")
             for line in procedure_problems:
@@ -516,6 +523,12 @@ def main():
             sys.exit(0)
 
     if args.cmd == "ladder":
+        target_path = procedures.target(mem_path, args.path)
+        if target_path and target_path.is_file() and procedures.is_capture_format(target_path):
+            print(
+                "procedure-capture format: use the workspace's own ladder (sd.py procedure ladder)"
+            )
+            sys.exit(0)
         try:
             report = procedures.ladder(mem_path, args.path)
         except ValueError as exc:

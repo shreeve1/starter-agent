@@ -2,6 +2,8 @@
 """Read-only structural checks for shared procedures; approval remains an owner decision."""
 
 import re
+import subprocess
+import sys
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -137,11 +139,63 @@ def trust_problems(path: Path, fields: dict, sections: dict, today: date) -> lis
     return problems
 
 
-def validate(path: Path, today: date | None = None) -> list[str]:
+WARN_PREFIX = "warn: "
+CAPTURE_NEEDS = (
+    "procedure-capture procedures need .agents/skills/procedure-capture/scripts/validate.py"
+)
+
+
+def _is_capture(fields: dict, sections: dict) -> bool:
+    return (
+        fields.get("type") == "procedure"
+        and (2, "Applies when") in sections
+        and (2, "Active memory") not in sections
+    )
+
+
+def is_capture_format(path: Path) -> bool:
+    if path.is_symlink():
+        return False
+    fields, sections = parse_sections(path)
+    return _is_capture(fields, sections)
+
+
+def capture_check(path: Path, root: Path) -> list[str]:
+    root = root.absolute()
+    validator = root / ".agents/skills/procedure-capture/scripts/validate.py"
+    if unsafe_path(validator, root) or not validator.is_file():
+        return [f"{path}: {CAPTURE_NEEDS}"]
+    try:
+        done = subprocess.run(
+            [sys.executable, str(validator), str(path)],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+    except subprocess.TimeoutExpired:
+        return [f"{path}: procedure-capture validator timed out"]
+    lines = done.stdout.splitlines()
+    if done.returncode == 0:
+        return [
+            f"{WARN_PREFIX}{path}: {line[5:].strip()}" for line in lines if line.startswith("warn ")
+        ]
+    problems = [f"{path}: {line[5:]}" for line in lines if line.startswith("   - ")]
+    if problems:
+        return problems
+    output = (done.stdout + done.stderr).splitlines()[:5]
+    return [f"{path}: {line}" for line in output] or [
+        f"{path}: procedure-capture validator exited {done.returncode}"
+    ]
+
+
+def validate(path: Path, today: date | None = None, root: Path | None = None) -> list[str]:
     today = today or date.today()
     if unsafe_path(path) or not path.is_file():
         return [f"{path}: expected a regular file without symlink components"]
     fields, sections = parse_sections(path)
+    if _is_capture(fields, sections):
+        return capture_check(path, root or path.absolute().parents[3])
     problems = []
     if fields.get("type") != "procedure":
         problems.append(f"{path}: requires type: procedure")
@@ -301,11 +355,13 @@ def target(memory_dir: Path, relative_path: str) -> Path | None:
     return memory_dir.joinpath(*parts[1:])
 
 
-def selected(memory_dir: Path, relative_path: str, today: date | None = None) -> list[str]:
+def selected(
+    memory_dir: Path, relative_path: str, today: date | None = None, root: Path | None = None
+) -> list[str]:
     path = target(memory_dir, relative_path)
     if path is None:
         return [f"{relative_path}: invalid procedure target"]
-    problems = validate(path, today)
+    problems = validate(path, today, root or memory_dir.absolute().parent)
     runs = runs_path(path)
     if runs.exists():
         problems += runs_problems(runs, memory_dir)
@@ -459,8 +515,9 @@ def render(report: Ladder) -> str:
     return "\n".join(lines)
 
 
-def audit(memory_dir: Path, today: date | None = None) -> list[str]:
+def audit(memory_dir: Path, today: date | None = None, root: Path | None = None) -> list[str]:
     problems = []
+    root = root or memory_dir.absolute().parent
     base = memory_dir / "workflows"
     if unsafe_path(base, memory_dir):
         return [f"{base}: symlink components are not allowed"]
@@ -481,5 +538,5 @@ def audit(memory_dir: Path, today: date | None = None) -> list[str]:
             elif path.name.endswith(".runs.md"):
                 problems.extend(runs_problems(path, memory_dir))
             elif hubs.parse_frontmatter(path).get("type") == "procedure":
-                problems.extend(validate(path, today))
+                problems.extend(validate(path, today, root))
     return problems
