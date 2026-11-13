@@ -83,6 +83,19 @@ def duplicate_rows(memory_dir):
     return out
 
 
+def missing_hub_index_row(memory_dir, indexed):
+    """Warning when hub pages exist but memory/index.md does not list the hub index."""
+    folder = schema.load(memory_dir)["client_folder"]
+    hub_dir = memory_dir / folder / hubs.HUB_DIR
+    index = "memory/" + (hub_dir / hubs.INDEX).relative_to(memory_dir).as_posix()
+    has_hubs = (
+        any(p.name != hubs.INDEX for p in hub_dir.glob("*.md")) if hub_dir.is_dir() else False
+    )
+    if has_hubs and index not in indexed:
+        return [f"memory/index.md: no row for {index}; add one (it lists every hub)"]
+    return []
+
+
 def audit_index(memory_dir, indexed):
     actual_files = []
     for d in PROMOTED_DIRS:
@@ -611,6 +624,7 @@ def main():
     graph = links.build(mem_path)
     warnings = crowded(mem_path) + bloat(mem_path) + budgets(mem_path, args.root)
     warnings += duplicate_rows(mem_path)
+    warnings += missing_hub_index_row(mem_path, indexed)
     warnings.extend(f"{src}: broken link {target}" for src, target in links.broken(graph, mem_path))
     for line in warnings:
         print(f"Warning: {line}")

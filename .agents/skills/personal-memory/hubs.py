@@ -107,15 +107,21 @@ def label(text):
     return re.sub(r"([\\\[\]])", r"\\\1", text)
 
 
-def procedure_clients(vault_root, folder):
-    """Client shorts whose folder holds Procedures (<folder>/<short>/procedures/**/*.md)."""
+def procedure_clients(vault_root, folder, client_dirs):
+    """Client shorts whose folder holds Procedures (<folder>/<short>/procedures/**/*.md).
+
+    Only when "procedures" is a configured client folder, and never for names starting with "_"
+    (hub and other reserved folders such as _unassigned)."""
     base = vault_root / folder
-    if not base.is_dir():
+    if "procedures" not in client_dirs or not base.is_dir():
         return []
     return sorted(
         d.name
         for d in base.iterdir()
-        if d.is_dir() and d.name != HUB_DIR and doc_links(vault_root, folder, d.name, "procedures")
+        if d.is_dir()
+        and not d.name.startswith("_")
+        and d.name != HUB_DIR
+        and doc_links(vault_root, folder, d.name, "procedures")
     )
 
 
@@ -200,7 +206,7 @@ def plan(memory_dir):
     hub_dir = memory_dir / folder / HUB_DIR
     clients = collect(memory_dir)
     # A client with Procedures but no Client Memory notes still gets a hub, so its Procedures are listed.
-    for short in procedure_clients(vault_root, folder):
+    for short in procedure_clients(vault_root, folder, data["client_dirs"]):
         clients.setdefault(short, {})
     wanted = {
         hub_dir / f"{short}.md": render(

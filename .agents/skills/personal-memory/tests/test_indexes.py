@@ -483,6 +483,28 @@ class IndexSplitTests(unittest.TestCase):
 
 
 class IndexFollowingTests(unittest.TestCase):
+    def test_missing_main_index_row_for_hub_index_warns(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem)
+            for d in ("workflows", "decisions"):
+                (mem / d).mkdir()
+            make_client_note(mem / "clients/halo/exampleco/note.md")
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertIn(
+                "Warning: memory/index.md: no row for memory/clients/_hubs/index.md", proc.stdout
+            )
+            with (mem / "index.md").open("a", encoding="utf-8") as f:
+                f.write(
+                    "| [Client Hubs Index](memory/clients/_hubs/index.md) | index | Hubs. | |\n"
+                )
+            proc = run_script(GATE, mem, "audit")
+            self.assertNotIn("no row for memory/clients/_hubs/index.md", proc.stdout)
+
     def test_split_topic_entries_count_as_indexed(self):
         with tempfile.TemporaryDirectory() as td:
             mem = Path(td)

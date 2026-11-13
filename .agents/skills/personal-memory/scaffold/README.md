@@ -64,7 +64,7 @@ Ordinary grounded facts are captured automatically under Memory authority, witho
 
 ## Client Memory
 
-For things the project keeps coming back to (hosts, services, customers). Notes live at `memory/<client_folder>/<subject>/<short>/<slug>.md`, one fact per note; `client_folder` and `client_subjects` are set in `schema.json`. `<short>` is the short name from `glossary.md`. Run `hubs.py` after writing; edit hubs by hand only without Python, following the skill's manual hub instructions, and give each an `index.md` row under `## Client Hubs`. Unused when `client_subjects` is empty.
+For things the project keeps coming back to (hosts, services, customers). Notes live at `memory/<client_folder>/<subject>/<short>/<slug>.md`, one fact per note; `client_folder` and `client_subjects` are set in `schema.json`. `<short>` is the short name from `glossary.md`. Run `hubs.py` after writing; it lists each hub in the generated `memory/<client_folder>/_hubs/index.md`, which holds the one `## Client Hubs` row in `memory/index.md`. Edit hubs by hand only without Python, following the skill's manual hub instructions, and list the hub in that index by hand. Unused when `client_subjects` is empty.
 
 ## Naming
 

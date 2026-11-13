@@ -150,6 +150,13 @@ class PolicyTests(unittest.TestCase):
         for mode in self.modes():
             self.assertNotIn("a new item that contradicts memory overwrites it in place", mode)
 
+    def test_hub_instructions_name_the_generated_hub_index(self):
+        for mode in self.modes():
+            self.assertNotIn("give each an `index.md` row under `## Client Hubs`", mode)
+            self.assertNotIn("add an `index.md` row under `## Client Hubs`", mode)
+        readme = (PM / "scaffold/README.md").read_text()
+        self.assertIn("memory/<client_folder>/_hubs/index.md", readme)
+
     def test_main_index_holds_every_session_material_only(self):
         skill = (PM / "SKILL.md").read_text()
         step5 = skill.split("5. Create or update `memory/index.md`")[1].split("\n6. ")[0]
@@ -162,8 +169,13 @@ class PolicyTests(unittest.TestCase):
         )
         self.assertIn("open the topic page it points to", rules)
         index = (PM / "scaffold/index.md").read_text()
-        for row in ("memory/workflows/index.md", "memory/decisions/index.md"):
+        for row in (
+            "memory/workflows/index.md",
+            "memory/decisions/index.md",
+            "memory/clients/_hubs/index.md",
+        ):
             self.assertIn(row, index)
+        self.assertIn("client hub index", step5)
         for mode in self.modes():
             self.assertNotIn("add an index row for every promoted note", mode)
 

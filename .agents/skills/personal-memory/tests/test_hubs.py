@@ -289,6 +289,28 @@ class HubProcedureTests(unittest.TestCase):
 
 
 class HubIndexTests(unittest.TestCase):
+    def test_procedures_trigger_only_with_configured_folder_and_skip_reserved_names(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mem = root / "memory"
+            mem.mkdir()
+            make_schema(mem)
+            data = json.loads((mem / "schema.json").read_text(encoding="utf-8"))
+            data["client_dirs"] = ["tickets"]
+            (mem / "schema.json").write_text(json.dumps(data), encoding="utf-8")
+            (root / "clients/acme/procedures/365").mkdir(parents=True)
+            (root / "clients/acme/procedures/365/x.md").write_text("# X\n", encoding="utf-8")
+            (root / "clients/_unassigned/procedures").mkdir(parents=True)
+            (root / "clients/_unassigned/procedures/y.md").write_text("# Y\n", encoding="utf-8")
+            wanted, _ = hubs.plan(mem)
+            self.assertNotIn(mem / "clients/_hubs/acme.md", wanted)
+            self.assertNotIn(mem / "clients/_hubs/_unassigned.md", wanted)
+            data["client_dirs"] = ["tickets", "procedures"]
+            (mem / "schema.json").write_text(json.dumps(data), encoding="utf-8")
+            wanted, _ = hubs.plan(mem)
+            self.assertIn(mem / "clients/_hubs/acme.md", wanted)
+            self.assertNotIn(mem / "clients/_hubs/_unassigned.md", wanted)
+
     def test_procedure_only_client_gets_hub(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
