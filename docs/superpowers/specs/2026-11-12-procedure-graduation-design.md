@@ -1,6 +1,6 @@
 # Procedure graduation: design
 
-Date: 2026-11-12. Status: draft for the owner's review. Covers two workspaces and one sync:
+Date: 2026-11-12. Status: approved by the owner 2026-11-12, including the calls listed at the end. Covers two workspaces and one sync:
 
 - itastack: `~/Documents/itastack` (no Git; Syncthing; the owner's IT client workspace).
 - starter-agent: `~/starter-agent` (Git; the template other agent workspaces are built from).
@@ -188,7 +188,7 @@ starter-agent, new:
 - Work order inside each workspace. starter-agent starts once itastack's changes pass its test suites and independent review; the live success checks wait on real tickets, so they do not block it, and anything they teach is applied to both workspaces afterwards.
 - The exact form of the renumbering marker, as long as it names the first `Ref` under the new numbering unambiguously.
 
-## Calls made in this design (not yet confirmed by the owner)
+## Calls made in this design (approved with the design, 2026-11-12)
 
 - starter-agent keeps the existing names: `promoted` is the reviewed rung, rather than renaming it `reviewed`.
 - An agent saves a starter-agent draft procedure without asking first and reports it in one line, following the owner's stated goal that AI sessions propose procedures; the draft cannot run any change without a yes.
