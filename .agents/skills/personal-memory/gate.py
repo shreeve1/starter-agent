@@ -43,7 +43,7 @@ CHANGED_LINE = re.compile(r"(?im)^\s*-?\s*changed\s+\d{4}-\d{2}-\d{2}")
 TABLE_PADDING = re.compile(r"(?:[^|\s]|\|) {2,}\|")
 SEPARATOR_ROW = re.compile(r"\|[\s:|-]+\|")
 COMPACT_FILES = ("index.md", "rules.md", "glossary.md")
-INDEX_LIMIT = 10240
+INDEX_LIMIT = indexes.INDEX_LIMIT
 ROOT_LIMITS = {"AGENTS.md": 16384, "CONTEXT.md": 24576}
 
 
@@ -102,8 +102,9 @@ def audit_topic_dirs(memory_dir, indexed):
                     rel = "memory/" + p.relative_to(memory_dir).as_posix()
                     if rel not in indexed:
                         problems.append(f"{rel}: missing from memory/{d}/index.md")
-    changed, _ = indexes.drift(memory_dir)
+    changed, stale = indexes.drift(memory_dir)
     problems.extend(f"index drift: {p} (run indexes.py)" for p in changed)
+    problems.extend(f"index stale: {p} (run indexes.py)" for p in stale)
     return problems
 
 
