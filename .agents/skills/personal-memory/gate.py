@@ -421,6 +421,8 @@ def audit_clients(memory_dir, indexed):
     hub_dir = root / hubs.HUB_DIR
     if hub_dir.is_dir():
         for h in sorted(hub_dir.glob("*.md")):
+            if h.name == hubs.INDEX:
+                continue
             rel = "memory/" + h.relative_to(memory_dir).as_posix()
             if rel not in indexed:
                 problems.append(f"{rel}: hub has no memory/index.md row")

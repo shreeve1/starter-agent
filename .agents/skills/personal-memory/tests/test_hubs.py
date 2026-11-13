@@ -1,6 +1,7 @@
 """Tests for personal-memory client hubs: procedures folder is listed like tickets/projects."""
 
 import json
+import shutil
 import sys
 import tempfile
 import unittest
@@ -279,11 +280,93 @@ class HubProcedureTests(unittest.TestCase):
             (proc / "late.md").write_text("# x\n")
             wanted, _ = hubs.plan(mem)
             self.assertEqual(
-                sorted(p.relative_to(mem).as_posix() for p in wanted), ["students/_hubs/ana.md"]
+                sorted(p.relative_to(mem).as_posix() for p in wanted),
+                ["students/_hubs/ana.md", "students/_hubs/index.md"],
             )
             text = wanted[mem / "students/_hubs/ana.md"]
             self.assertIn("- [Note](memory/students/contacts/ana/note.md)", text)
             self.assertIn("- [late](students/ana/procedures/pickup/late.md)", text)
+
+
+class HubIndexTests(unittest.TestCase):
+    def test_procedure_only_client_gets_hub(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mem = root / "memory"
+            mem.mkdir()
+            make_schema(mem)
+            proc = root / "clients/acme/procedures/365"
+            proc.mkdir(parents=True)
+            (proc / "x.md").write_text("# X\n", encoding="utf-8")
+            wanted, _ = hubs.plan(mem)
+            text = wanted[mem / "clients/_hubs/acme.md"]
+            self.assertIn("## procedures", text)
+            self.assertIn("- [x](clients/acme/procedures/365/x.md)", text)
+
+    def test_hub_index_lists_every_hub(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mem = root / "memory"
+            mem.mkdir()
+            make_schema(mem)
+            make_client_note(mem / "clients/halo/exampleco/note.md")
+            make_client_note(mem / "clients/halo/acme/note.md")
+            (mem / "glossary.md").write_text(
+                "| Short | Client ID | Identity |\n|---|---|---|\n"
+                "| acme | 1 | Acme Corp: Halo client 1 |\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            text = (mem / "clients/_hubs/index.md").read_text(encoding="utf-8")
+            self.assertIn("generated: hubs.py", text)
+            self.assertIn("- [acme](memory/clients/_hubs/acme.md) Acme Corp\n", text)
+            self.assertIn("- [exampleco](memory/clients/_hubs/exampleco.md)\n", text)
+            self.assertLess(text.index("[acme]"), text.index("[exampleco]"))
+
+    def test_hub_index_is_not_treated_as_a_hub(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mem = root / "memory"
+            mem.mkdir()
+            make_schema(mem)
+            make_client_note(mem / "clients/halo/exampleco/note.md")
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            wanted, stale = hubs.plan(mem)
+            self.assertEqual(stale, [])
+            self.assertNotIn(mem / "clients/_hubs/index.md", stale)
+            self.assertEqual(run_script(HUBS, mem, "--check").returncode, 0)
+            proc = run_script(GATE, mem, "audit")
+            self.assertNotIn("_hubs/index.md", proc.stdout)
+
+    def test_hub_index_removed_when_no_hubs_remain(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mem = root / "memory"
+            mem.mkdir()
+            make_schema(mem)
+            make_client_note(mem / "clients/halo/exampleco/note.md")
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            shutil.rmtree(mem / "clients/halo")
+            proc = run_script(HUBS, mem, "--check")
+            self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            self.assertFalse((mem / "clients/_hubs/index.md").exists())
+            self.assertFalse((mem / "clients/_hubs/exampleco.md").exists())
+
+    def test_hub_index_follows_configured_client_folder(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            mem = root / "memory"
+            mem.mkdir()
+            make_schema(mem, client_subjects=["setup"])
+            data = json.loads((mem / "schema.json").read_text(encoding="utf-8"))
+            data["client_folder"] = "projects"
+            (mem / "schema.json").write_text(json.dumps(data), encoding="utf-8")
+            make_client_note(mem / "projects/setup/robot/note.md")
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            text = (mem / "projects/_hubs/index.md").read_text(encoding="utf-8")
+            self.assertIn("- [robot](memory/projects/_hubs/robot.md)\n", text)
+            self.assertFalse((mem / "clients").exists())
 
 
 if __name__ == "__main__":
