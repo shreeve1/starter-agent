@@ -2,6 +2,8 @@
 
 ## Local changes
 
+- Index sizing: `memory/index.md` lists only every-session material. Workflows, decisions and client hubs are listed in their generated indexes; a topic index that would exceed 10240 bytes splits into one page per topic, and `gate.py audit` warns on a duplicate row in `memory/index.md`.
+
 On top of Release 5, in this workspace only:
 
 - Workflow notes are loaded as reference; only `type: procedure` files can be selected as Lead and gated. The installed `memory-audit` skill has pre-approved authority for non-deleting changes, with deletions still requiring the owner's yes.

@@ -150,6 +150,23 @@ class PolicyTests(unittest.TestCase):
         for mode in self.modes():
             self.assertNotIn("a new item that contradicts memory overwrites it in place", mode)
 
+    def test_main_index_holds_every_session_material_only(self):
+        skill = (PM / "SKILL.md").read_text()
+        step5 = skill.split("5. Create or update `memory/index.md`")[1].split("\n6. ")[0]
+        self.assertIn("Do not add a row for a workflow, a decision or a client hub", step5)
+        self.assertIn("generated index", step5)
+        self.assertNotIn("Add an `index.md` row under `## Client Hubs` for any new hub", skill)
+        rules = (PM / "scaffold/rules.md").read_text()
+        self.assertIn(
+            "read the topic page it points to", (PM / "scaffold/AGENTS-memory.md").read_text()
+        )
+        self.assertIn("open the topic page it points to", rules)
+        index = (PM / "scaffold/index.md").read_text()
+        for row in ("memory/workflows/index.md", "memory/decisions/index.md"):
+            self.assertIn(row, index)
+        for mode in self.modes():
+            self.assertNotIn("add an index row for every promoted note", mode)
+
 
 if __name__ == "__main__":
     unittest.main()
