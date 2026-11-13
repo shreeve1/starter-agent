@@ -482,5 +482,105 @@ class IndexSplitTests(unittest.TestCase):
             self.assertEqual(run_script(INDEXES, mem, "--check").returncode, 1)
 
 
+class IndexFollowingTests(unittest.TestCase):
+    def test_split_topic_entries_count_as_indexed(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem)
+            fill_topic(mem, "halo", 30)
+            fill_topic(mem, "365", 30)
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            self.assertTrue((mem / "workflows/halo/index.md").exists())
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertNotIn("missing from", proc.stdout)
+            self.assertIn("Success", proc.stdout)
+
+    def test_runs_files_are_not_promoted_notes(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem)
+            fill_topic(mem, "halo", 3)
+            write_fm(mem / "workflows/halo/halo-00.runs.md", "Run log", "Runs for halo-00.")
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertNotIn("missing from", proc.stdout)
+
+    def test_hub_listed_only_in_hub_index_passes(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem)
+            for d in ("workflows", "decisions"):
+                (mem / d).mkdir()
+            make_client_note(mem / "clients/halo/exampleco/note.md")
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            self.assertIn("exampleco", (mem / "clients/_hubs/index.md").read_text(encoding="utf-8"))
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertNotIn("hub has no", proc.stdout)
+
+    def test_hub_in_neither_index_fails(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem)
+            for d in ("workflows", "decisions"):
+                (mem / d).mkdir()
+            make_client_note(mem / "clients/halo/exampleco/note.md")
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            (mem / "clients/_hubs/index.md").unlink()
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+            self.assertIn(
+                "memory/clients/_hubs/exampleco.md: hub has no memory/index.md or memory/clients/_hubs/index.md row",
+                proc.stdout,
+            )
+
+    def test_duplicate_main_index_rows_warn_and_pass(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem)
+            fill_topic(mem, "halo", 1)
+            make_client_note(mem / "clients/halo/exampleco/note.md")
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            self.assertEqual(run_script(HUBS, mem).returncode, 0)
+            with (mem / "index.md").open("a", encoding="utf-8") as f:
+                f.write(
+                    "| [dup](memory/workflows/halo/halo-00.md) | workflow | Dup. | 2026-10-07 |\n"
+                )
+                f.write(
+                    "| [hub dup](memory/clients/_hubs/exampleco.md) | hub | Dup hub. | 2026-10-07 |\n"
+                )
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertIn(
+                "Warning: memory/index.md: row memory/workflows/halo/halo-00.md duplicates memory/workflows/index.md",
+                proc.stdout,
+            )
+            self.assertIn(
+                "Warning: memory/index.md: row memory/clients/_hubs/exampleco.md duplicates memory/clients/_hubs/index.md",
+                proc.stdout,
+            )
+
+    def test_budget_warns_for_oversized_topic_index(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = Path(td)
+            make_index(mem)
+            make_schema(mem)
+            fill_topic(mem, "halo", 60)
+            self.assertEqual(run_script(INDEXES, mem).returncode, 0)
+            proc = run_script(GATE, mem, "audit")
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            self.assertIn("Warning: memory/workflows/halo/index.md:", proc.stdout)
+            self.assertIn("over 10240", proc.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()
