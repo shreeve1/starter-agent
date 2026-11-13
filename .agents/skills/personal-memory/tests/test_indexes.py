@@ -525,7 +525,12 @@ class IndexFollowingTests(unittest.TestCase):
             make_index(mem)
             make_schema(mem)
             fill_topic(mem, "halo", 3)
-            write_fm(mem / "workflows/halo/halo-00.runs.md", "Run log", "Runs for halo-00.")
+            (mem / "workflows/halo/halo-00.runs.md").write_text(
+                "---\ntype: worked-runs\nprocedure: memory/workflows/halo/halo-00.md\n---\n"
+                "## Worked runs\n\n"
+                "| Ref | Date | Step # | Actual action | Actual result | Matches Check? |\n|---|---|---|---|---|---|\n",
+                encoding="utf-8",
+            )
             self.assertEqual(run_script(INDEXES, mem).returncode, 0)
             proc = run_script(GATE, mem, "audit")
             self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)

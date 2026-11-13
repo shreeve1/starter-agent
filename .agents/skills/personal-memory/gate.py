@@ -320,7 +320,8 @@ def bloat(memory_dir):
         text = hubs.read_note(p).split("\n---\n", 1)[-1]
         fm = hubs.parse_frontmatter(p)
         size = p.stat().st_size
-        if size > SIZE_LIMIT:
+        runs_log = p.name.endswith(".runs.md")
+        if size > SIZE_LIMIT and not runs_log:
             compactable = p.parent == memory_dir and p.name in COMPACT_FILES
             fix = (
                 "run gate.py compact"
@@ -329,7 +330,7 @@ def bloat(memory_dir):
                 else "trim or split"
             )
             out.append(f"{rel}: {size} bytes, over {SIZE_LIMIT}; {fix}")
-        if len(fm.get("summary", "")) > SUMMARY_LIMIT:
+        if len(fm.get("summary", "")) > SUMMARY_LIMIT and not runs_log:
             out.append(f"{rel}: summary {len(fm['summary'])} chars, over {SUMMARY_LIMIT}")
         if fm.get("status") == "superseded":
             out.append(

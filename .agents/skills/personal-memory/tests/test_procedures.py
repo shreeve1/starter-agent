@@ -453,5 +453,166 @@ class LadderRuleTests(unittest.TestCase):
             self.assertTrue(procedures.validate(path, TODAY))
 
 
+def write_runs(mem, rows, head="", procedure="memory/workflows/projects/review.md"):
+    path = mem / "workflows/projects/review.runs.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "| Ref | Date | Step # | Actual action | Actual result | Matches Check? |",
+        "|---|---|---|---|---|---|",
+    ]
+    lines += [
+        f"| {ref} | {date} | {step} | did it | seen | {result} |"
+        for ref, step, result, date in rows
+    ]
+    text = f"---\ntype: worked-runs\nprocedure: {procedure}\n{head}---\n## Worked runs\n\n"
+    path.write_text(text + "\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+D = "2026-10-02"
+
+
+class RunLogTests(unittest.TestCase):
+    def test_runs_file_checked_and_not_a_procedure(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            write_runs(mem, [("R-1", "1", "pass", D)])
+            self.assertEqual(procedures.audit(mem, TODAY), [])
+            write_runs(mem, [("R-1", "1", "ok", D)])
+            problems = procedures.audit(mem, TODAY)
+            self.assertEqual(len(problems), 1, problems)
+            self.assertIn("review.runs.md", problems[0])
+            self.assertNotIn("requires type: procedure", problems[0])
+
+    def test_runs_rows_before_marker_not_checked(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            path = write_runs(
+                mem,
+                [("R-1", "9", "pass", D), ("R-2", "1", "pass", "2026-11-02")],
+                head="renumbered: 2026-11-01 after R-1\n",
+            )
+            self.assertEqual(procedures.runs_problems(path, mem), [])
+            fields, rows, _ = procedures.read_runs(path)
+            self.assertEqual([r.ref for r in procedures.counted(fields, rows)], ["R-2"])
+
+    def test_runs_bad_result_and_unknown_step_fail(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            path = write_runs(mem, [("R-1", "1", "ok", D), ("R-2", "9", "pass", D)])
+            problems = procedures.runs_problems(path, mem)
+            self.assertEqual(len(problems), 2, problems)
+            self.assertTrue(any("'ok'" in p for p in problems))
+            self.assertTrue(any("step 9 is not a step" in p for p in problems))
+
+    def test_unknown_step_suggests_marker(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            path = write_runs(mem, [("R-1", "1", "pass", D), ("R-2", "9", "pass", D)])
+            problems = procedures.runs_problems(path, mem)
+            self.assertEqual(len(problems), 1, problems)
+            self.assertIn("renumbered: <date> after <last old Ref>", problems[0])
+
+    def test_orphan_runs_file_fails(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            path = write_runs(mem, [("R-1", "1", "pass", D)])
+            problems = procedures.runs_problems(path, mem)
+            self.assertEqual(len(problems), 1, problems)
+            self.assertIn("no procedure beside it", problems[0])
+
+    def test_runs_procedure_path_traversal_refused(self):
+        real = procedures.hubs.parse_frontmatter
+
+        def guard(path, *args, **kwargs):
+            if Path(path).name == "outside.md":
+                raise AssertionError("outside read")
+            return real(path, *args, **kwargs)
+
+        for target in (
+            "../../outside.md",
+            "/tmp/outside.md",
+            "memory\\workflows\\projects\\review.md",
+            "C:/outside.md",
+            "memory/workflows/projects/../../../outside.md",
+        ):
+            with self.subTest(target=target), tempfile.TemporaryDirectory() as td:
+                mem = workspace(td, [])
+                write_procedure(mem)
+                (mem.parent / "outside.md").write_text("---\ntype: procedure\n---\n")
+                path = write_runs(mem, [("R-1", "1", "pass", D)], procedure=target)
+                with patch.object(procedures.hubs, "parse_frontmatter", side_effect=guard):
+                    problems = procedures.runs_problems(path, mem)
+                self.assertTrue(any("procedure must be" in p for p in problems), problems)
+
+    def test_runs_file_bom_crlf(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            path = write_runs(mem, [("R-1", "1", "pass", D), ("R-2", "1", "fail", D)])
+            path.write_bytes(b"\xef\xbb\xbf" + path.read_bytes().replace(b"\n", b"\r\n"))
+            self.assertEqual(procedures.runs_problems(path, mem), [])
+            fields, rows, problems = procedures.read_runs(path)
+            self.assertEqual(problems, [])
+            self.assertEqual(fields["type"], "worked-runs")
+            self.assertEqual([r.result for r in rows], ["pass", "fail"])
+
+    def test_runs_file_exempt_from_size_warning(self):
+        import gate
+
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            path = write_runs(mem, [(f"R-{i}", "1", "pass", D) for i in range(200)])
+            self.assertGreater(path.stat().st_size, gate.SIZE_LIMIT)
+            self.assertEqual([line for line in gate.bloat(mem) if "runs" in line], [])
+
+    def test_audit_with_runs_file_has_no_index_problem(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            write_runs(mem, [("R-1", "1", "pass", D)])
+            run_script(INDEXES, mem)
+            result = run_script(GATE, mem, "audit")
+            self.assertNotIn("review.runs.md", result.stdout)
+            self.assertNotIn("Traceback", result.stderr)
+
+    def test_bad_or_unknown_marker_counts_no_rows(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            for head in ("renumbered: 2026-11-01 after R-9\n", "renumbered: next week after R-1\n"):
+                with self.subTest(head=head):
+                    path = write_runs(
+                        mem, [("R-1", "1", "pass", D), ("R-2", "1", "pass", D)], head=head
+                    )
+                    fields, rows, _ = procedures.read_runs(path)
+                    self.assertEqual(procedures.counted(fields, rows), [])
+                    self.assertTrue(
+                        any(
+                            "bad renumbered marker" in p
+                            for p in procedures.runs_problems(path, mem)
+                        )
+                    )
+            path = write_runs(mem, [("R-1", "1", "pass", D)])
+            fields, rows, _ = procedures.read_runs(path)
+            self.assertEqual(len(procedures.counted(fields, rows)), 1)
+
+    def test_runs_file_without_frontmatter_is_a_problem_not_a_crash(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            path = mem / "workflows/projects/review.runs.md"
+            path.write_text(
+                "## Worked runs\n\n| Ref | Date | Step # | Actual action | Actual result | Matches Check? |\n|---|---|---|---|---|---|\n| R-1 | 2026-10-02 | 1 | x | y | pass |\n"
+            )
+            problems = procedures.runs_problems(path, mem)
+            self.assertTrue(any("runs file has no frontmatter" in p for p in problems), problems)
+
+
 if __name__ == "__main__":
     unittest.main()

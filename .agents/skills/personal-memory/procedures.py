@@ -4,6 +4,7 @@
 import re
 from datetime import date
 from pathlib import Path
+from typing import NamedTuple
 
 import hubs
 import schema
@@ -178,6 +179,109 @@ def validate(path: Path, today: date | None = None) -> list[str]:
     return problems
 
 
+RESULTS = ("pass", "fail", "partial", "skipped")
+MARKER = re.compile(r"^\d{4}-\d{2}-\d{2} after \S+$")
+
+
+class RunRow(NamedTuple):
+    ref: str
+    date: str
+    step: str
+    result: str
+
+
+def runs_path(path: Path) -> Path:
+    return path.with_name(path.stem + ".runs.md")
+
+
+def read_runs(path: Path) -> tuple[dict, list[RunRow], list[str]]:
+    text = hubs.read_note(path)
+    fields = {}
+    body = text
+    end = text.find("\n---", 4)
+    if text.startswith("---\n") and end != -1:
+        fields = hubs.parse_frontmatter(path)
+        body = text[end + 4 :]
+    problems = []
+    if not fields:
+        problems.append(f"{path}: runs file has no frontmatter")
+    rows = []
+    in_section = False
+    seen = False
+    for line in body.splitlines():
+        heading = re.match(r"^##\s+(.+?)\s*$", line)
+        if heading:
+            in_section = heading[1] == "Worked runs"
+            seen = seen or in_section
+            continue
+        if not in_section or not line.strip().startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if cells[0] == "Ref" or all(re.fullmatch(r":?-+:?", c) for c in cells):
+            continue
+        if len(cells) != 6:
+            problems.append(f"{path}: row is not 6 cells: {line.strip()}")
+            continue
+        rows.append(RunRow(cells[0], cells[1], cells[2], cells[5]))
+    if not seen:
+        problems.append(f"{path}: runs file needs a ## Worked runs table")
+    return fields, rows, problems
+
+
+def _marker_ref(value: str, refs: set[str]) -> str | None:
+    if not MARKER.fullmatch(value):
+        return None
+    ref = value.split(" after ", 1)[1]
+    return ref if ref in refs else None
+
+
+def counted(fields: dict, rows: list[RunRow]) -> list[RunRow]:
+    if "renumbered" not in fields:
+        return rows
+    ref = _marker_ref(fields["renumbered"], {r.ref for r in rows})
+    if ref is None:
+        return []
+    last = max(i for i, r in enumerate(rows) if r.ref == ref)
+    return rows[last + 1 :]
+
+
+def runs_problems(runs_file: Path, memory_dir: Path) -> list[str]:
+    name = runs_file.name
+    try:
+        rel = runs_file.absolute().relative_to(memory_dir.absolute()).as_posix()
+    except ValueError:
+        return [f"{runs_file}: runs file must sit inside the memory folder"]
+    if unsafe_path(runs_file, memory_dir) or not runs_file.is_file():
+        return [f"{runs_file}: expected a regular file without symlink components"]
+    fields, rows, problems = read_runs(runs_file)
+    if not fields:
+        return problems
+    if fields.get("type") != "worked-runs":
+        problems.append(f"{runs_file}: type must be worked-runs")
+    expected = "memory/" + rel[: -len(".runs.md")] + ".md"
+    if fields.get("procedure") != expected:
+        return problems + [f"{runs_file}: procedure must be {expected}"]
+    sibling = runs_file.with_name(name[: -len(".runs.md")] + ".md")
+    if unsafe_path(sibling, memory_dir) or not sibling.is_file():
+        return problems + [f"{runs_file}: no procedure beside it at {expected}"]
+    _, sections = parse_sections(sibling)
+    numbered = step_ids(sections)
+    if "renumbered" in fields and _marker_ref(fields["renumbered"], {r.ref for r in rows}) is None:
+        marker = fields["renumbered"]
+        problems.append(f"{runs_file}: bad renumbered marker: {marker}")
+    for row in counted(fields, rows):
+        if row.result not in RESULTS:
+            problems.append(
+                f"{runs_file}: {row.ref} result {row.result!r} must be one of {', '.join(RESULTS)}"
+            )
+        if row.step not in numbered:
+            problems.append(
+                f"{runs_file}: {row.ref} step {row.step} is not a step in the procedure; "
+                "if a Correction renumbered the steps, add renumbered: <date> after <last old Ref> to the runs file"
+            )
+    return problems
+
+
 def selected(memory_dir: Path, relative_path: str, today: date | None = None) -> list[str]:
     parts = relative_path.split("/")
     topics = schema.load(memory_dir)["topics"]
@@ -194,7 +298,11 @@ def selected(memory_dir: Path, relative_path: str, today: date | None = None) ->
     ):
         return [f"{relative_path}: invalid procedure target"]
     path = memory_dir.joinpath(*parts[1:])
-    return validate(path, today)
+    problems = validate(path, today)
+    runs = runs_path(path)
+    if runs.exists():
+        problems += runs_problems(runs, memory_dir)
+    return problems
 
 
 def audit(memory_dir: Path, today: date | None = None) -> list[str]:
@@ -216,6 +324,8 @@ def audit(memory_dir: Path, today: date | None = None) -> list[str]:
         for path in sorted(folder.glob("*.md")):
             if unsafe_path(path, memory_dir):
                 problems.append(f"{path}: symlink components are not allowed")
+            elif path.name.endswith(".runs.md"):
+                problems.extend(runs_problems(path, memory_dir))
             elif hubs.parse_frontmatter(path).get("type") == "procedure":
                 problems.extend(validate(path, today))
     return problems
