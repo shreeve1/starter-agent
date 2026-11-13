@@ -614,5 +614,245 @@ class RunLogTests(unittest.TestCase):
             self.assertTrue(any("runs file has no frontmatter" in p for p in problems), problems)
 
 
+REL = "memory/workflows/projects/review.md"
+LADDER_BODY = """## Active memory
+Trigger: change a thing
+
+### Prerequisites
+Ready.
+
+### Steps
+1. Read it.
+2. Change it.
+3. Check it.
+
+### Verify
+Check the change.
+
+### Approval
+Ask first.
+
+### Recovery
+- Step 2: Put the old value back.
+
+## Related
+None.
+
+## Notes
+Owner tested it.
+"""
+
+
+def ladder_procedure(mem, status="promoted", body=LADDER_BODY, extra=""):
+    approved = verified = "2026-10-01"
+    if status == "draft":
+        body = body.replace("## Related", "### Gaps\nNone.\n\n## Related")
+        approved = verified = ""
+    line = f"status: {status}\n" if status else ""
+    return write_procedure(
+        mem,
+        risk="changes-state",
+        approved=approved,
+        verified=verified,
+        body=body,
+        extra=line + extra,
+    )
+
+
+def rows_for(ref, date, results):
+    return [(ref, step, result, date) for step, result in results]
+
+
+class LadderReportTests(unittest.TestCase):
+    def test_draft_offers_mark_reviewed(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            ladder_procedure(mem, status="draft")
+            write_runs(
+                mem, rows_for("R-1", "2026-10-02", [("1", "pass"), ("2", "pass"), ("3", "pass")])
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual((report.rung, report.rung_name), (0, "proposed"))
+            self.assertEqual(report.runs, [("R-1", True)])
+            self.assertEqual(
+                report.next_move, "next: mark it reviewed (the owner's yes in a run review)"
+            )
+
+    def test_partial_change_step_spoils_run(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            ladder_procedure(mem, status="draft")
+            write_runs(
+                mem,
+                rows_for("R-1", "2026-10-02", [("1", "pass"), ("2", "pass"), ("3", "pass")])
+                + rows_for("R-2", "2026-10-03", [("1", "pass"), ("2", "partial"), ("3", "pass")]),
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.runs, [("R-1", True), ("R-2", False)])
+            self.assertEqual(report.steps[0].state, "blocked")
+            self.assertEqual(report.steps[0].reason, "last result partial on R-2")
+            self.assertEqual(report.next_move, "next: fix what differed, then a clean run")
+
+    def test_qualifies_after_three_clean_passes(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            ladder_procedure(mem)
+            write_runs(
+                mem,
+                rows_for("R-1", "2026-10-01", [("2", "pass")])
+                + rows_for("R-2", "2026-10-02", [("2", "pass")])
+                + rows_for("R-3", "2026-10-03", [("2", "pass")]),
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual((report.rung, report.rung_name), (1, "reviewed"))
+            self.assertEqual([s.state for s in report.steps], ["qualifies"])
+            self.assertEqual(report.next_move, "next: trust steps 2 (the owner's yes)")
+
+    def test_recent_failure_blocks_qualification(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            ladder_procedure(mem)
+            results = ["pass", "pass", "fail", "pass", "pass"]
+            write_runs(
+                mem,
+                sum(
+                    (
+                        rows_for(f"R-{i}", f"2026-10-0{i}", [("2", r)])
+                        for i, r in enumerate(results, 1)
+                    ),
+                    [],
+                ),
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.steps[0].reason, "2 clean pass(es) of 3")
+
+    def test_no_known_undo_blocked(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            ladder_procedure(
+                mem, body=LADDER_BODY.replace("Put the old value back.", "not possible.")
+            )
+            write_runs(mem, rows_for("R-1", "2026-10-02", [("2", "pass")]))
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.steps[0].reason, "no known undo")
+
+    def test_trust_change_resets_count(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            body = LADDER_BODY.replace(
+                "Owner tested it.",
+                "Owner tested it.\n- 2026-10-03: trust revoked: step 2 failed readback",
+            )
+            ladder_procedure(mem, body=body)
+            write_runs(
+                mem,
+                rows_for("R-1", "2026-10-01", [("2", "pass")])
+                + rows_for("R-2", "2026-10-02", [("2", "pass")])
+                + rows_for("R-3", "2026-10-02", [("2", "pass")])
+                + rows_for("R-4", "2026-10-04", [("2", "pass")])
+                + rows_for("R-5", "2026-10-05", [("2", "pass")]),
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.steps[0].reason, "2 clean pass(es) of 3")
+            self.assertEqual(report.runs, [("R-4", True), ("R-5", True)])
+
+    def test_regrant_after_revoke_uses_latest_date(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            body = LADDER_BODY.replace(
+                "- Step 2: Put the old value back.",
+                "- Step 2: Put the old value back.\n- Step 3: Put the old value back.",
+            ).replace(
+                "Owner tested it.",
+                "Owner tested it.\n- 2026-10-03: trust revoked: step 2 failed readback",
+            )
+            ladder_procedure(mem, body=body, extra="trusted: 2026-10-06\ntrusted_steps: [2]\n")
+            write_runs(
+                mem,
+                rows_for("R-1", "2026-10-04", [("3", "pass")])
+                + rows_for("R-2", "2026-10-05", [("3", "pass")])
+                + rows_for("R-3", "2026-10-07", [("3", "pass")]),
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.rung, 3)
+            states = {s.step: (s.state, s.reason) for s in report.steps}
+            self.assertEqual(states["2"][0], "trusted")
+            self.assertEqual(states["3"], ("blocked", "1 clean pass(es) of 3"))
+
+    def test_undated_row_not_counted_after_trust_change(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            body = LADDER_BODY.replace(
+                "Owner tested it.",
+                "Owner tested it.\n- 2026-10-03: trust revoked: step 2 failed readback",
+            )
+            ladder_procedure(mem, body=body)
+            write_runs(
+                mem,
+                rows_for("R-1", "", [("2", "pass")])
+                + rows_for("R-2", "2026-10-04", [("2", "pass")])
+                + rows_for("R-3", "2026-10-05", [("2", "pass")]),
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.steps[0].reason, "2 clean pass(es) of 3")
+
+    def test_rows_before_marker_not_counted(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            ladder_procedure(mem)
+            write_runs(
+                mem,
+                rows_for("R-1", "2026-10-01", [("1", "pass"), ("2", "pass")])
+                + rows_for("R-2", "2026-11-02", [("2", "pass")])
+                + rows_for("R-3", "2026-11-03", [("2", "pass")]),
+                head="renumbered: 2026-11-01 after R-1\n",
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.runs, [("R-2", True), ("R-3", True)])
+
+    def test_bad_marker_listed_and_counts_nothing(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            ladder_procedure(mem)
+            write_runs(
+                mem,
+                rows_for("R-1", "2026-10-01", [("1", "pass"), ("2", "pass")]),
+                head="renumbered: 2026-11-01 after R-9\n",
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.skipped_rows, ["bad renumbered marker: 2026-11-01 after R-9"])
+            self.assertEqual(report.runs, [])
+
+    def test_trust_suggested_is_rung_two(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            body = LADDER_BODY.replace(
+                "Owner tested it.", "Owner tested it.\n- 2026-10-02: trust suggested"
+            )
+            ladder_procedure(mem, body=body)
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual((report.rung, report.rung_name), (2, "trust offered"))
+
+    def test_legacy_promoted_is_rung_one(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem, body=BODY)
+            self.assertEqual(procedures.ladder(mem, REL, TODAY).rung, 1)
+
+    def test_cli_writes_nothing(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            ladder_procedure(mem)
+            write_runs(mem, rows_for("R-1", "2026-10-02", [("2", "pass")]))
+            before = {p: p.read_bytes() for p in mem.rglob("*") if p.is_file()}
+            result = run_script(GATE, mem, "ladder", REL)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Counted runs: 1", result.stdout)
+            self.assertEqual(before, {p: p.read_bytes() for p in mem.rglob("*") if p.is_file()})
+            missing = run_script(GATE, mem, "ladder", "memory/workflows/projects/none.md")
+            self.assertEqual(missing.returncode, 1)
+            self.assertNotIn("Traceback", missing.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

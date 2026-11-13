@@ -2,6 +2,7 @@
 """Read-only structural checks for shared procedures; approval remains an owner decision."""
 
 import re
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import NamedTuple
@@ -282,7 +283,7 @@ def runs_problems(runs_file: Path, memory_dir: Path) -> list[str]:
     return problems
 
 
-def selected(memory_dir: Path, relative_path: str, today: date | None = None) -> list[str]:
+def target(memory_dir: Path, relative_path: str) -> Path | None:
     parts = relative_path.split("/")
     topics = schema.load(memory_dir)["topics"]
     if (
@@ -296,13 +297,166 @@ def selected(memory_dir: Path, relative_path: str, today: date | None = None) ->
         or "\\" in relative_path
         or ":" in relative_path
     ):
+        return None
+    return memory_dir.joinpath(*parts[1:])
+
+
+def selected(memory_dir: Path, relative_path: str, today: date | None = None) -> list[str]:
+    path = target(memory_dir, relative_path)
+    if path is None:
         return [f"{relative_path}: invalid procedure target"]
-    path = memory_dir.joinpath(*parts[1:])
     problems = validate(path, today)
     runs = runs_path(path)
     if runs.exists():
         problems += runs_problems(runs, memory_dir)
     return problems
+
+
+@dataclass
+class StepStatus:
+    step: str
+    state: str
+    reason: str
+    passes: list[str]
+
+
+@dataclass
+class Ladder:
+    path: str
+    rung: int
+    rung_name: str
+    runs: list[tuple[str, bool]]
+    steps: list[StepStatus]
+    skipped_rows: list[str]
+    next_move: str
+
+
+def _and_list(items: list[str]) -> str:
+    if len(items) == 1:
+        return items[0]
+    return ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def ladder(memory_dir: Path, relative_path: str, today: date | None = None) -> Ladder:
+    path = target(memory_dir, relative_path)
+    if path is None:
+        raise ValueError(f"{relative_path}: invalid procedure target")
+    problems = validate(path, today)
+    if problems:
+        raise ValueError("\n".join(problems))
+    fields, sections = parse_sections(path)
+    draft = fields.get("status") == "draft"
+    notes = "\n".join(sections.get((2, "Notes"), []))
+    numbered = step_ids(sections)
+    undo = undo_steps(sections)
+    change = sorted(recovery_steps(sections) & numbered, key=int)
+
+    run_fields, rows, skipped = {}, [], []
+    runs_file = runs_path(path)
+    if runs_file.exists():
+        run_fields, rows, skipped = read_runs(runs_file)
+        if not run_fields:
+            rows = []
+    if (
+        "renumbered" in run_fields
+        and _marker_ref(run_fields["renumbered"], {r.ref for r in rows}) is None
+    ):
+        skipped.append(f"bad renumbered marker: {run_fields['renumbered']}")
+
+    trust_date = fields.get("trusted", "")
+    revoked = re.findall(r"^- (\d{4}-\d{2}-\d{2}): trust revoked", notes, re.M)
+    last_change = max(revoked + ([trust_date] if trust_date else []), default="")
+    trusted_ids = (
+        set(trusted_step_ids(fields.get("trusted_steps", "")) or []) if trust_date else set()
+    )
+
+    grouped: dict[str, dict[str, RunRow]] = {}
+    for row in counted(run_fields, rows):
+        if last_change and not (row.date and row.date >= last_change):
+            continue
+        if row.result not in RESULTS or row.step not in numbered:
+            skipped.append(f"{row.ref} step {row.step}: {row.result}")
+            continue
+        grouped.setdefault(row.ref, {})[row.step] = row
+
+    runs = []
+    for ref, by_step in grouped.items():
+        clean = all(row.result != "fail" for row in by_step.values()) and all(
+            by_step[s].result in ("pass", "skipped") for s in change if s in by_step
+        )
+        runs.append((ref, clean))
+
+    steps = []
+    qualifying = []
+    for s in change:
+        if s in trusted_ids:
+            steps.append(StepStatus(s, "trusted", "", []))
+            continue
+        vals = [
+            by_step[s]
+            for by_step in grouped.values()
+            if s in by_step and by_step[s].result != "skipped"
+        ]
+        passes = [row.ref for row in vals if row.result == "pass"]
+        if s not in undo:
+            state, reason = "blocked", "no known undo"
+        elif vals and vals[-1].result != "pass":
+            state, reason = "blocked", f"last result {vals[-1].result} on {vals[-1].ref}"
+        else:
+            trailing = 0
+            for row in reversed(vals):
+                if row.result != "pass":
+                    break
+                trailing += 1
+            if trailing < 3:
+                state, reason = "blocked", f"{trailing} clean pass(es) of 3"
+            elif draft:
+                state, reason = "blocked", "procedure is draft"
+            else:
+                state, reason = "qualifies", ""
+        if state == "qualifies":
+            qualifying.append(s)
+        steps.append(StepStatus(s, state, reason, passes))
+
+    if trust_date:
+        rung = 3
+    elif draft:
+        rung = 0
+    elif re.search(r"^- \d{4}-\d{2}-\d{2}: trust suggested", notes, re.M):
+        rung = 2
+    else:
+        rung = 1
+    rung_name = ("proposed", "reviewed", "trust offered", "trusted")[rung]
+
+    if draft and not runs:
+        next_move = "next: a clean run under the current numbering"
+    elif draft and runs[-1][1]:
+        next_move = "next: mark it reviewed (the owner's yes in a run review)"
+    elif draft:
+        next_move = "next: fix what differed, then a clean run"
+    elif qualifying:
+        next_move = f"next: trust steps {_and_list(qualifying)} (the owner's yes)"
+    else:
+        next_move = "next: nothing to offer yet"
+    return Ladder(relative_path, rung, rung_name, runs, steps, skipped, next_move)
+
+
+def render(report: Ladder) -> str:
+    lines = [
+        f"{report.path}: rung {report.rung} {report.rung_name}",
+        f"Counted runs: {len(report.runs)}",
+    ]
+    for ref, clean in report.runs:
+        lines.append(f"  {ref}: {'clean' if clean else 'not clean'}")
+    for step in report.steps:
+        extra = f": {step.reason}" if step.reason else ""
+        lines.append(f"  step {step.step}: {step.state}{extra}")
+        if step.passes and step.state != "trusted":
+            lines.append(f"    passes: {', '.join(step.passes)}")
+    for row in report.skipped_rows:
+        lines.append(f"  skipped row: {row}")
+    lines.append(report.next_move)
+    return "\n".join(lines)
 
 
 def audit(memory_dir: Path, today: date | None = None) -> list[str]:

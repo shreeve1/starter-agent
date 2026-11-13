@@ -482,6 +482,8 @@ def main():
     pc.add_argument(
         "path", nargs="?", help="Selected workspace-relative memory/workflows/<topic>/<file>.md"
     )
+    lad = sub.add_parser("ladder", help="Show a procedure rung and next move; writes nothing")
+    lad.add_argument("path", help="Workspace-relative memory/workflows/<topic>/<file>.md")
     sub.add_parser("crowded", help="Report memory folders holding more than 15 direct .md files")
     sub.add_parser("stale", help=f"List notes not updated or verified in over {STALE_DAYS} days")
     sub.add_parser(
@@ -513,6 +515,14 @@ def main():
             print("Success: Procedures are structurally valid.")
             sys.exit(0)
 
+    if args.cmd == "ladder":
+        try:
+            report = procedures.ladder(mem_path, args.path)
+        except ValueError as exc:
+            print(exc)
+            sys.exit(1)
+        print(procedures.render(report))
+        sys.exit(0)
     if args.cmd == "crowded":
         for line in crowded(mem_path):
             print(line)
