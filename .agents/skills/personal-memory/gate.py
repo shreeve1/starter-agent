@@ -520,6 +520,18 @@ def main():
                 sys.exit(1)
         if args.cmd == "procedures":
             print("Success: Procedures are structurally valid.")
+            if args.path:
+                print(
+                    "After the run: append one row per step to "
+                    + args.path[: -len(".md")]
+                    + ".runs.md, then ask once: Review how this run went? "
+                    + '(reference.md "Procedures", Run review).'
+                )
+                if procedures.is_trusted(mem_path, args.path):
+                    print(
+                        "If a trusted step's Verify fails: stop, empty trusted:, "
+                        "add - <YYYY-MM-DD>: trust revoked: <reason> under Notes, and tell the owner."
+                    )
             sys.exit(0)
 
     if args.cmd == "ladder":

@@ -12,7 +12,21 @@ from typing import NamedTuple
 import hubs
 import schema
 
-NOT_UNDO = ("<", "not known", "none", "n/a", "...", "not possible", "cannot", "irreversible")
+NOT_UNDO = (
+    "<",
+    "not known",
+    "none",
+    "n/a",
+    "...",
+    "not possible",
+    "cannot",
+    "irreversible",
+    "ask",
+    "contact",
+    "unknown",
+    "tbd",
+    "todo",
+)
 UNDO_LINE = re.compile(r"^\s*-\s+Steps?\s+(\d+(?:\s*(?:,|and)\s*\d+)*)\s*:\s*(.*)$", re.I)
 
 
@@ -245,6 +259,16 @@ class RunRow(NamedTuple):
     result: str
 
 
+def _real_run_date(value: str) -> bool:
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        return False
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
 def runs_path(path: Path) -> Path:
     return path.with_name(path.stem + ".runs.md")
 
@@ -325,6 +349,8 @@ def runs_problems(runs_file: Path, memory_dir: Path) -> list[str]:
         marker = fields["renumbered"]
         problems.append(f"{runs_file}: bad renumbered marker: {marker}")
     for row in counted(fields, rows):
+        if row.date and not _real_run_date(row.date):
+            problems.append(f"{runs_file}: run row {row.ref} has invalid date {row.date}")
         if row.result not in RESULTS:
             problems.append(
                 f"{runs_file}: {row.ref} result {row.result!r} must be one of {', '.join(RESULTS)}"
@@ -353,6 +379,11 @@ def target(memory_dir: Path, relative_path: str) -> Path | None:
     ):
         return None
     return memory_dir.joinpath(*parts[1:])
+
+
+def is_trusted(memory_dir: Path, relative_path: str) -> bool:
+    path = target(memory_dir, relative_path)
+    return path is not None and path.is_file() and bool(hubs.parse_frontmatter(path).get("trusted"))
 
 
 def selected(
@@ -428,7 +459,7 @@ def ladder(memory_dir: Path, relative_path: str, today: date | None = None) -> L
 
     grouped: dict[str, dict[str, RunRow]] = {}
     for row in counted(run_fields, rows):
-        if last_change and not (row.date and row.date >= last_change):
+        if last_change and not (_real_run_date(row.date) and row.date >= last_change):
             continue
         if row.result not in RESULTS or row.step not in numbered:
             skipped.append(f"{row.ref} step {row.step}: {row.result}")

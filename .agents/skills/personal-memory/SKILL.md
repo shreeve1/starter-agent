@@ -39,7 +39,7 @@ Reads are routed by `memory/rules.md`; the session-start steps live in the folde
 
 ## Rules
 
-- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures memory/workflows/<topic>/<slug>.md` or compare the full Procedure File template manually without Python. Missing risk, Prerequisites, Verify or other required sections blocks execution; approved and verified are required for promoted procedures, and a draft needs its `### Gaps` section. Report gaps and wait for owner-assisted repair.
+- Stop before any procedure step: if equally specific leads remain, ask which applies, even when their steps are identical. After selecting a lead, check readiness with `gate.py procedures memory/workflows/<topic>/<slug>.md` or compare the full Procedure File template manually without Python. Missing risk, Prerequisites, Verify or other required sections blocks execution; approved and verified are required for promoted procedures, and a draft needs its `### Gaps` section. Report gaps and wait for owner-assisted repair. After the last step or a stop, append run rows and ask once: Review how this run went?; if a trusted step's Verify fails, empty trusted:, add a trust revoked line under Notes and tell the owner (reference.md "Procedures").
 
 `memory/rules.md` is one table: When | Lead | Also load | Note. A rule is a trigger plus pointers; the content it points to lives in a preference, email, workflow or other memory file.
 

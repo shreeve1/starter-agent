@@ -44,6 +44,19 @@ class PolicyTests(unittest.TestCase):
         procedures = (PM / "SKILL.md").read_text().split("## Procedures")[1].split("\n## ")[0]
         self.assertIn("reference.md", procedures)
 
+    def test_run_end_prompt_reachable_in_both_install_modes(self):
+        sentence = (
+            "After the last step or a stop, append run rows and ask once: Review how this run went?; "
+            "if a trusted step's Verify fails, empty trusted:, add a trust revoked line under Notes "
+            'and tell the owner (reference.md "Procedures").'
+        )
+        paths = [PM / "scaffold/AGENTS-memory.md", PM / "scaffold/rules.md", PM / "SKILL.md"]
+        if is_starter_workspace(ROOT) and (ROOT / "memory/rules.md").is_file():
+            paths.append(ROOT / "memory/rules.md")
+        for path in paths:
+            with self.subTest(path=path.name):
+                self.assertIn(sentence, path.read_text())
+
     def test_trust_only_in_visible_sessions(self):
         reference = (PM / "reference.md").read_text().split("## Procedures")[1].split("\n## ")[0]
         self.assertIn("visible session", reference)

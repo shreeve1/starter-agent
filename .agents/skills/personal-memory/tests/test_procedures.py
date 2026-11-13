@@ -980,5 +980,91 @@ class CaptureFormatTests(unittest.TestCase):
             self.assertEqual(before, path.read_bytes())
 
 
+AFTER_LINE = (
+    "After the run: append one row per step to memory/workflows/projects/review.runs.md, "
+    'then ask once: Review how this run went? (reference.md "Procedures", Run review).'
+)
+TRUST_LINE = (
+    "If a trusted step's Verify fails: stop, empty trusted:, add - <YYYY-MM-DD>: "
+    "trust revoked: <reason> under Notes, and tell the owner."
+)
+
+
+class ReviewFixTests(unittest.TestCase):
+    def test_procedures_prints_run_end_reminder(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            result = run_script(GATE, mem, "procedures", "memory/workflows/projects/review.md")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            lines = result.stdout.splitlines()
+            self.assertIn("Success: Procedures are structurally valid.", lines)
+            self.assertEqual(
+                lines[lines.index("Success: Procedures are structurally valid.") + 1], AFTER_LINE
+            )
+            self.assertNotIn(TRUST_LINE, lines)
+
+    def test_procedures_prints_trust_reminder_only_when_trusted(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem, risk="changes-state", body=TRUSTED_BODY, extra=TRUSTED)
+            result = run_script(GATE, mem, "procedures", "memory/workflows/projects/review.md")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            lines = result.stdout.splitlines()
+            self.assertIn(AFTER_LINE, lines)
+            self.assertIn(TRUST_LINE, lines)
+
+    def test_undo_that_asks_or_defers_is_not_a_real_undo(self):
+        for phrase in (
+            "ask the owner how to undo this",
+            "Contact the vendor",
+            "unknown",
+            "TBD",
+            "todo: write it",
+        ):
+            with self.subTest(phrase=phrase), tempfile.TemporaryDirectory() as td:
+                body = THREE_STEPS.replace("- Step 2: Reopen the item.", f"- Step 2: {phrase}")
+                path = write_procedure(
+                    Path(td),
+                    risk="changes-state",
+                    extra="status: promoted\ntrusted: 2026-10-01\ntrusted_steps: [2]\n",
+                    body=body,
+                )
+                problems = procedures.validate(path, TODAY)
+                self.assertIn(
+                    f"{path}: trusted step 2 has no real undo under ### Recovery", problems
+                )
+
+    def test_invalid_run_date_is_reported(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            write_procedure(mem)
+            path = write_runs(mem, [("R-1", "1", "pass", "zzzz")])
+            problems = procedures.runs_problems(path, mem)
+            self.assertTrue(
+                any("run row R-1 has invalid date zzzz" in p for p in problems), problems
+            )
+            path = write_runs(mem, [("R-1", "1", "pass", "")])
+            self.assertEqual(procedures.runs_problems(path, mem), [])
+
+    def test_invalid_run_date_never_counts_after_trust_change(self):
+        with tempfile.TemporaryDirectory() as td:
+            mem = workspace(td, [])
+            body = LADDER_BODY.replace(
+                "Owner tested it.",
+                "Owner tested it.\n- 2026-10-03: trust revoked: step 2 failed readback",
+            )
+            ladder_procedure(mem, body=body)
+            write_runs(
+                mem,
+                rows_for("R-1", "zzzz", [("2", "pass")])
+                + rows_for("R-2", "2026-10-04", [("2", "pass")])
+                + rows_for("R-3", "2026-10-05", [("2", "pass")]),
+            )
+            report = procedures.ladder(mem, REL, TODAY)
+            self.assertEqual(report.steps[0].reason, "2 clean pass(es) of 3")
+            self.assertEqual(report.runs, [("R-2", True), ("R-3", True)])
+
+
 if __name__ == "__main__":
     unittest.main()
