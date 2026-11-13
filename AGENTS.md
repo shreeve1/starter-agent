@@ -57,7 +57,7 @@ This is not optional and does not require the user to say "remember." Before rep
 
 Write everything that qualifies once, at the end of the task, with the `personal-memory` skill — not mid-task after each trigger. Do NOT ask first. Then end the reply with ONE line per item saved: `Memory saved: <path> - <short summary>`.
 
-Ordinary grounded facts need no capture approval or candidates queue. Authority changes follow Memory authority below; audit checks structure, not permission. Never store passwords or other credentials; omit them automatically and never ask about them. Client information (names, environments, contacts, config facts) IS allowed in memory — it is what makes memory useful.
+Ordinary grounded facts need no capture approval or candidates queue. Authority changes follow Memory authority above; audit checks structure, not permission. Credentials and client information follow the Safety rules below.
 
 Does not qualify: one-off task details (a single
 user, record, or device); the status of work still in motion (waiting on a vendor reply, a cancellation in progress, "built but not live") — save it once, when it settles; temporary instructions; anything memory already states correctly. When unsure, capture only if a future session would otherwise have to re-learn it the hard way. The full policy is under "Personal workspace memory" below.
@@ -143,7 +143,7 @@ Skip short replies, opinions and questions.
 
 ## Personal workspace memory
 
-This workspace uses `memory/` for local, personal, non-code memory. Populated memory `.md` files are tracked in git so they have version history. Hooks live in `.githooks/`: pre-commit scans for secrets, runs `gate.py audit` and the skill tests; commit-msg caps the subject at 72 characters. They are not enabled in this Codex workspace; run those checks directly before commits.
+This workspace uses `memory/` for local, personal, non-code memory. Populated memory `.md` files are tracked in git so they have version history. Hooks: see Codex runtime above.
 
 Use the `personal-memory` skill when capturing, checking, promoting, pruning, or using memory under `memory/`.
 
@@ -164,7 +164,7 @@ Use the `personal-memory` skill when capturing, checking, promoting, pruning, or
 
 ### Global capture
 
-What happens after a trigger (see "Memory capture: check at the end of every task"). Capture is autonomous; there are no candidates.
+What happens after a trigger (see "Memory capture: check at the end of every task").
 
 - **Write at end of task:** once per task, use the `personal-memory` skill to write directly to the correct topic file (workflows and decisions go in a topic folder from the fixed list), update `memory/index.md`, run `python3 .agents/skills/personal-memory/indexes.py` when a workflow/decision changed, and run `gate.py audit`. Trim any file you touched that it warns about.
 - **Commit at end of task:** per "Commit at the end of every task" above.
@@ -209,6 +209,4 @@ Create new skills or agents only when the user asks or agrees.
 
 ## Answer style
 
-- Be direct.
 - Mention exact workspace-relative artifact paths after creating or updating files.
-- For uncertain behavior, say what was verified and what remains inferred.
