@@ -2,6 +2,7 @@
 
 ## Local changes
 
+- `AGENTS.md`: "Discussion is not approval; an approved plan is" replaces the hard rule that required explicit approval phrases before any file change. Discussion still gets proposals only; an approved plan or direct request is carried through to running and usable, stopping only at a named stopping point or a hard limit (unrestorable deletion, force-push, client or connected systems, sending messages, spending money). Cleanup git can restore needs no approval (James, 2026-11-14).
 - `memory-audit`: in a git project, deletions git can restore are pre-approved fixes, applied and listed under **Review** with evidence and backlinks (James, 2026-11-13). Deletions without git, procedure-step changes and global-instruction changes still wait for the owner's yes.
 - Added the `memory-audit` skill (user-invoked): audits a project's agent instructions and memory for steering conflicts, stale facts and oversized files; non-deleting fixes are pre-approved, read-only live checks verify facts, and deletions, procedure-step changes and global-instruction changes wait for the owner. starter-agent is its source; dotfiles syncs it with `bin/sync-starter-skills`.
 - Removed `memory/docs/it-client-subjects.md` and its `memory/index.md` row: this workspace sets no `client_subjects`, and the `halo`/`365` examples already live in `memory/README.md`.
